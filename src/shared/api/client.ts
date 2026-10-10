@@ -16,4 +16,15 @@ const authMiddleware: Middleware = {
     },
 };
 
-api.use(authMiddleware);
+const unauthorizedMiddleware: Middleware = {
+  onResponse({ request, response }) {
+    const isAuthRoute = new URL(request.url).pathname.startsWith("/auth/");
+    if (response.status === 401 && !isAuthRoute) {
+      tokenStorage.clear();
+      window.location.assign("/login?expired=1");
+    }
+    return response;
+  },
+};
+
+api.use(authMiddleware, unauthorizedMiddleware);
