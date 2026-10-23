@@ -1,9 +1,0 @@
-# Qualquer caminho serve o index.html, com status 200.
-#
-# As rotas de /goals, /budget e companhia existem só no React Router, no navegador. O servidor
-# de arquivos estáticos não as conhece: sem esta regra, abrir uma delas direto na barra de
-# endereço, recarregar a página ou compartilhar o link daria 404.
-#
-# Lido pelo Cloudflare Pages e pelo Netlify. Na Vercel, o equivalente é um rewrite no
-# vercel.json; está descrito no docs/deploy.md da API.
-/*    /index.html   200
