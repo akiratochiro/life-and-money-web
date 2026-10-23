@@ -4,10 +4,8 @@ import { LoginPage } from "../features/auth/LoginPage";
 import { RegisterPage } from "../features/auth/RegisterPage";
 import { RequireAuth } from "../features/auth/RequireAuth";
 import { HomePage } from "../features/home/HomePage";
-
-function ComingSoon({ title }: { title: string }) {
-  return <h1 className="font-display text-2xl font-semibold">{title} (em breve)</h1>;
-}
+import { NewTransactionPage } from "../features/transactions/NewTransactionPage";
+import { ComingSoon } from "./ComingSoon";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -20,7 +18,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "/", element: <HomePage /> },
           { path: "/transactions", element: <ComingSoon title="Extrato" /> },
-          { path: "/transactions/new", element: <ComingSoon title="Nova transação" /> },
+          { path: "/transactions/new", element: <NewTransactionPage /> },
           { path: "/budget", element: <ComingSoon title="Orçamento" /> },
           { path: "/goals", element: <ComingSoon title="Metas" /> },
         ],

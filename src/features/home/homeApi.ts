@@ -4,7 +4,6 @@ import { unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
 
 export type BudgetLine = components["schemas"]["BudgetLine"];
-export type Goal = components["schemas"]["SavingsGoalResponse"];
 
 export function useMe() {
   return useQuery({
@@ -24,12 +23,5 @@ export function useBudgetDashboard(month: string) {
   return useQuery({
     queryKey: ["dashboard", "budget", month],
     queryFn: () => unwrap(api.GET("/dashboard/budget", { params: { query: { month } } })),
-  });
-}
-
-export function useGoals() {
-  return useQuery({
-    queryKey: ["goals"],
-    queryFn: () => unwrap(api.GET("/goals")),
   });
 }

@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import type { Goal } from "./homeApi";
+import type { Goal } from "../goals/goalsApi";
 import { Card } from "../../shared/ui/Card";
 import { Ring } from "../../shared/ui/Ring";
 import { Badge } from "../../shared/ui/Badge";

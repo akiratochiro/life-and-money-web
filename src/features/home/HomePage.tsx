@@ -1,6 +1,8 @@
-import { useBudgetDashboard, useGoals, useMe, useMonthTotals } from "./homeApi";
+import { useBudgetDashboard, useMe, useMonthTotals } from "./homeApi";
+import { useGoals } from "../goals/goalsApi";
 import { BalanceCard } from "./BalanceCard";
-import { AttentionSection, isAlert } from "./AttentionSection";
+import { AttentionSection } from "./AttentionSection";
+import { isAlert } from "./budgetAlerts";
 import { GoalsSection } from "./GoalsSection";
 import { BudgetSummary } from "./BudgetSummary";
 import { useLogout } from "../auth/useLogout";

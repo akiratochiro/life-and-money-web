@@ -1,20 +1,11 @@
-import type { BudgetLine, Goal } from "./homeApi";
+import type { BudgetLine } from "./homeApi";
+import type { Goal } from "../goals/goalsApi";
 import { Card } from "../../shared/ui/Card";
 import { Ring } from "../../shared/ui/Ring";
 import { Badge } from "../../shared/ui/Badge";
 import { Money } from "../../shared/ui/Money";
 import { lastDayOfMonth } from "../../shared/lib/dates";
-
-export function isAlert(line: BudgetLine): boolean {
-  return line.status === "EXCEEDED" || line.status === "WARNING";
-}
-
-function bySeverity(a: BudgetLine, b: BudgetLine): number {
-  if (a.status !== b.status) {
-    return a.status === "EXCEEDED" ? -1 : 1;
-  }
-  return (b.usedPercentage ?? Infinity) - (a.usedPercentage ?? Infinity);
-}
+import { bySeverity, isAlert } from "./budgetAlerts";
 
 type Props = { lines: BudgetLine[]; overdueGoals: Goal[] };
 

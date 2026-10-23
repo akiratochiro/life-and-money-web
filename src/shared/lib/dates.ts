@@ -24,3 +24,19 @@ export function longDate(today = new Date()): string {
   const text = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" }).format(today);
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+export function toIsoDate(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+export function todayIso(today = new Date()): string {
+  return toIsoDate(today);
+}
+
+export function yesterdayIso(today = new Date()): string {
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  return toIsoDate(yesterday);
+}
