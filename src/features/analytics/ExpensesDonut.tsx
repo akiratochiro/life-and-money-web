@@ -12,15 +12,15 @@ type Slice = { key: string; name: string; cents: number; percentage: number; col
 const percentFormat = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
 
 function toSlices(data: ExpensesByCategory): Slice[] {
-  const categories = data.categories ?? [];
+  const categories = data.categories;
   const fitsAll = categories.length <= MAX_SLICES;
   const shown = fitsAll ? categories : categories.slice(0, MAX_SLICES - 1);
 
   const slices: Slice[] = shown.map((category, index) => ({
     key: String(category.categoryId),
-    name: category.name ?? "",
-    cents: toCents(category.total ?? 0),
-    percentage: category.percentage ?? 0,
+    name: category.name,
+    cents: toCents(category.total),
+    percentage: category.percentage,
     color: PALETTE[index],
   }));
 
@@ -29,8 +29,8 @@ function toSlices(data: ExpensesByCategory): Slice[] {
     slices.push({
       key: "others",
       name: `Outras (${rest.length})`,
-      cents: rest.reduce((sum, category) => sum + toCents(category.total ?? 0), 0),
-      percentage: rest.reduce((sum, category) => sum + (category.percentage ?? 0), 0),
+      cents: rest.reduce((sum, category) => sum + toCents(category.total), 0),
+      percentage: rest.reduce((sum, category) => sum + category.percentage, 0),
       color: OTHERS_COLOR,
     });
   }
@@ -103,7 +103,7 @@ export function ExpensesDonut({ data }: { data: ExpensesByCategory }) {
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 px-8 text-center">
           <span className="truncate text-xs font-semibold text-text-muted">{active ? active.name : "Total gasto"}</span>
           <Money
-            value={(active ? active.cents : toCents(data.total ?? 0)) / 100}
+            value={(active ? active.cents : toCents(data.total)) / 100}
             className="font-display text-xl font-bold tracking-tight"
           />
           {active && (

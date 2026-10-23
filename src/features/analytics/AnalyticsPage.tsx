@@ -66,7 +66,7 @@ export function AnalyticsPage() {
         ) : totals.isError ? (
           <p role="alert" className="text-sm text-text-soft">Não foi possível carregar o histórico.</p>
         ) : (
-          <MonthlyBars key={range} months={totals.data.months ?? []} averages={averages} />
+          <MonthlyBars key={range} months={totals.data.months} averages={averages} />
         )}
 
         {!totals.isPending && !totals.isError && (
@@ -76,9 +76,9 @@ export function AnalyticsPage() {
                 Médias de {averages.basedOnMonths} {averages.basedOnMonths === 1 ? "mês fechado" : "meses fechados"}
               </p>
               <dl className="grid grid-cols-3 gap-2">
-                <Average label="Entrou" value={averages.income ?? 0} className="text-income" />
-                <Average label="Saiu" value={averages.expense ?? 0} className="text-expense" />
-                <Average label="Guardou" value={averages.saving ?? 0} className="text-saving-soft" />
+                <Average label="Entrou" value={averages.income} className="text-income" />
+                <Average label="Saiu" value={averages.expense} className="text-expense" />
+                <Average label="Guardou" value={averages.saving} className="text-saving-soft" />
               </dl>
             </div>
           ) : (

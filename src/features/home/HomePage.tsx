@@ -66,7 +66,7 @@ export function HomePage() {
         <Feed
           month={month}
           totals={totals.data}
-          lines={budget.data.items ?? []}
+          lines={budget.data.items}
           goals={goals.data ?? []}
         />
       )}
@@ -77,14 +77,12 @@ export function HomePage() {
 type FeedProps = {
   month: string;
   totals: NonNullable<ReturnType<typeof useMonthlyTotals>["data"]>;
-  lines: NonNullable<
-    ReturnType<typeof useBudgetDashboard>["data"]
-  >["items"] & {};
+  lines: NonNullable<ReturnType<typeof useBudgetDashboard>["data"]>["items"];
   goals: NonNullable<ReturnType<typeof useGoals>["data"]>;
 };
 
 function Feed({ month, totals, lines, goals }: FeedProps) {
-  const current = totals.months?.at(-1);
+  const current = totals.months.at(-1);
   const overdueGoals = goals.filter((goal) => goal.status === "OVERDUE");
   const otherGoals = goals.filter((goal) => goal.status !== "OVERDUE");
   const calmLines = lines.filter((line) => !isAlert(line));

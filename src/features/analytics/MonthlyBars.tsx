@@ -10,7 +10,7 @@ export function MonthlyBars({ months, averages }: Props) {
 
   const max = Math.max(
     1,
-    ...months.flatMap((month) => [month.income ?? 0, month.expense ?? 0, month.saving ?? 0]),
+    ...months.flatMap((month) => [month.income, month.expense, month.saving]),
     averages?.expense ?? 0,
   );
   const heightOf = (value: number) => `${(value / max) * 100}%`;
@@ -23,7 +23,7 @@ export function MonthlyBars({ months, averages }: Props) {
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 z-10 border-t-2 border-dashed border-expense/70"
-            style={{ bottom: heightOf(averages.expense ?? 0) }}
+            style={{ bottom: heightOf(averages.expense) }}
           />
         )}
         <div className="flex h-full items-end gap-1.5">
@@ -32,15 +32,15 @@ export function MonthlyBars({ months, averages }: Props) {
               key={month.month}
               type="button"
               aria-pressed={selected === month.month}
-              aria-label={`${monthLabel(month.month ?? "")}${month.closed ? "" : ", em andamento"}`}
-              onClick={() => setSelected(month.month ?? null)}
+              aria-label={`${monthLabel(month.month)}${month.closed ? "" : ", em andamento"}`}
+              onClick={() => setSelected(month.month)}
               className={`flex h-full flex-1 items-end justify-center gap-0.5 rounded-xl px-1 transition hover:bg-ink-800 aria-pressed:bg-ink-800 ${
                 month.closed ? "" : "opacity-55"
               }`}
             >
-              <span className="block w-full max-w-3 rounded-t-md bg-income transition-[height] duration-700" style={{ height: heightOf(month.income ?? 0) }} />
-              <span className="block w-full max-w-3 rounded-t-md bg-expense transition-[height] duration-700" style={{ height: heightOf(month.expense ?? 0) }} />
-              <span className="block w-full max-w-3 rounded-t-md bg-saving transition-[height] duration-700" style={{ height: heightOf(month.saving ?? 0) }} />
+              <span className="block w-full max-w-3 rounded-t-md bg-income transition-[height] duration-700" style={{ height: heightOf(month.income) }} />
+              <span className="block w-full max-w-3 rounded-t-md bg-expense transition-[height] duration-700" style={{ height: heightOf(month.expense) }} />
+              <span className="block w-full max-w-3 rounded-t-md bg-saving transition-[height] duration-700" style={{ height: heightOf(month.saving) }} />
             </button>
           ))}
         </div>
@@ -49,7 +49,7 @@ export function MonthlyBars({ months, averages }: Props) {
       <div className="flex gap-1.5" aria-hidden="true">
         {months.map((month) => (
           <span key={month.month} className="flex-1 text-center text-[11px] font-bold uppercase text-text-muted">
-            {shortMonthName(month.month ?? "")}
+            {shortMonthName(month.month)}
             {month.closed ? "" : "*"}
           </span>
         ))}
@@ -58,13 +58,13 @@ export function MonthlyBars({ months, averages }: Props) {
       {active && (
         <div className="rounded-2xl bg-ink-800 p-4">
           <p className="mb-3 text-sm font-bold">
-            {monthLabel(active.month ?? "")}
+            {monthLabel(active.month)}
             {!active.closed && <span className="font-semibold text-text-muted"> · em andamento</span>}
           </p>
           <dl className="grid grid-cols-3 gap-2">
-            <Value label="Entrou" value={active.income ?? 0} className="text-income" />
-            <Value label="Saiu" value={active.expense ?? 0} className="text-expense" />
-            <Value label="Guardou" value={active.saving ?? 0} className="text-saving-soft" />
+            <Value label="Entrou" value={active.income} className="text-income" />
+            <Value label="Saiu" value={active.expense} className="text-expense" />
+            <Value label="Guardou" value={active.saving} className="text-saving-soft" />
           </dl>
         </div>
       )}

@@ -1,4 +1,4 @@
-import type { BudgetLine } from "./homeApi";
+import type { BudgetLine } from "../budget/budgetApi";
 import { Money } from "../../shared/ui/Money";
 import { EmptyCard, SectionHeader } from "./GoalsSection";
 
@@ -24,7 +24,7 @@ export function BudgetSummary({ lines, hasAnyBudget }: { lines: BudgetLine[]; ha
             <div className="flex justify-between gap-3 text-sm">
               <span className="truncate font-bold">{line.categoryName}</span>
               <span className="shrink-0 text-text-soft">
-                <Money value={line.spent ?? 0} /> de <Money value={line.effectiveLimit ?? 0} />
+                <Money value={line.spent} /> de <Money value={line.effectiveLimit} />
               </span>
             </div>
             <div className="h-2.5 rounded-full bg-track">

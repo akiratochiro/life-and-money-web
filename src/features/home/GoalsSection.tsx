@@ -9,7 +9,7 @@ function byPriority(a: Goal, b: Goal): number {
   if (a.status !== b.status) {
     return a.status === "IN_PROGRESS" ? -1 : 1;
   }
-  return (a.deadline ?? "").localeCompare(b.deadline ?? "");
+  return a.deadline.localeCompare(b.deadline);
 }
 
 export function GoalsSection({ goals }: { goals: Goal[] }) {
@@ -28,8 +28,8 @@ export function GoalsSection({ goals }: { goals: Goal[] }) {
 }
 
 function GoalCard({ goal }: { goal: Goal }) {
-  const target = goal.targetAmount ?? 0;
-  const progress = target > 0 ? ((goal.saved ?? 0) / target) * 100 : 0;
+  const target = goal.targetAmount;
+  const progress = target > 0 ? (goal.saved / target) * 100 : 0;
   const reached = goal.status === "REACHED";
 
   return (
@@ -42,7 +42,7 @@ function GoalCard({ goal }: { goal: Goal }) {
             <Badge tone={reached ? "income" : "saving"}>{reached ? "Concluída" : "Em dia"}</Badge>
           </div>
           <p className="text-sm text-text-soft">
-            <Money value={goal.saved ?? 0} /> de <Money value={target} />
+            <Money value={goal.saved} /> de <Money value={target} />
           </p>
         </div>
       </div>

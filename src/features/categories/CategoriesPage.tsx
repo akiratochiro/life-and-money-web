@@ -84,7 +84,7 @@ export function CategoriesPage() {
               {archived.map((category) => (
                 <li key={category.id} className="flex items-center justify-between gap-3 px-3 py-3 text-text-muted">
                   <span className="truncate">{category.name}</span>
-                  <span className="shrink-0 text-xs font-semibold">{TYPE_LABEL[category.type ?? "EXPENSE"]}</span>
+                  <span className="shrink-0 text-xs font-semibold">{TYPE_LABEL[category.type]}</span>
                 </li>
               ))}
             </ul>
@@ -147,10 +147,10 @@ function NewCategoryForm() {
 
 function CategoryRow({ category }: { category: Category }) {
   const [mode, setMode] = useState<"view" | "rename" | "archive">("view");
-  const [name, setName] = useState(category.name ?? "");
+  const [name, setName] = useState(category.name);
   const renameCategory = useRenameCategory();
   const archiveCategory = useArchiveCategory();
-  const id = category.id!;
+  const id = category.id;
 
   if (mode === "rename") {
     const errorMessage = conflictMessage(renameCategory.error);
@@ -186,7 +186,7 @@ function CategoryRow({ category }: { category: Category }) {
             <button
               type="button"
               onClick={() => {
-                setName(category.name ?? "");
+                setName(category.name);
                 setMode("view");
               }}
               className="h-11 flex-1 rounded-full bg-surface font-bold text-text transition active:scale-95"

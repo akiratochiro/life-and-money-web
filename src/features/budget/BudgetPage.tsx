@@ -17,8 +17,8 @@ const SEVERITY: Record<BudgetStatus, number> = {
 };
 
 function bySeverityThenName(a: BudgetLine, b: BudgetLine): number {
-  const bySeverity = SEVERITY[a.status ?? "OK"] - SEVERITY[b.status ?? "OK"];
-  return bySeverity !== 0 ? bySeverity : (a.categoryName ?? "").localeCompare(b.categoryName ?? "");
+  const bySeverity = SEVERITY[a.status] - SEVERITY[b.status];
+  return bySeverity !== 0 ? bySeverity : a.categoryName.localeCompare(b.categoryName);
 }
 
 export function BudgetPage() {
@@ -33,8 +33,8 @@ export function BudgetPage() {
   const income = dashboard.data?.income ?? 0;
 
   const expenseLines = lines.filter((line) => line.categoryType === "EXPENSE");
-  const plannedCents = expenseLines.reduce((sum, line) => sum + toCents(line.effectiveLimit ?? 0), 0);
-  const spentCents = expenseLines.reduce((sum, line) => sum + toCents(line.spent ?? 0), 0);
+  const plannedCents = expenseLines.reduce((sum, line) => sum + toCents(line.effectiveLimit), 0);
+  const spentCents = expenseLines.reduce((sum, line) => sum + toCents(line.spent), 0);
   const hasPercentage = lines.some((line) => line.mode === "PERCENTAGE");
 
   const budgetedIds = new Set(lines.map((line) => line.categoryId));
@@ -110,7 +110,7 @@ export function BudgetPage() {
                       {definingId !== category.id && (
                         <button
                           type="button"
-                          onClick={() => setDefiningId(category.id ?? null)}
+                          onClick={() => setDefiningId(category.id)}
                           className="h-11 px-2 text-sm font-bold text-signal"
                         >
                           Definir limite
@@ -118,7 +118,7 @@ export function BudgetPage() {
                       )}
                     </div>
                     {definingId === category.id && (
-                      <BudgetEditor categoryId={category.id!} onDone={() => setDefiningId(null)} />
+                      <BudgetEditor categoryId={category.id} onDone={() => setDefiningId(null)} />
                     )}
                   </li>
                 ))}

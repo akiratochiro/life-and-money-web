@@ -36,7 +36,7 @@ const TYPE_STYLE: Record<
 function groupByDate(transactions: Transaction[]) {
   const groups: { date: string; items: Transaction[] }[] = [];
   for (const transaction of transactions) {
-    const date = transaction.transactionDate ?? "";
+    const date = transaction.transactionDate;
     const last = groups.at(-1);
     if (last && last.date === date) {
       last.items.push(transaction);
@@ -53,7 +53,7 @@ export function TransactionsPage() {
   const transactions = useTransactions(month);
   const categories = useCategories(true);
 
-  const categoryById = new Map<number | undefined, Category>(
+  const categoryById = new Map<number, Category>(
     (categories.data ?? []).map((category) => [category.id, category]),
   );
   const list = transactions.data ?? [];
@@ -66,7 +66,7 @@ export function TransactionsPage() {
   for (const transaction of list) {
     const type = categoryById.get(transaction.categoryId)?.type;
     if (type) {
-      totals[type] += toCents(transaction.amount ?? 0);
+      totals[type] += toCents(transaction.amount);
     }
   }
 
@@ -135,7 +135,7 @@ export function TransactionsPage() {
                     <span
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl font-display text-sm font-semibold ${style.tile}`}
                     >
-                      {category?.name?.charAt(0) ?? "?"}
+                      {category?.name.charAt(0) ?? "?"}
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col">
                       <span className="truncate font-bold">
@@ -149,7 +149,7 @@ export function TransactionsPage() {
                     </span>
                     <span className={`shrink-0 font-bold ${style.amount}`}>
                       {style.sign}
-                      <Money value={transaction.amount ?? 0} />
+                      <Money value={transaction.amount} />
                     </span>
                   </button>
                 );

@@ -8,7 +8,7 @@ import { Money } from "../../shared/ui/Money";
 import { formatDate } from "../../shared/lib/dates";
 import { toCents } from "../../shared/lib/money";
 
-type GoalStatus = NonNullable<Goal["status"]>;
+type GoalStatus = Goal["status"];
 
 const STATUS: Record<GoalStatus, { label: string; tone: BadgeTone; ring: string }> = {
   IN_PROGRESS: { label: "Em dia", tone: "saving", ring: "var(--color-saving)" },
@@ -27,17 +27,17 @@ export function GoalCard({ goal }: { goal: Goal }) {
   const updateGoal = useUpdateGoal();
   const deleteGoal = useDeleteGoal();
 
-  const id = goal.id!;
-  const status = goal.status ?? "IN_PROGRESS";
+  const id = goal.id;
+  const status = goal.status;
   const style = STATUS[status];
-  const target = goal.targetAmount ?? 0;
-  const saved = goal.saved ?? 0;
+  const target = goal.targetAmount;
+  const saved = goal.saved;
   const progress = target > 0 ? (saved / target) * 100 : 0;
 
   if (mode === "edit") {
     return (
       <GoalForm
-        initial={{ name: goal.name ?? "", cents: toCents(target), deadline: goal.deadline ?? "" }}
+        initial={{ name: goal.name, cents: toCents(target), deadline: goal.deadline }}
         submitLabel="Salvar alterações"
         pending={updateGoal.isPending}
         error={updateGoal.error}
@@ -59,12 +59,10 @@ export function GoalCard({ goal }: { goal: Goal }) {
           <p className="text-sm text-text-soft">
             <Money value={saved} /> de <Money value={target} />
           </p>
-          {goal.deadline && (
-            <p className="text-xs font-semibold text-text-muted">
-              até {formatDate(goal.deadline)}
-              {status === "IN_PROGRESS" && ` · ${monthsLeftText(goal.monthsLeft ?? 0)}`}
-            </p>
-          )}
+          <p className="text-xs font-semibold text-text-muted">
+            até {formatDate(goal.deadline)}
+            {status === "IN_PROGRESS" && ` · ${monthsLeftText(goal.monthsLeft)}`}
+          </p>
         </div>
       </div>
 
@@ -77,7 +75,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
       {status === "OVERDUE" && (
         <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3">
           <span className="text-sm text-text-soft">O prazo passou. Faltam</span>
-          <Money value={goal.remaining ?? 0} className="font-extrabold text-danger" />
+          <Money value={goal.remaining} className="font-extrabold text-danger" />
         </div>
       )}
 

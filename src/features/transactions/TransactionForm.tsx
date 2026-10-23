@@ -125,7 +125,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
                 key={category.id}
                 type="button"
                 aria-pressed={categoryId === category.id}
-                onClick={() => setCategoryId(category.id ?? null)}
+                onClick={() => setCategoryId(category.id)}
                 className={chipClass(categoryId === category.id)}
               >
                 {category.name}
@@ -178,7 +178,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
                 key={goal.id}
                 type="button"
                 aria-pressed={goalId === goal.id}
-                onClick={() => setGoalId(goal.id ?? null)}
+                onClick={() => setGoalId(goal.id)}
                 className={chipClass(goalId === goal.id)}
               >
                 {goal.name}

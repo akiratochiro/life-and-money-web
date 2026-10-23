@@ -1,4 +1,4 @@
-import type { BudgetLine } from "./homeApi";
+import type { BudgetLine } from "../budget/budgetApi";
 import type { Goal } from "../goals/goalsApi";
 import { Card } from "../../shared/ui/Card";
 import { Ring } from "../../shared/ui/Ring";
@@ -51,9 +51,9 @@ function BudgetAlertCard({ line }: { line: BudgetLine }) {
         </div>
         <p className="text-sm leading-snug text-text-soft">
           {exceeded ? (
-            <>Você passou <Money value={Math.abs(line.remaining ?? 0)} /> do planejado.</>
+            <>Você passou <Money value={Math.abs(line.remaining)} /> do planejado.</>
           ) : (
-            <>Restam <Money value={line.remaining ?? 0} /> até {lastDayOfMonth()}.</>
+            <>Restam <Money value={line.remaining} /> até {lastDayOfMonth()}.</>
           )}
         </p>
       </div>
@@ -62,8 +62,8 @@ function BudgetAlertCard({ line }: { line: BudgetLine }) {
 }
 
 function OverdueGoalCard({ goal }: { goal: Goal }) {
-  const target = goal.targetAmount ?? 0;
-  const progress = target > 0 ? ((goal.saved ?? 0) / target) * 100 : 0;
+  const target = goal.targetAmount;
+  const progress = target > 0 ? (goal.saved / target) * 100 : 0;
 
   return (
     <Card className="flex items-center gap-4 bg-surface-raised">
@@ -74,7 +74,7 @@ function OverdueGoalCard({ goal }: { goal: Goal }) {
           <Badge tone="danger">Atrasada</Badge>
         </div>
         <p className="text-sm leading-snug text-text-soft">
-          O prazo passou. Faltam <Money value={goal.remaining ?? 0} /> para a meta.
+          O prazo passou. Faltam <Money value={goal.remaining} /> para a meta.
         </p>
       </div>
     </Card>

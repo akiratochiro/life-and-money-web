@@ -4,7 +4,7 @@ import type { components } from "../../shared/api/schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export type Category = components["schemas"]["CategoryResponse"];
-export type CategoryType = NonNullable<Category["type"]>;
+export type CategoryType = Category["type"];
 export type NewCategory = components["schemas"]["CreateCategoryRequest"];
 
 export function useCategories(includeArchived = false) {

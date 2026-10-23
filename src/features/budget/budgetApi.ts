@@ -4,8 +4,8 @@ import { expectNoContent, unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
 
 export type BudgetLine = components["schemas"]["BudgetLine"];
-export type BudgetMode = NonNullable<BudgetLine["mode"]>;
-export type BudgetStatus = NonNullable<BudgetLine["status"]>;
+export type BudgetMode = BudgetLine["mode"];
+export type BudgetStatus = BudgetLine["status"];
 
 export function useBudgetDashboard(month: string) {
   return useQuery({

@@ -7,8 +7,8 @@ import { PlusIcon } from "../../shared/ui/icons";
 const ORDER = { OVERDUE: 0, IN_PROGRESS: 1, REACHED: 2 };
 
 function byPriority(a: Goal, b: Goal): number {
-  const byStatus = ORDER[a.status ?? "IN_PROGRESS"] - ORDER[b.status ?? "IN_PROGRESS"];
-  return byStatus !== 0 ? byStatus : (a.deadline ?? "").localeCompare(b.deadline ?? "");
+  const byStatus = ORDER[a.status] - ORDER[b.status];
+  return byStatus !== 0 ? byStatus : a.deadline.localeCompare(b.deadline);
 }
 
 export function GoalsPage() {

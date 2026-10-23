@@ -1,4 +1,4 @@
-import type { BudgetLine } from "./homeApi";
+import type { BudgetLine } from "../budget/budgetApi";
 
 export function isAlert(line: BudgetLine): boolean {
   return line.status === "EXCEEDED" || line.status === "WARNING";

@@ -19,8 +19,8 @@ type Props = { line: BudgetLine; editable: boolean };
 export function BudgetLineCard({ line, editable }: Props) {
   const [mode, setMode] = useState<"view" | "edit" | "remove">("view");
   const removeBudget = useRemoveBudget();
-  const status = STATUS[line.status ?? "OK"];
-  const categoryId = line.categoryId!;
+  const status = STATUS[line.status];
+  const categoryId = line.categoryId;
   const isSaving = line.categoryType === "SAVING";
 
   return (
@@ -39,10 +39,10 @@ export function BudgetLineCard({ line, editable }: Props) {
 
       <div className="flex items-baseline justify-between gap-3 text-sm">
         <span className="text-text-soft">
-          <Money value={line.spent ?? 0} /> {isSaving ? "guardados" : "gastos"} de <Money value={line.effectiveLimit ?? 0} />
+          <Money value={line.spent} /> {isSaving ? "guardados" : "gastos"} de <Money value={line.effectiveLimit} />
         </span>
         <span className="shrink-0 text-xs font-semibold text-text-muted">
-          {line.mode === "PERCENTAGE" ? `${percent.format(line.limitValue ?? 0)}% da receita` : "Valor fixo"}
+          {line.mode === "PERCENTAGE" ? `${percent.format(line.limitValue)}% da receita` : "Valor fixo"}
         </span>
       </div>
 

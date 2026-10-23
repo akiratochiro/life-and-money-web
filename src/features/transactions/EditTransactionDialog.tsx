@@ -22,7 +22,7 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
   }, []);
 
   const close = () => dialogRef.current?.close();
-  const id = transaction.id!;
+  const id = transaction.id;
 
   return (
     <dialog
@@ -48,8 +48,8 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
       <TransactionForm
         initial={{
           type: category?.type ?? "EXPENSE",
-          cents: toCents(transaction.amount ?? 0),
-          categoryId: transaction.categoryId ?? null,
+          cents: toCents(transaction.amount),
+          categoryId: transaction.categoryId,
           date: transaction.transactionDate,
           description: transaction.description ?? "",
           goalId: transaction.goalId ?? null,
