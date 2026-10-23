@@ -1,4 +1,4 @@
-import { usePrivacy } from "../privacy/PrivacyProvider";
+import { usePrivacy } from "../privacy/privacyContext";
 
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 

@@ -1,4 +1,4 @@
-import { usePrivacy } from "../../shared/privacy/PrivacyProvider";
+import { usePrivacy } from "../../shared/privacy/privacyContext";
 import { Money } from "../../shared/ui/Money";
 import { EyeIcon, EyeOffIcon } from "../../shared/ui/icons";
 import { monthName } from "../../shared/lib/dates";
