@@ -1,4 +1,5 @@
-import { useMe, useMonthTotals } from "./homeApi";
+import { useMe } from "./homeApi";
+import { useMonthlyTotals } from "../analytics/analyticsApi";
 import { useGoals } from "../goals/goalsApi";
 import { BalanceCard } from "./BalanceCard";
 import { AttentionSection } from "./AttentionSection";
@@ -8,11 +9,12 @@ import { BudgetSummary } from "./BudgetSummary";
 import { useLogout } from "../auth/useLogout";
 import { currentMonth, greeting, longDate } from "../../shared/lib/dates";
 import { useBudgetDashboard } from "../budget/budgetApi";
+import { Link } from "react-router";
 
 export function HomePage() {
   const month = currentMonth();
   const me = useMe();
-  const totals = useMonthTotals();
+  const totals = useMonthlyTotals(1);
   const budget = useBudgetDashboard(month);
   const goals = useGoals();
   const logout = useLogout();
@@ -29,7 +31,11 @@ export function HomePage() {
             {firstName ? `, ${firstName}` : ""}
           </h1>
         </div>
-        <button type="button" onClick={logout} className="h-11 rounded-full px-4 text-sm font-bold text-text-muted transition hover:text-text active:scale-95">
+        <button
+          type="button"
+          onClick={logout}
+          className="h-11 rounded-full px-4 text-sm font-bold text-text-muted transition hover:text-text active:scale-95"
+        >
           Sair
         </button>
       </header>
@@ -37,8 +43,13 @@ export function HomePage() {
       {totals.isPending || budget.isPending || goals.isPending ? (
         <HomeSkeleton />
       ) : totals.isError || budget.isError || goals.isError ? (
-        <div role="alert" className="flex flex-col items-start gap-3 rounded-card bg-surface p-5">
-          <p className="text-sm text-text-soft">Não foi possível carregar seus dados agora.</p>
+        <div
+          role="alert"
+          className="flex flex-col items-start gap-3 rounded-card bg-surface p-5"
+        >
+          <p className="text-sm text-text-soft">
+            Não foi possível carregar seus dados agora.
+          </p>
           <button
             type="button"
             onClick={() => {
@@ -52,7 +63,12 @@ export function HomePage() {
           </button>
         </div>
       ) : (
-        <Feed month={month} totals={totals.data} lines={budget.data.items ?? []} goals={goals.data ?? []} />
+        <Feed
+          month={month}
+          totals={totals.data}
+          lines={budget.data.items ?? []}
+          goals={goals.data ?? []}
+        />
       )}
     </div>
   );
@@ -60,8 +76,10 @@ export function HomePage() {
 
 type FeedProps = {
   month: string;
-  totals: NonNullable<ReturnType<typeof useMonthTotals>["data"]>;
-  lines: NonNullable<ReturnType<typeof useBudgetDashboard>["data"]>["items"] & {};
+  totals: NonNullable<ReturnType<typeof useMonthlyTotals>["data"]>;
+  lines: NonNullable<
+    ReturnType<typeof useBudgetDashboard>["data"]
+  >["items"] & {};
   goals: NonNullable<ReturnType<typeof useGoals>["data"]>;
 };
 
@@ -79,6 +97,12 @@ function Feed({ month, totals, lines, goals }: FeedProps) {
         expense={current?.expense ?? 0}
         saving={current?.saving ?? 0}
       />
+      <Link
+        to="/analytics"
+        className="-mt-3 flex h-11 items-center justify-center rounded-full text-sm font-bold text-signal"
+      >
+        Ver para onde foi o dinheiro
+      </Link>
       <AttentionSection lines={lines} overdueGoals={overdueGoals} />
       <GoalsSection goals={otherGoals} />
       <BudgetSummary lines={calmLines} hasAnyBudget={lines.length > 0} />
@@ -88,7 +112,11 @@ function Feed({ month, totals, lines, goals }: FeedProps) {
 
 function HomeSkeleton() {
   return (
-    <div className="flex flex-col gap-4" aria-busy="true" aria-label="Carregando">
+    <div
+      className="flex flex-col gap-4"
+      aria-busy="true"
+      aria-label="Carregando"
+    >
       <div className="h-64 animate-pulse rounded-hero bg-surface" />
       <div className="h-28 animate-pulse rounded-card bg-surface" />
       <div className="h-28 animate-pulse rounded-card bg-surface" />

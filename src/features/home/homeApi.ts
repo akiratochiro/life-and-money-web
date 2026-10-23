@@ -9,10 +9,3 @@ export function useMe() {
   });
 }
 
-export function useMonthTotals() {
-  return useQuery({
-    queryKey: ["dashboard", "monthly-totals", 1],
-    queryFn: () => unwrap(api.GET("/dashboard/monthly-totals", { params: { query: { months: 1 } } })),
-  });
-}
-

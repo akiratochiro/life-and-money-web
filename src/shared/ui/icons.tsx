@@ -55,3 +55,12 @@ export const TagIcon = (p: IconProps) => (
     <circle cx="7.5" cy="7.5" r="1.5" />
   </svg>
 );
+
+export const ChartIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="M4 20V11" />
+    <path d="M10 20V5" />
+    <path d="M16 20v-6" />
+    <path d="M21 20H3" />
+  </svg>
+);

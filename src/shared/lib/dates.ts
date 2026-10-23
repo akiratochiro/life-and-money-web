@@ -73,3 +73,10 @@ export function formatDate(isoDate: string): string {
     new Date(year, month - 1, day),
   );
 }
+
+export function shortMonthName(month: string): string {
+  const [year, monthNumber] = month.split("-").map(Number);
+  return new Intl.DateTimeFormat("pt-BR", { month: "short" })
+    .format(new Date(year, monthNumber - 1, 1))
+    .replace(".", "");
+}
