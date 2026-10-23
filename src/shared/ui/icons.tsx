@@ -49,3 +49,9 @@ export const ChevronRightIcon = (p: IconProps) => (
 export const CloseIcon = (p: IconProps) => (
   <svg {...base} {...p}><path d="M6 6l12 12" /><path d="M18 6L6 18" /></svg>
 );
+export const TagIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />
+    <circle cx="7.5" cy="7.5" r="1.5" />
+  </svg>
+);

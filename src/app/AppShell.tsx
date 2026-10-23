@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router";
-import { GaugeIcon, HomeIcon, ListIcon, PlusIcon, TargetIcon } from "../shared/ui/icons";
+import { GaugeIcon, HomeIcon, ListIcon, PlusIcon, TagIcon, TargetIcon } from "../shared/ui/icons";
 
 const items = [
   { to: "/", label: "Início", icon: HomeIcon },
@@ -8,8 +8,14 @@ const items = [
   { to: "/goals", label: "Metas", icon: TargetIcon },
 ];
 
+const desktopOnlyItems = [{ to: "/categories", label: "Categorias", icon: TagIcon }];
+
 function navClass({ isActive }: { isActive: boolean }) {
   return isActive ? "text-signal" : "text-text-muted hover:text-text";
+}
+
+function sideItemClass(state: { isActive: boolean }) {
+  return `flex h-12 items-center gap-3 rounded-2xl px-3 font-bold transition ${navClass(state)}`;
 }
 
 export function AppShell() {
@@ -20,15 +26,8 @@ export function AppShell() {
           Life and Money
         </p>
         <nav aria-label="Navegação principal" className="flex flex-col gap-1">
-          {items.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === "/"}
-              className={(state) =>
-                `flex h-12 items-center gap-3 rounded-2xl px-3 font-bold transition ${navClass(state)}`
-              }
-            >
+          {[...items, ...desktopOnlyItems].map(({ to, label, icon: Icon }) => (
+            <NavLink key={to} to={to} end={to === "/"} className={sideItemClass}>
               <Icon />
               {label}
             </NavLink>
@@ -54,7 +53,12 @@ export function AppShell() {
         className="fixed inset-x-0 bottom-0 flex h-24 items-center justify-between border-t border-line bg-ink-900/95 px-3 pb-6 pt-2 backdrop-blur lg:hidden"
       >
         {items.slice(0, 2).map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} end={to === "/"} className={(state) => `flex w-16 flex-col items-center gap-1 text-[11px] font-bold ${navClass(state)}`}>
+          <NavLink
+            key={to}
+            to={to}
+            end={to === "/"}
+            className={(state) => `flex w-16 flex-col items-center gap-1 text-[11px] font-bold ${navClass(state)}`}
+          >
             <Icon />
             {label}
           </NavLink>
@@ -67,7 +71,11 @@ export function AppShell() {
           <PlusIcon width={26} height={26} />
         </NavLink>
         {items.slice(2).map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} className={(state) => `flex w-16 flex-col items-center gap-1 text-[11px] font-bold ${navClass(state)}`}>
+          <NavLink
+            key={to}
+            to={to}
+            className={(state) => `flex w-16 flex-col items-center gap-1 text-[11px] font-bold ${navClass(state)}`}
+          >
             <Icon />
             {label}
           </NavLink>

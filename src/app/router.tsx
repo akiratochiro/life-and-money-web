@@ -7,6 +7,7 @@ import { HomePage } from "../features/home/HomePage";
 import { NewTransactionPage } from "../features/transactions/NewTransactionPage";
 import { ComingSoon } from "./ComingSoon";
 import { TransactionsPage } from "../features/transactions/TransactionsPage";
+import { CategoriesPage } from "../features/categories/CategoriesPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
         element: <AppShell />,
         children: [
           { path: "/", element: <HomePage /> },
+          { path: "/categories", element: <CategoriesPage /> },
           { path: "/transactions", element: <TransactionsPage /> },
           { path: "/transactions/new", element: <NewTransactionPage /> },
           { path: "/budget", element: <ComingSoon title="Orçamento" /> },
