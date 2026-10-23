@@ -5,10 +5,10 @@ import { RegisterPage } from "../features/auth/RegisterPage";
 import { RequireAuth } from "../features/auth/RequireAuth";
 import { HomePage } from "../features/home/HomePage";
 import { NewTransactionPage } from "../features/transactions/NewTransactionPage";
-import { ComingSoon } from "./ComingSoon";
 import { TransactionsPage } from "../features/transactions/TransactionsPage";
 import { CategoriesPage } from "../features/categories/CategoriesPage";
 import { BudgetPage } from "../features/budget/BudgetPage";
+import { GoalsPage } from "../features/goals/GoalsPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
           { path: "/transactions", element: <TransactionsPage /> },
           { path: "/transactions/new", element: <NewTransactionPage /> },
           { path: "/budget", element: <BudgetPage /> },
-          { path: "/goals", element: <ComingSoon title="Metas" /> },
+          { path: "/goals", element: <GoalsPage /> },
         ],
       },
     ],

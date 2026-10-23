@@ -62,3 +62,14 @@ export function dayLabel(isoDate: string, today = new Date()): string {
     new Date(year, month - 1, day),
   );
 }
+
+export function firstDayOfNextMonth(today = new Date()): string {
+  return toIsoDate(new Date(today.getFullYear(), today.getMonth() + 1, 1));
+}
+
+export function formatDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  return new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "short", year: "numeric" }).format(
+    new Date(year, month - 1, day),
+  );
+}
