@@ -1,15 +1,12 @@
 import { api } from "../../shared/api/client";
 import { unwrap } from "../../shared/api/problem";
-import { tokenStorage } from "../../shared/auth/tokenStorage";
+import { startSession } from "../../shared/auth/session";
 
 export type Credentials = { email: string; password: string };
 
 export async function login(credentials: Credentials): Promise<void> {
-  const data = await unwrap(api.POST("/auth/login", { body: credentials }));
-  if (!data.accessToken) {
-    throw new Error("A resposta do login veio sem token.");
-  }
-  tokenStorage.set(data.accessToken);
+  // A resposta traz o access token; o refresh token vem no cookie, que o navegador guarda sozinho.
+  startSession(await unwrap(api.POST("/auth/login", { body: credentials })));
 }
 
 export type Registration = Credentials & { name: string };

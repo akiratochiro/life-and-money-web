@@ -125,7 +125,51 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Cadastra um usuário
+         * @description Não abre sessão: depois do cadastro, chame POST /auth/login.
+         */
         post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Renova o access token
+         * @description Lê o refresh token do cookie, rotaciona a sessão e devolve um access token novo. Exige o header X-Refresh-Request.
+         */
+        post: operations["refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Encerra a sessão
+         * @description Revoga o refresh token e apaga o cookie. Sem sessão ativa, não faz nada.
+         */
+        post: operations["logout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -141,6 +185,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Abre uma sessão
+         * @description Devolve o access token no corpo e o refresh token num cookie HttpOnly.
+         */
         post: operations["login"];
         delete?: never;
         options?: never;
@@ -357,11 +405,6 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
-        LoginRequest: {
-            /** Format: email */
-            email: string;
-            password: string;
-        };
         TokenResponse: {
             accessToken: string;
             tokenType: string;
@@ -370,6 +413,11 @@ export interface components {
              * @description Validade do access token, em segundos
              */
             expiresIn: number;
+        };
+        LoginRequest: {
+            /** Format: email */
+            email: string;
+            password: string;
         };
         RenameCategoryRequest: {
             name: string;
@@ -775,6 +823,50 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["UserResponse"];
                 };
+            };
+        };
+    };
+    refresh: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Refresh-Request"?: string;
+            };
+            path?: never;
+            cookie?: {
+                refreshToken?: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TokenResponse"];
+                };
+            };
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                refreshToken?: string;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router/dom";
 import { router } from "./router";
 import { PrivacyProvider } from "../shared/privacy/PrivacyProvider";
+import { SessionProvider } from "../features/auth/SessionProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -12,9 +13,11 @@ const queryClient = new QueryClient({
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <PrivacyProvider>
-        <RouterProvider router={router} />
-      </PrivacyProvider>
+      <SessionProvider>
+        <PrivacyProvider>
+          <RouterProvider router={router} />
+        </PrivacyProvider>
+      </SessionProvider>
     </QueryClientProvider>
   );
 }
