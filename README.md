@@ -27,7 +27,8 @@ openapi-fetch + openapi-typescript
 
 ## Decisões de arquitetura
 
-As principais estão em [docs/decisions.md](docs/decisions.md). Em resumo:
+As principais estão em [docs/decisions.md](docs/decisions.md), e o [docs/revisao.md](docs/revisao.md)
+traz as mesmas escolhas em forma de perguntas e respostas. Em resumo:
 
 - **Tipos gerados a partir do OpenAPI da API**, nunca escritos à mão: o contrato do back-end é a
   fonte da verdade, e uma mudança incompatível aparece como erro de compilação
