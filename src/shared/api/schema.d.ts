@@ -260,19 +260,19 @@ export interface components {
         };
         TransactionResponse: {
             /** Format: int64 */
-            id?: number;
+            id: number;
             /** Format: int64 */
-            categoryId?: number;
+            categoryId: number;
             /** Format: int64 */
             goalId?: number;
-            amount?: number;
+            amount: number;
             /** Format: date */
-            transactionDate?: string;
+            transactionDate: string;
             description?: string;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         SavingsGoalRequest: {
             name: string;

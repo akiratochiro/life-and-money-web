@@ -40,3 +40,25 @@ export function yesterdayIso(today = new Date()): string {
   yesterday.setDate(yesterday.getDate() - 1);
   return toIsoDate(yesterday);
 }
+
+export function addMonths(month: string, amount: number): string {
+  const [year, monthNumber] = month.split("-").map(Number);
+  return currentMonth(new Date(year, monthNumber - 1 + amount, 1));
+}
+
+export function monthLabel(month: string): string {
+  const [year, monthNumber] = month.split("-").map(Number);
+  const text = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(
+    new Date(year, monthNumber - 1, 1),
+  );
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+export function dayLabel(isoDate: string, today = new Date()): string {
+  if (isoDate === todayIso(today)) return "Hoje";
+  if (isoDate === yesterdayIso(today)) return "Ontem";
+  const [year, month, day] = isoDate.split("-").map(Number);
+  return new Intl.DateTimeFormat("pt-BR", { weekday: "short", day: "numeric", month: "short" }).format(
+    new Date(year, month - 1, day),
+  );
+}

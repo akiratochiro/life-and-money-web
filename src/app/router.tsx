@@ -6,6 +6,7 @@ import { RequireAuth } from "../features/auth/RequireAuth";
 import { HomePage } from "../features/home/HomePage";
 import { NewTransactionPage } from "../features/transactions/NewTransactionPage";
 import { ComingSoon } from "./ComingSoon";
+import { TransactionsPage } from "../features/transactions/TransactionsPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -17,7 +18,7 @@ export const router = createBrowserRouter([
         element: <AppShell />,
         children: [
           { path: "/", element: <HomePage /> },
-          { path: "/transactions", element: <ComingSoon title="Extrato" /> },
+          { path: "/transactions", element: <TransactionsPage /> },
           { path: "/transactions/new", element: <NewTransactionPage /> },
           { path: "/budget", element: <ComingSoon title="Orçamento" /> },
           { path: "/goals", element: <ComingSoon title="Metas" /> },

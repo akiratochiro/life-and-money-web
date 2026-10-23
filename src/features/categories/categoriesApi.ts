@@ -6,9 +6,9 @@ import type { components } from "../../shared/api/schema";
 export type Category = components["schemas"]["CategoryResponse"];
 export type CategoryType = NonNullable<Category["type"]>;
 
-export function useCategories() {
+export function useCategories(includeArchived = false) {
   return useQuery({
-    queryKey: ["categories"],
-    queryFn: () => unwrap(api.GET("/categories")),
+    queryKey: ["categories", { includeArchived }],
+    queryFn: () => unwrap(api.GET("/categories", { params: { query: { includeArchived } } })),
   });
 }

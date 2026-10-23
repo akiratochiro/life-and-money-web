@@ -1,20 +1,52 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
-import { unwrap } from "../../shared/api/problem";
+import { ApiError, unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
 
+export type Transaction = components["schemas"]["TransactionResponse"];
 export type TransactionInput = components["schemas"]["TransactionRequest"];
 
-export function useCreateTransaction() {
-  const queryClient = useQueryClient();
+export function useTransactions(month: string) {
+  return useQuery({
+    queryKey: ["transactions", month],
+    queryFn: () => unwrap(api.GET("/transactions", { params: { query: { month } } })),
+  });
+}
 
+function useInvalidateMoneyData() {
+  const queryClient = useQueryClient();
+  return () =>
+    Promise.all(
+      ["dashboard", "goals", "transactions"].map((key) => queryClient.invalidateQueries({ queryKey: [key] })),
+    );
+}
+
+export function useCreateTransaction() {
+  const invalidate = useInvalidateMoneyData();
   return useMutation({
     mutationFn: (body: TransactionInput) => unwrap(api.POST("/transactions", { body })),
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
-        queryClient.invalidateQueries({ queryKey: ["goals"] }),
-        queryClient.invalidateQueries({ queryKey: ["transactions"] }),
-      ]),
+    onSuccess: invalidate,
+  });
+}
+
+export function useUpdateTransaction() {
+  const invalidate = useInvalidateMoneyData();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: number; body: TransactionInput }) =>
+      unwrap(api.PUT("/transactions/{id}", { params: { path: { id } }, body })),
+    onSuccess: invalidate,
+  });
+}
+
+export function useDeleteTransaction() {
+  const invalidate = useInvalidateMoneyData();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const { error, response } = await api.DELETE("/transactions/{id}", { params: { path: { id } } });
+      if (error !== undefined || !response.ok) {
+        throw new ApiError(response.status, error);
+      }
+    },
+    onSuccess: invalidate,
   });
 }

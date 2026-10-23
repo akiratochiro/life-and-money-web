@@ -1,0 +1,1 @@
+export const toCents = (amount: number): number => Math.round(amount * 100);
