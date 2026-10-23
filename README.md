@@ -36,6 +36,8 @@ As principais estão em [docs/decisions.md](docs/decisions.md). Em resumo:
 - **TanStack Query cuida do estado do servidor**; não há store global de dados do servidor
 - **Dinheiro em centavos** nos formulários, para não arredondar errado antes de enviar
 - **Erros vêm prontos da API** (RFC 9457): o `detail` já chega em português e vai direto para a tela
+- **O access token vive só em memória**; quem devolve a sessão depois de um recarregamento é um
+  cookie `HttpOnly` que este código nunca lê
 
 ## Rodando localmente
 
@@ -63,6 +65,23 @@ O app sobe em `http://localhost:5173`.
 
 Sempre que um endpoint ou um campo muda na API, rode `npm run api:types` com a API no ar e
 commite o arquivo gerado junto com a mudança que o consome.
+
+## Publicação
+
+O build gera arquivos estáticos, servidos no Cloudflare Pages:
+
+| Campo | Valor |
+|---|---|
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Variável de build | `VITE_API_URL` com a URL da API, sem barra no final |
+
+O `public/_redirects` manda qualquer rota para o `index.html`. Sem ele, abrir `/goals` direto
+na barra de endereço daria 404: o roteamento é do React Router, e o servidor de arquivos
+estáticos não conhece essas rotas.
+
+O passo a passo completo, incluindo a API e o banco, está no
+[docs/deploy.md da API](https://github.com/akiratochiro/life-and-money/blob/main/docs/deploy.md).
 
 ## Roadmap
 
