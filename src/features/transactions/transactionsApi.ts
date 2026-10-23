@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
-import { ApiError, unwrap } from "../../shared/api/problem";
+import { expectNoContent, unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
 
 export type Transaction = components["schemas"]["TransactionResponse"];
@@ -41,12 +41,7 @@ export function useUpdateTransaction() {
 export function useDeleteTransaction() {
   const invalidate = useInvalidateMoneyData();
   return useMutation({
-    mutationFn: async (id: number) => {
-      const { error, response } = await api.DELETE("/transactions/{id}", { params: { path: { id } } });
-      if (error !== undefined || !response.ok) {
-        throw new ApiError(response.status, error);
-      }
-    },
+    mutationFn: (id: number) => expectNoContent(api.DELETE("/transactions/{id}", { params: { path: { id } } })),
     onSuccess: invalidate,
   });
 }

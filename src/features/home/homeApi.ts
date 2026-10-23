@@ -1,9 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
 import { unwrap } from "../../shared/api/problem";
-import type { components } from "../../shared/api/schema";
-
-export type BudgetLine = components["schemas"]["BudgetLine"];
 
 export function useMe() {
   return useQuery({
@@ -19,9 +16,3 @@ export function useMonthTotals() {
   });
 }
 
-export function useBudgetDashboard(month: string) {
-  return useQuery({
-    queryKey: ["dashboard", "budget", month],
-    queryFn: () => unwrap(api.GET("/dashboard/budget", { params: { query: { month } } })),
-  });
-}

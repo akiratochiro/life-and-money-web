@@ -1,4 +1,4 @@
-import { useBudgetDashboard, useMe, useMonthTotals } from "./homeApi";
+import { useMe, useMonthTotals } from "./homeApi";
 import { useGoals } from "../goals/goalsApi";
 import { BalanceCard } from "./BalanceCard";
 import { AttentionSection } from "./AttentionSection";
@@ -7,6 +7,7 @@ import { GoalsSection } from "./GoalsSection";
 import { BudgetSummary } from "./BudgetSummary";
 import { useLogout } from "../auth/useLogout";
 import { currentMonth, greeting, longDate } from "../../shared/lib/dates";
+import { useBudgetDashboard } from "../budget/budgetApi";
 
 export function HomePage() {
   const month = currentMonth();

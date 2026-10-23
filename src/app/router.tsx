@@ -8,6 +8,7 @@ import { NewTransactionPage } from "../features/transactions/NewTransactionPage"
 import { ComingSoon } from "./ComingSoon";
 import { TransactionsPage } from "../features/transactions/TransactionsPage";
 import { CategoriesPage } from "../features/categories/CategoriesPage";
+import { BudgetPage } from "../features/budget/BudgetPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -22,7 +23,7 @@ export const router = createBrowserRouter([
           { path: "/categories", element: <CategoriesPage /> },
           { path: "/transactions", element: <TransactionsPage /> },
           { path: "/transactions/new", element: <NewTransactionPage /> },
-          { path: "/budget", element: <ComingSoon title="Orçamento" /> },
+          { path: "/budget", element: <BudgetPage /> },
           { path: "/goals", element: <ComingSoon title="Metas" /> },
         ],
       },

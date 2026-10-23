@@ -7,7 +7,9 @@ const tones = {
   income: "bg-income text-[#04252a]",
 };
 
-type Props = { tone: keyof typeof tones; children: ReactNode };
+export type BadgeTone = keyof typeof tones;
+
+type Props = { tone: BadgeTone; children: ReactNode };
 
 export function Badge({ tone, children }: Props) {
   return (

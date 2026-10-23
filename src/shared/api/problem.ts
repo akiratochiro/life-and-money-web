@@ -5,11 +5,14 @@ type Problem = {
 };
 
 export class ApiError extends Error {
-  constructor(
-    public readonly status: number,
-    public readonly problem: unknown,
-  ) {
+  readonly status: number;
+  readonly problem: unknown;
+
+  constructor(status: number, problem: unknown) {
     super(messageOf(problem));
+    this.name = "ApiError";
+    this.status = status;
+    this.problem = problem;
   }
 
   get fieldErrors(): Record<string, string> {
@@ -30,4 +33,13 @@ export async function unwrap<T>(
     throw new ApiError(response.status, error);
   }
   return data;
+}
+
+export async function expectNoContent(
+  request: Promise<{ error?: unknown; response: Response }>,
+): Promise<void> {
+  const { error, response } = await request;
+  if (error !== undefined || !response.ok) {
+    throw new ApiError(response.status, error);
+  }
 }
