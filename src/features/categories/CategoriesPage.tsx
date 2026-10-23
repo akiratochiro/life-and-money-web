@@ -205,7 +205,8 @@ function CategoryRow({ category }: { category: Category }) {
         <div className="flex flex-col gap-3 rounded-2xl bg-ink-800 p-4">
           <p className="text-sm leading-snug text-text-soft">
             Arquivar <strong className="text-text">{category.name}</strong>? As transações antigas continuam no
-            histórico, mas não será possível lançar novas nela.
+            histórico, mas não será possível lançar novas nela, e ela sai do orçamento a partir
+            deste mês.
           </p>
           {archiveCategory.error && (
             <p role="alert" className="text-sm font-semibold text-danger">{archiveCategory.error.message}</p>
