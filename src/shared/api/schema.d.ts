@@ -251,7 +251,10 @@ export interface components {
         TransactionRequest: {
             /** Format: int64 */
             categoryId: number;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description Meta de poupança a creditar; apenas para categorias do tipo SAVING
+             */
             goalId?: number;
             amount: number;
             /** Format: date */
@@ -277,41 +280,53 @@ export interface components {
         SavingsGoalRequest: {
             name: string;
             targetAmount: number;
-            /** Format: date */
+            /**
+             * Format: date
+             * @description Precisa ser um mês posterior ao mês atual
+             */
             deadline: string;
         };
         SavingsGoalResponse: {
             /** Format: int64 */
-            id?: number;
-            name?: string;
-            targetAmount?: number;
+            id: number;
+            name: string;
+            targetAmount: number;
             /** Format: date */
-            deadline?: string;
-            saved?: number;
-            remaining?: number;
-            /** Format: int64 */
-            monthsLeft?: number;
+            deadline: string;
+            /** @description Total já guardado em transações ligadas à meta */
+            saved: number;
+            /** @description Quanto falta para a meta; zero quando já atingida */
+            remaining: number;
+            /**
+             * Format: int64
+             * @description Meses cheios entre o mês atual e o mês do prazo
+             */
+            monthsLeft: number;
+            /** @description Quanto guardar por mês para atingir a meta no prazo; ausente quando o prazo já passou */
             monthlyNeeded?: number;
             /** @enum {string} */
-            status?: "IN_PROGRESS" | "REACHED" | "OVERDUE";
+            status: "IN_PROGRESS" | "REACHED" | "OVERDUE";
         };
         BudgetRequest: {
             /** @enum {string} */
             mode: "AMOUNT" | "PERCENTAGE";
+            /** @description Valor em reais quando mode é AMOUNT, percentual da receita do mês quando é PERCENTAGE */
             limitValue: number;
-            percentageWithinLimit?: boolean;
         };
         BudgetItemResponse: {
             /** Format: int64 */
-            id?: number;
+            id: number;
             /** Format: int64 */
-            categoryId?: number;
+            categoryId: number;
             /** @enum {string} */
-            mode?: "AMOUNT" | "PERCENTAGE";
-            limitValue?: number;
-            validFrom?: string;
+            mode: "AMOUNT" | "PERCENTAGE";
+            /** @description Valor em reais (AMOUNT) ou percentual da receita do mês (PERCENTAGE) */
+            limitValue: number;
+            /** @description Primeiro mês de vigência */
+            validFrom: string;
+            /** @description Último mês de vigência; ausente enquanto o item está em vigor */
             validTo?: string;
-            active?: boolean;
+            active: boolean;
         };
         CreateCategoryRequest: {
             name: string;
@@ -320,13 +335,13 @@ export interface components {
         };
         CategoryResponse: {
             /** Format: int64 */
-            id?: number;
-            name?: string;
+            id: number;
+            name: string;
             /** @enum {string} */
-            type?: "INCOME" | "EXPENSE" | "SAVING";
-            archived?: boolean;
+            type: "INCOME" | "EXPENSE" | "SAVING";
+            archived: boolean;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
         };
         RegisterRequest: {
             name: string;
@@ -336,11 +351,11 @@ export interface components {
         };
         UserResponse: {
             /** Format: int64 */
-            id?: number;
-            name?: string;
-            email?: string;
+            id: number;
+            name: string;
+            email: string;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
         };
         LoginRequest: {
             /** Format: email */
@@ -348,70 +363,89 @@ export interface components {
             password: string;
         };
         TokenResponse: {
-            accessToken?: string;
-            tokenType?: string;
-            /** Format: int64 */
-            expiresIn?: number;
+            accessToken: string;
+            tokenType: string;
+            /**
+             * Format: int64
+             * @description Validade do access token, em segundos
+             */
+            expiresIn: number;
         };
         RenameCategoryRequest: {
             name: string;
         };
         Averages: {
-            income?: number;
-            expense?: number;
-            saving?: number;
-            /** Format: int32 */
-            basedOnMonths?: number;
+            income: number;
+            expense: number;
+            saving: number;
+            /**
+             * Format: int32
+             * @description Quantos meses fechados entraram na média
+             */
+            basedOnMonths: number;
         };
         MonthlyTotal: {
-            month?: string;
-            income?: number;
-            expense?: number;
-            saving?: number;
-            closed?: boolean;
+            month: string;
+            income: number;
+            expense: number;
+            saving: number;
+            /** @description Falso apenas para o mês corrente, que ainda pode mudar */
+            closed: boolean;
         };
         MonthlyTotalsResponse: {
-            months?: components["schemas"]["MonthlyTotal"][];
+            /** @description Um item por mês do intervalo pedido, do mais antigo para o mais recente */
+            months: components["schemas"]["MonthlyTotal"][];
+            /** @description Ausente enquanto o usuário não tem nenhum mês fechado desde o cadastro */
             averages?: components["schemas"]["Averages"];
         };
         CategoryExpense: {
             /** Format: int64 */
-            categoryId?: number;
-            name?: string;
-            total?: number;
-            percentage?: number;
+            categoryId: number;
+            name: string;
+            total: number;
+            /** @description Participação da categoria no total do mês, em percentual */
+            percentage: number;
         };
         ExpensesByCategoryResponse: {
-            month?: string;
-            total?: number;
-            categories?: components["schemas"]["CategoryExpense"][];
+            month: string;
+            /** @description Total de despesas do mês */
+            total: number;
+            /** @description Categorias de despesa com movimento no mês, da maior para a menor */
+            categories: components["schemas"]["CategoryExpense"][];
         };
         BudgetDashboardResponse: {
-            month?: string;
-            closed?: boolean;
-            income?: number;
-            items?: components["schemas"]["BudgetLine"][];
+            month: string;
+            /** @description Falso apenas para o mês corrente, que ainda pode mudar */
+            closed: boolean;
+            /** @description Receita realizada no mês, base dos orçamentos em percentual */
+            income: number;
+            items: components["schemas"]["BudgetLine"][];
         };
         BudgetLine: {
             /** Format: int64 */
-            categoryId?: number;
-            categoryName?: string;
+            categoryId: number;
+            categoryName: string;
             /** @enum {string} */
-            categoryType?: "INCOME" | "EXPENSE" | "SAVING";
+            categoryType: "INCOME" | "EXPENSE" | "SAVING";
             /** @enum {string} */
-            mode?: "AMOUNT" | "PERCENTAGE";
-            limitValue?: number;
-            effectiveLimit?: number;
-            spent?: number;
-            remaining?: number;
+            mode: "AMOUNT" | "PERCENTAGE";
+            /** @description Valor planejado como foi definido: reais ou percentual */
+            limitValue: number;
+            /** @description Limite já convertido em reais para o mês consultado */
+            effectiveLimit: number;
+            spent: number;
+            /** @description Limite menos o gasto; negativo quando o limite foi ultrapassado */
+            remaining: number;
+            /** @description Ausente quando o limite do mês é zero, caso em que não há percentual a calcular */
             usedPercentage?: number;
             /** @enum {string} */
-            status?: "OK" | "WARNING" | "EXCEEDED" | "IN_PROGRESS" | "REACHED";
+            status: "OK" | "WARNING" | "EXCEEDED" | "IN_PROGRESS" | "REACHED";
         };
         GoalDeletionResponse: {
             /** Format: int64 */
-            goalId?: number;
-            keptAsSavings?: number;
+            goalId: number;
+            /** @description Valor que estava guardado e permanece como poupança, sem meta */
+            keptAsSavings: number;
         };
     };
     responses: never;
