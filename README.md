@@ -2,89 +2,100 @@
 
 [![CI](https://github.com/akiratochiro/life-and-money-web/actions/workflows/ci.yml/badge.svg)](https://github.com/akiratochiro/life-and-money-web/actions/workflows/ci.yml)
 
-Front-end do Life and Money, um app de controle financeiro pessoal: lançamentos do dia a dia,
-orçamento por categoria, metas de poupança e análises mês a mês.
+Front-end for Life and Money, a personal finance app: day-to-day transactions, budgets per
+category, savings goals and month-by-month analytics.
 
-Consome a [Life and Money API](https://github.com/akiratochiro/life-and-money). Pensado primeiro
-para o celular — é nele que a despesa é lançada na hora em que acontece.
+It consumes the [Life and Money API](https://github.com/akiratochiro/life-and-money-api), and it
+is designed mobile-first: the phone is where an expense gets recorded, right when it happens.
 
-## Telas
+## Live demo
 
-| Tela | O que resolve |
+**https://life-and-money-web.akira-tochiro23.workers.dev**
+
+> The API runs on a free instance that sleeps after 15 minutes of inactivity.
+> The first request after that can take up to a minute while it wakes up.
+
+Create an account to try it: new users start with a default set of categories.
+
+## Screens
+
+| Screen | What it solves |
 |---|---|
-| Início | Um feed na ordem do que importa: saldo do mês, o que precisa de atenção, metas e orçamento |
-| Nova transação | Lançar entrada, saída ou aporte em poucos toques, com atalhos de "hoje" e "ontem" |
-| Extrato | Transações do mês agrupadas por dia, com edição e exclusão |
-| Orçamento | Limite por categoria, em reais ou em percentual da receita, com vigência por mês |
-| Metas | Quanto falta, quanto guardar por mês e o prazo de cada meta |
-| Análises | Rosca de gastos por categoria e barras mês a mês, com a média dos meses fechados |
-| Categorias | Criar, renomear e arquivar as próprias categorias |
+| Home | A feed ordered by what matters now: the month's balance, what needs attention, goals and budget |
+| New transaction | Record an income, an expense or a saving in a few taps, with "today" and "yesterday" shortcuts |
+| Statement | The month's transactions grouped by day, with editing and deletion |
+| Budget | A limit per category, as a fixed amount or a percentage of income, effective by month |
+| Goals | How much is left, how much to save each month and the deadline of each goal |
+| Analytics | Expenses by category in a donut and month-by-month bars, with the average of closed months |
+| Categories | Create, rename and archive your own categories |
 
 ## Stack
 
-React 19 · TypeScript · Vite · React Router · TanStack Query · Tailwind CSS 4 ·
-openapi-fetch + openapi-typescript
+React 19 · TypeScript · Vite · React Router · TanStack Query · Tailwind CSS 4 · openapi-fetch + openapi-typescript
 
-## Decisões de arquitetura
+## Architecture decisions
 
-As principais estão em [docs/decisions.md](docs/decisions.md), e o [docs/revisao.md](docs/revisao.md)
-traz as mesmas escolhas em forma de perguntas e respostas. Em resumo:
+The main ones are in [docs/decisions.md](docs/decisions.md), and [docs/revisao.md](docs/revisao.md)
+covers the same choices as questions and answers. In short:
 
-- **Tipos gerados a partir do OpenAPI da API**, nunca escritos à mão: o contrato do back-end é a
-  fonte da verdade, e uma mudança incompatível aparece como erro de compilação
-- **Organização por feature** (`features/transactions`, `features/budget`...), com o que é
-  compartilhado em `shared/`
-- **TanStack Query cuida do estado do servidor**; não há store global de dados do servidor
-- **Dinheiro em centavos** nos formulários, para não arredondar errado antes de enviar
-- **Erros vêm prontos da API** (RFC 9457): o `detail` já chega em português e vai direto para a tela
-- **O access token vive só em memória**; quem devolve a sessão depois de um recarregamento é um
-  cookie `HttpOnly` que este código nunca lê
+- **Types generated from the API's OpenAPI spec**, never written by hand: the back-end contract is
+  the source of truth, and a breaking change shows up as a compile error
+- **Organized by feature** (`features/transactions`, `features/budget`...), with shared code in `shared/`
+- **TanStack Query owns server state**; there is no global store for server data
+- **Money as integer cents** in forms, so values are never rounded wrong before being sent
+- **Errors come ready from the API** (RFC 9457): the `detail` arrives in Portuguese and goes straight to the screen
+- **The access token lives only in memory**; after a reload, the session comes back through an
+  `HttpOnly` cookie that this code never reads
 
-## Rodando localmente
+## Running locally
 
-Requisitos: Node 22+ e a API rodando em `http://localhost:8080`.
+Requirements: Node 22+ and the API running at `http://localhost:8080`.
 
 ```bash
 git clone https://github.com/akiratochiro/life-and-money-web.git
 cd life-and-money-web
 npm install
-cp .env.example .env     # VITE_API_URL aponta para a API
+cp .env.example .env     # VITE_API_URL points to the API
 npm run dev
 ```
 
-O app sobe em `http://localhost:5173`.
+The app runs at `http://localhost:5173`.
 
 ## Scripts
 
-| Script | O que faz |
+| Script | What it does |
 |---|---|
-| `npm run dev` | Servidor de desenvolvimento com HMR |
-| `npm run build` | Checa os tipos (`tsc -b`) e gera o bundle de produção |
-| `npm run preview` | Serve o bundle gerado, para conferir o build |
-| `npm run lint` | ESLint em todo o projeto |
-| `npm run api:types` | Regenera `src/shared/api/schema.d.ts` a partir do OpenAPI da API |
+| `npm run dev` | Development server with HMR |
+| `npm run build` | Type-checks (`tsc -b`) and builds the production bundle |
+| `npm run preview` | Serves the built bundle, to check the build |
+| `npm run lint` | Runs ESLint on the whole project |
+| `npm run api:types` | Regenerates `src/shared/api/schema.d.ts` from the API's OpenAPI spec |
 
-Sempre que um endpoint ou um campo muda na API, rode `npm run api:types` com a API no ar e
-commite o arquivo gerado junto com a mudança que o consome.
+Whenever an endpoint or a field changes in the API, run `npm run api:types` with the API running
+and commit the generated file together with the change that uses it.
 
-## Publicação
+## Deployment
 
-O build gera arquivos estáticos, servidos no Cloudflare Pages:
+The build produces static files, served by **Cloudflare Workers** (static assets, no server code):
 
-| Campo | Valor |
+| Setting | Value |
 |---|---|
 | Build command | `npm run build` |
-| Output directory | `dist` |
-| Variável de build | `VITE_API_URL` com a URL da API, sem barra no final |
+| Deploy command | `npx wrangler deploy` |
+| Build variable | `VITE_API_URL` with the API URL, without a trailing slash |
 
-O `public/_redirects` manda qualquer rota para o `index.html`. Sem ele, abrir `/goals` direto
-na barra de endereço daria 404: o roteamento é do React Router, e o servidor de arquivos
-estáticos não conhece essas rotas.
+`VITE_API_URL` is embedded in the JavaScript at build time, so it must be a **build** variable,
+and changing it requires a new build. Production builds fail on purpose if it is missing, instead
+of shipping an app that calls the wrong address.
 
-O passo a passo completo, incluindo a API e o banco, está no
-[docs/deploy.md da API](https://github.com/akiratochiro/life-and-money/blob/main/docs/deploy.md).
+Routing is handled by [`wrangler.jsonc`](wrangler.jsonc): `not_found_handling: "single-page-application"`
+serves `index.html` for any path that is not a file, so that opening `/goals` directly, or
+reloading it, reaches React Router instead of returning a 404.
+
+The full step by step, including the API and the database, is in the
+[API's docs/deploy.md](https://github.com/akiratochiro/life-and-money-api/blob/main/docs/deploy.md).
 
 ## Roadmap
 
-- [ ] Instalável como PWA, com atalho na tela inicial
-- [ ] Retirada de uma meta de poupança (depende da API)
+- Installable as a PWA, with a home-screen shortcut
+- Withdrawals from savings goals (depends on the API)
