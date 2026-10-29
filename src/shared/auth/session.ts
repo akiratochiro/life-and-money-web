@@ -1,4 +1,5 @@
 import type { components } from "../api/schema";
+import { API_BASE } from "../api/base";
 
 type TokenResponse = components["schemas"]["TokenResponse"];
 
@@ -15,12 +16,9 @@ type TokenResponse = components["schemas"]["TokenResponse"];
  * da sessão para montar o header Authorization, e o contrário criaria uma importação circular.
  */
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 /**
- * O header existe para barrar CSRF. Em produção o cookie é SameSite=None, então o navegador o
- * enviaria também num POST disparado por outro site; um header fora da lista segura do CORS
- * obriga o preflight, que só passa para as origens que a API permite.
+ * Segunda barreira contra CSRF; a primeira é o SameSite=Strict do cookie. Um header fora da lista
+ * segura do CORS obriga o preflight, e a API não libera nenhuma outra origem.
  */
 const REFRESH_REQUEST_HEADER = "X-Refresh-Request";
 
@@ -81,9 +79,8 @@ export function renewSession(): Promise<string | null> {
 
 async function requestRenewal(): Promise<string | null> {
   try {
-    const response = await fetch(`${API_URL}/auth/refresh`, {
+    const response = await fetch(`${API_BASE}/auth/refresh`, {
       method: "POST",
-      credentials: "include",
       headers: { [REFRESH_REQUEST_HEADER]: "1" },
     });
 
@@ -111,7 +108,7 @@ export function currentAccessToken(): Promise<string | null> {
 
 export async function revokeSession(): Promise<void> {
   try {
-    await fetch(`${API_URL}/auth/logout`, { method: "POST", credentials: "include" });
+    await fetch(`${API_BASE}/auth/logout`, { method: "POST" });
   } catch {
     // O logout local acontece de qualquer forma; o cookie expira sozinho mais tarde.
   }

@@ -1,17 +1,18 @@
 import createClient, { type Middleware } from "openapi-fetch";
 import type { paths } from "./schema";
+import { API_BASE } from "./base";
 import { currentAccessToken, endSession } from "../auth/session";
 
 export const api = createClient<paths>({
-    baseUrl: import.meta.env.VITE_API_URL,
-    // Necessário para o cookie do refresh token viajar. Como o cookie tem Path=/auth, ele só
-    // é enviado nas chamadas de autenticação, e não em toda requisição da API.
-    credentials: "include",
+    baseUrl: API_BASE,
+    // Como o cookie tem Path=/api/auth, ele só é enviado nas chamadas de autenticação, e não em
+    // toda requisição da API. Na mesma origem, "same-origin" (o padrão do fetch) já basta.
+    credentials: "same-origin",
 });
 
 /** As rotas de /auth se autenticam pelo cookie ou pelo corpo, nunca pelo Bearer. */
 function isAuthRoute(url: string): boolean {
-    return new URL(url).pathname.startsWith("/auth/");
+    return new URL(url).pathname.startsWith(`${API_BASE}/auth/`);
 }
 
 const authMiddleware: Middleware = {
