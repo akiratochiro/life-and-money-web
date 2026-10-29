@@ -49,7 +49,8 @@ covers the same choices as questions and answers. In short:
 
 ## Running locally
 
-Requirements: Node 22+ and the API running at `http://localhost:8080`.
+Requirements: Node 22.22+ or 24.15+ (required by jsdom, used in the tests) and the API running at
+`http://localhost:8080`.
 
 ```bash
 git clone https://github.com/akiratochiro/life-and-money-web.git
@@ -69,10 +70,24 @@ The app runs at `http://localhost:5173`.
 | `npm run build` | Type-checks (`tsc -b`) and builds the production bundle |
 | `npm run preview` | Serves the built bundle, to check the build |
 | `npm run lint` | Runs ESLint on the whole project |
+| `npm test` | Runs the tests once (Vitest + Testing Library on jsdom) |
+| `npm run test:watch` | Runs the tests in watch mode, re-running on every change |
 | `npm run api:types` | Regenerates `src/shared/api/schema.d.ts` from the API's OpenAPI spec |
 
 Whenever an endpoint or a field changes in the API, run `npm run api:types` with the API running
 and commit the generated file together with the change that uses it.
+
+## Tests
+
+```bash
+npm test
+```
+
+Tests live next to the code they cover (`money.ts` → `money.test.ts`) and run on Vitest, which
+reuses the Vite configuration. Pure functions, such as the cents conversion and the order of the
+budget alerts, have unit tests; components are tested with Testing Library, which interacts with
+them the way a user would, on a DOM simulated by jsdom. CI runs the tests on every push, before
+the build.
 
 ## Deployment
 

@@ -116,3 +116,27 @@ Quando uma feature precisa do tipo de outra, ela importa do módulo de API dessa
 (a home importa `BudgetLine` de `features/budget/budgetApi`). É uma dependência direta entre
 features, assumida de propósito: criar um pacote intermediário só para o tipo seria mais
 cerimônia do que benefício.
+
+## 7. Testes com Vitest, Testing Library e jsdom
+
+**Contexto.** As regras que vivem no front — a conversão de centavos, a ordem dos alertas de
+orçamento — só eram conferidas à mão. Um erro de arredondamento ou uma ordem trocada passaria
+pelo `tsc` sem aviso, porque os tipos continuam certos.
+
+**Decisão.** Os testes rodam no Vitest, configurado no bloco `test` do próprio `vite.config.ts`.
+Componentes são testados com a Testing Library num DOM simulado pelo jsdom, e a interação é feita
+com o `user-event`, que digita tecla por tecla como o usuário. A CI roda `npm test` antes do build.
+
+**Consequências.** O Vitest usa os mesmos plugins e a mesma resolução de módulos do app, então não
+existe uma segunda configuração de build só para os testes — que é o que o Jest exigiria, com um
+transformador de TypeScript e de JSX à parte. A Testing Library empurra os testes para o que o
+usuário vê (`getByLabelText`, `getByRole`) em vez de detalhes de implementação, então um refactor
+que não muda o comportamento não quebra o teste.
+
+Os imports de `describe`, `it` e `expect` são explícitos, sem `globals: true`. Fica mais claro de
+onde cada coisa vem, mas a Testing Library deixa de limpar o DOM sozinha entre um teste e outro,
+por isso o `src/test/setup.ts` registra o `cleanup`.
+
+O jsdom é rápido, mas não é um navegador: não calcula layout nem roda CSS. O que depende disso,
+como o tamanho do anel de progresso na tela, continua fora dos testes. Ele também fixa a versão
+mínima do Node (22.22 ou 24.15).

@@ -20,6 +20,7 @@ Deploy: front estático no **Cloudflare Workers** (`wrangler.jsonc`, SPA com
 npm run dev         # http://localhost:5173 (API em VITE_API_URL, lida no build; ver .env.example)
 npm run build       # tsc -b + bundle de produção; é o que a CI roda
 npm run lint        # ESLint
+npm test            # Vitest uma vez (npm run test:watch para modo watch)
 npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
 ```
 
@@ -51,9 +52,11 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   o porquê das escolhas e os trade-offs, para eu conseguir defendê-las numa entrevista.
 - **Passos pequenos, um commit por passo**, em Conventional Commits (`feat:`, `fix:`, `test:`,
   `docs:`, `build:`, `ci:`, `chore:`, `refactor:`).
-- **Toda regra de negócio nova precisa de teste.** Ainda não há test runner configurado neste
-  repositório: antes da primeira regra que precise de teste, proponha a configuração (ex.:
-  Vitest) como um passo separado.
+- **Toda regra de negócio nova precisa de teste.** Vitest + Testing Library em jsdom, configurados
+  no bloco `test` do `vite.config.ts` (setup em `src/test/setup.ts`). O arquivo de teste fica ao
+  lado do código (`money.ts` → `money.test.ts`), com imports explícitos de `vitest` (sem globals).
+  Regra pura vira função testada isoladamente; componente é testado pelo que o usuário vê e faz
+  (`getByLabelText`, `getByRole`, `userEvent`), não por detalhes de implementação.
 - **Nenhum serviço ou dependência paga.** Se algo tiver plano gratuito com limite, me informe o
   limite atual (conferido na fonte oficial, com a data) antes de adotar.
 - **Se o contrato da API mudar**, atualize o OpenAPI na API, rode `npm run api:types` com a API
