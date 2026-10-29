@@ -1,4 +1,5 @@
-const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+import { digitsToInt, formatCents } from "../lib/money";
+
 const MAX_CENTS = 99_999_999_999;
 
 type Props = {
@@ -14,11 +15,8 @@ export function AmountInput({ cents, onChange, label }: Props) {
       <input
         inputMode="numeric"
         autoComplete="off"
-        value={brl.format(cents / 100)}
-        onChange={(event) => {
-          const digits = event.target.value.replace(/\D/g, "");
-          onChange(Math.min(Number(digits || "0"), MAX_CENTS));
-        }}
+        value={formatCents(cents)}
+        onChange={(event) => onChange(digitsToInt(event.target.value, MAX_CENTS))}
         className="w-full bg-transparent text-center font-display text-5xl font-bold tracking-tight tabular-nums text-text outline-none"
       />
     </label>
