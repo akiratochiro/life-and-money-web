@@ -1,7 +1,7 @@
 name: CI
 
 # Roda a cada push e em cada pull request para a main: nada entra na main sem
-# o lint e o build (que inclui a checagem de tipos) passando.
+# o lint, os testes e o build (que inclui a checagem de tipos) passando.
 on:
   push:
   pull_request:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: Lint e build
+    name: Lint, testes e build
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +36,11 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      # "npm test" é "vitest run": roda os testes uma vez e sai com erro se algum
+      # falhar. O modo watch fica no "npm run test:watch", para a máquina local.
+      - name: Testes
+        run: npm test
 
       # O script de build é "tsc -b && vite build", então a checagem de tipos
       # roda aqui: um tipo quebrado derruba a CI antes de gerar o bundle.
