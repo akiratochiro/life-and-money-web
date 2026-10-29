@@ -11,13 +11,14 @@ respostas.
 React 19 · TypeScript · Vite · React Router · TanStack Query · Tailwind CSS 4 ·
 openapi-fetch + openapi-typescript.
 
-Deploy: front estático no **Cloudflare Workers** (`wrangler.jsonc`, SPA com
-`not_found_handling: single-page-application`), API no **Render** (free), banco no **Neon** (free).
+Deploy: front no **Cloudflare Workers** (`wrangler.jsonc`), API no **Render** (free), banco no
+**Neon** (free). O Worker serve os estáticos (SPA com `not_found_handling: single-page-application`)
+e faz proxy de `/api/*` para a API (`worker/index.ts`, só esse caminho executa script).
 
 ## Comandos
 
 ```bash
-npm run dev         # http://localhost:5173 (API em VITE_API_URL, lida no build; ver .env.example)
+npm run dev         # http://localhost:5173; o proxy do Vite repassa /api/* para localhost:8080
 npm run build       # tsc -b + bundle de produção; é o que a CI roda
 npm run lint        # ESLint
 npm test            # Vitest uma vez (npm run test:watch para modo watch)
@@ -43,6 +44,10 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   `localStorage`/`sessionStorage` para tokens. O refresh token fica em cookie `HttpOnly` que
   este código nunca lê; o `SessionProvider` renova ao abrir o app, e o middleware renova quando
   faltam menos de 30 s para vencer. Renovações concorrentes compartilham a mesma promessa.
+- **Front e API na mesma origem.** Toda chamada usa o caminho relativo `/api` (`shared/api/base.ts`):
+  em produção o Worker repassa para o Render, no dev o proxy do Vite repassa para o localhost. Não
+  existe URL da API no build. Nunca chame a API por URL absoluta: o cookie de refresh
+  (`Path=/api/auth`, `SameSite=Strict`) só funciona na mesma origem.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

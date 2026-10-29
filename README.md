@@ -46,6 +46,8 @@ covers the same choices as questions and answers. In short:
 - **Errors come ready from the API** (RFC 9457): the `detail` arrives in Portuguese and goes straight to the screen
 - **The access token lives only in memory**; after a reload, the session comes back through an
   `HttpOnly` cookie that this code never reads
+- **Front and API on the same origin**: the Worker that serves the front proxies `/api/*` to the
+  API, so the session cookie is not a third-party cookie and Safari does not block it
 
 ## Running locally
 
@@ -56,11 +58,12 @@ Requirements: Node 22.22+ or 24.15+ (required by jsdom, used in the tests) and t
 git clone https://github.com/akiratochiro/life-and-money-web.git
 cd life-and-money-web
 npm install
-cp .env.example .env     # VITE_API_URL points to the API
 npm run dev
 ```
 
-The app runs at `http://localhost:5173`.
+The app runs at `http://localhost:5173`. The Vite proxy forwards `/api/*` to `localhost:8080`, so
+the browser only talks to the front's origin, as in production. There is no environment variable
+to set.
 
 ## Scripts
 
@@ -91,17 +94,23 @@ the build.
 
 ## Deployment
 
-The build produces static files, served by **Cloudflare Workers** (static assets, no server code):
+The front is deployed as a **Cloudflare Worker** that does two things:
+
+- serves the static files in `dist`, straight from the assets layer;
+- proxies `/api/*` to the API on Render ([`worker/index.ts`](worker/index.ts)), without rewriting
+  the path. Only those requests run the Worker script.
 
 | Setting | Value |
 |---|---|
 | Build command | `npm run build` |
 | Deploy command | `npx wrangler deploy` |
-| Build variable | `VITE_API_URL` with the API URL, without a trailing slash |
 
-`VITE_API_URL` is embedded in the JavaScript at build time, so it must be a **build** variable,
-and changing it requires a new build. Production builds fail on purpose if it is missing, instead
-of shipping an app that calls the wrong address.
+There is no build variable. The API address is `vars.API_ORIGIN` in [`wrangler.jsonc`](wrangler.jsonc),
+without a trailing slash, and it is read at runtime: pointing the front at another API only needs
+a new `wrangler deploy`, not a new build.
+
+To try the Worker locally against the local API, create a `.dev.vars` file (ignored by git) with
+`API_ORIGIN=http://localhost:8080` and run `npm run build && npx wrangler dev`.
 
 Routing is handled by [`wrangler.jsonc`](wrangler.jsonc): `not_found_handling: "single-page-application"`
 serves `index.html` for any path that is not a file, so that opening `/goals` directly, or

@@ -119,15 +119,20 @@ retentativa passaria a valer a complexidade.
 
 ### A API exige o header `X-Refresh-Request` no refresh. Para que serve?
 
-Para barrar CSRF. Em produção o front e a API ficam em domínios diferentes, então o cookie
-precisa ser `SameSite=None` — e aí o navegador o enviaria também num POST disparado por outro
-site. Um `POST /auth/refresh` forjado não leria a resposta (o CORS impede), mas rotacionaria o
-refresh token da vítima, e o front dela seria desconectado no uso seguinte.
+Hoje ele é a segunda barreira contra CSRF. A primeira é o `SameSite=Strict` do cookie: como o
+front e a API estão na mesma origem (o Worker faz proxy de `/api/*`), o navegador não envia o
+cookie em nenhuma requisição que parta de outro site.
 
-Exigir um header que não está na lista segura do CORS obriga o navegador a fazer o preflight
-antes do POST, e o preflight só passa para as origens que a API permite. A requisição forjada
-não chega ao endpoint. Dá para verificar isso com dois `curl`: o `OPTIONS` da origem permitida
-responde 200, e o de qualquer outra responde 403.
+Um `POST /auth/refresh` forjado nunca leria a resposta, porque a política de mesma origem impede.
+O risco era o efeito colateral: rotacionar o refresh token da vítima e desconectá-la.
+
+O header cobre navegadores que ignoram o `SameSite`. Um header fora da lista segura do CORS
+obriga o navegador a fazer o preflight antes do POST, e a API não libera nenhuma outra origem,
+então a requisição forjada não chega ao endpoint.
+
+Ele nasceu quando o front e a API estavam em domínios diferentes e o cookie precisava ser
+`SameSite=None`. Nessa época era a única barreira, e o Safari bloqueava o cookie de qualquer
+forma, por ser de terceiros — o que levou à decisão 8.
 
 ### O que acontece no logout?
 

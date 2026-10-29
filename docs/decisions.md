@@ -140,3 +140,27 @@ por isso o `src/test/setup.ts` registra o `cleanup`.
 O jsdom é rápido, mas não é um navegador: não calcula layout nem roda CSS. O que depende disso,
 como o tamanho do anel de progresso na tela, continua fora dos testes. Ele também fixa a versão
 mínima do Node (22.22 ou 24.15).
+
+## 8. Front e API na mesma origem, com o Worker como proxy
+
+**Contexto.** O front ficava em `*.workers.dev` e a API em `*.onrender.com`. Os dois sufixos estão
+na Public Suffix List, então cada subdomínio é um site diferente e o cookie de refresh era de
+terceiros. O Safari bloqueia cookies de terceiros por padrão — e no iPhone todo navegador usa o
+mesmo motor dele. O login funcionava, mas a sessão caía a cada recarregamento.
+
+**Decisão.** O Worker que serve o front também repassa `/api/*` para a API, e o front chama a API
+pelo caminho relativo `/api`. A API passou a responder sob `/api` (context-path), para o Worker
+não precisar reescrever o caminho. No desenvolvimento, o proxy do Vite faz o mesmo papel.
+
+**Consequências.** Para o navegador existe uma origem só, então o cookie é primário e pode ser
+`SameSite=Strict`, a API deixou de precisar de CORS e o `VITE_API_URL` deixou de existir — e com
+ele a armadilha de publicar um build apontando para o localhost.
+
+O prefixo `/api` na própria API, em vez de o Worker remover o prefixo, é o que faz o cookie
+funcionar: o `Path` do cookie é comparado com o caminho que o navegador vê. Se o Worker
+transformasse `/api/auth/refresh` em `/auth/refresh`, a API emitiria `Path=/auth` e o navegador
+nunca o enviaria de volta, a menos que o Worker reescrevesse também o `Set-Cookie`.
+
+O custo é um salto a mais: cada chamada passa pela Cloudflare antes de chegar ao Render, e cada
+uma conta no limite de 100.000 requisições por dia do plano gratuito do Workers. Os estáticos
+continuam fora dessa conta, porque só `/api/*` executa o script (`run_worker_first`).
