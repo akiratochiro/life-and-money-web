@@ -1,8 +1,18 @@
 {
   "name": "life-and-money-web",
   "compatibility_date": "2026-10-23",
+  // Só o proxy de /api/*. O resto do site são arquivos estáticos.
+  "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // Só /api/* executa o script. Os estáticos continuam saindo direto da camada de assets, que
+    // não conta no limite de requisições do plano gratuito.
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    // URL da API no Render, sem barra no final. Para o wrangler dev, sobrescreva no .dev.vars.
+    "API_ORIGIN": "https://life-and-money-api.onrender.com"
   }
 }

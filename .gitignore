@@ -26,3 +26,6 @@ dist-ssr
 
 # Estado local do wrangler dev
 .wrangler
+
+# Variáveis locais do wrangler dev (ex.: API_ORIGIN apontando para o localhost)
+.dev.vars*
