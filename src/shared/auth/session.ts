@@ -78,9 +78,16 @@ export function renewSession(): Promise<string | null> {
   return renewal;
 }
 
+/** Espera pedida num 429, com teto: o limite de renovação é por minuto. */
+function retryAfterMs(response: Response): number {
+  const seconds = Number(response.headers.get("Retry-After"));
+  return Number.isFinite(seconds) && seconds > 0 ? Math.min(seconds, 60) * 1_000 : 5_000;
+}
+
 /**
- * Sem timeout e com retry só para 502/503: é o proxy avisando que a API ainda não está de pé, ou
- * seja, que o pedido nem chegou a ela. Qualquer outra falha pode ter acontecido depois de a API
+ * Sem timeout e com retry só para 502/503 e 429. O 502/503 é o proxy avisando que a API ainda não
+ * está de pé, e o 429 é a API recusando antes de olhar o token: nos dois casos, o pedido não
+ * chegou a rotacionar nada. Qualquer outra falha pode ter acontecido depois de a API
  * rotacionar o token, e repetir com o token antigo seria tratado como roubo de sessão — a API
  * revogaria todas as sessões do usuário.
  */
@@ -97,12 +104,14 @@ async function requestRenewal(): Promise<string | null> {
         return accessToken;
       }
 
-      if (!isUpstreamUnavailable(response.status) || failures >= MAX_QUERY_RETRIES) {
+      const retryable = isUpstreamUnavailable(response.status) || response.status === 429;
+      if (!retryable || failures >= MAX_QUERY_RETRIES) {
         endSession();
         return null;
       }
 
-      await new Promise((resolve) => setTimeout(resolve, retryDelay(failures)));
+      const delay = response.status === 429 ? retryAfterMs(response) : retryDelay(failures);
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   } catch {
     // Sem rede não há como saber se a sessão ainda vale; tratar como encerrada é o seguro.

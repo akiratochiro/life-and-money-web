@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "./authApi";
 import { ApiError } from "../../shared/api/problem";
+import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 
@@ -26,10 +27,15 @@ export function LoginPage() {
     mutation.mutate({ email, password });
   }
 
+  const wait = useRetryCountdown(mutation.error);
+  const rateLimited = mutation.error instanceof ApiError && mutation.error.status === 429;
+
   const errorMessage =
     mutation.error instanceof ApiError && mutation.error.status === 401
       ? "E-mail ou senha incorretos."
-      : mutation.error?.message;
+      : rateLimited
+        ? undefined
+        : mutation.error?.message;
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-ink-900 px-5 py-10">
@@ -73,8 +79,13 @@ export function LoginPage() {
               {errorMessage}
             </p>
           )}
+          {wait > 0 && (
+            <p role="alert" className="text-sm font-semibold text-danger">
+              Muitas tentativas. Tente de novo em {formatWait(wait)}.
+            </p>
+          )}
 
-          <Button type="submit" disabled={mutation.isPending}>
+          <Button type="submit" disabled={mutation.isPending || wait > 0}>
             {mutation.isPending ? "Entrando..." : "Entrar"}
           </Button>
         </form>

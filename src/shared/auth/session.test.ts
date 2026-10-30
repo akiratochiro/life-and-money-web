@@ -34,6 +34,22 @@ describe("renewSession", () => {
     expect(isSignedIn()).toBe(true);
   });
 
+  it("espera o Retry-After de um 429 e tenta de novo, em vez de encerrar a sessão", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("{}", { status: 429, headers: { "Retry-After": "7" } }))
+      .mockResolvedValueOnce(respond(200, token));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const renewal = renewSession();
+    await vi.advanceTimersByTimeAsync(6_999);
+    expect(fetchMock).toHaveBeenCalledOnce();
+
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(renewal).resolves.toBe("novo");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it("não repete uma recusa da API: a sessão acabou de verdade", async () => {
     const fetchMock = vi.fn().mockResolvedValue(respond(401));
     vi.stubGlobal("fetch", fetchMock);

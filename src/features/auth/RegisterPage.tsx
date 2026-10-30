@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "./authApi";
 import { ApiError } from "../../shared/api/problem";
+import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 
@@ -26,8 +27,12 @@ export function RegisterPage() {
   const fieldErrors = apiError?.status === 400 ? apiError.fieldErrors : {};
   const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
+  const wait = useRetryCountdown(mutation.error);
+
   let formError: string | undefined;
-  if (apiError?.status === 409) {
+  if (apiError?.status === 429) {
+    formError = wait > 0 ? `Muitas tentativas. Tente de novo em ${formatWait(wait)}.` : undefined;
+  } else if (apiError?.status === 409) {
     formError = "Este e-mail já está cadastrado.";
   } else if (!hasFieldErrors) {
     formError = mutation.error?.message;
@@ -84,7 +89,7 @@ export function RegisterPage() {
             </p>
           )}
 
-          <Button type="submit" disabled={mutation.isPending}>
+          <Button type="submit" disabled={mutation.isPending || wait > 0}>
             {mutation.isPending ? "Criando sua conta..." : "Criar conta"}
           </Button>
         </form>

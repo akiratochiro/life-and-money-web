@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { requestPasswordReset } from "./authApi";
 import { ApiError } from "../../shared/api/problem";
+import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 
@@ -16,6 +17,8 @@ export function ForgotPasswordPage() {
   }
 
   const fieldError = mutation.error instanceof ApiError ? mutation.error.fieldErrors.email : undefined;
+  const wait = useRetryCountdown(mutation.error);
+  const rateLimited = mutation.error instanceof ApiError && mutation.error.status === 429;
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-ink-900 px-5 py-10">
@@ -51,13 +54,18 @@ export function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
               />
 
-              {mutation.error && !fieldError && (
+              {mutation.error && !fieldError && !rateLimited && (
                 <p role="alert" className="text-sm font-semibold text-danger">
                   {mutation.error.message}
                 </p>
               )}
+              {wait > 0 && (
+                <p role="alert" className="text-sm font-semibold text-danger">
+                  Muitas tentativas. Tente de novo em {formatWait(wait)}.
+                </p>
+              )}
 
-              <Button type="submit" disabled={mutation.isPending}>
+              <Button type="submit" disabled={mutation.isPending || wait > 0}>
                 {mutation.isPending ? "Enviando..." : "Enviar link"}
               </Button>
             </form>
