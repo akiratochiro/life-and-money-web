@@ -48,6 +48,12 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   em produção o Worker repassa para o Render, no dev o proxy do Vite repassa para o localhost. Não
   existe URL da API no build. Nunca chame a API por URL absoluta: o cookie de refresh
   (`Path=/api/auth`, `SameSite=Strict`) só funciona na mesma origem.
+- **A API pode estar hibernando** (Render free). Ao abrir, `shared/api/serverWake.ts` bate no
+  `/health` e o `ServerWakeOverlay` aparece se passar de ~2 s; a renovação da sessão espera o
+  servidor. As regras de rede ficam em `shared/api/retryPolicy.ts`: queries repetem só erros
+  transitórios (rede, timeout, 502/503/504) e leituras (GET) têm timeout de 20 s. **Escrita nunca
+  ganha timeout nem retry** (duplicaria lançamentos), e o refresh só repete 502/503, porque
+  reenviar um token já rotacionado revoga todas as sessões do usuário.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

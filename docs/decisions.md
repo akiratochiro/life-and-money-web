@@ -164,3 +164,33 @@ nunca o enviaria de volta, a menos que o Worker reescrevesse também o `Set-Cook
 O custo é um salto a mais: cada chamada passa pela Cloudflare antes de chegar ao Render, e cada
 uma conta no limite de 100.000 requisições por dia do plano gratuito do Workers. Os estáticos
 continuam fora dessa conta, porque só `/api/*` executa o script (`run_worker_first`).
+
+## 9. Esperar a API acordar em vez de mostrar erro
+
+**Contexto.** A API roda no plano gratuito do Render, que hiberna depois de um tempo sem
+requisições. A primeira chamada depois disso leva de 30 a 60 segundos, ou volta 502/503 do proxy
+enquanto a API sobe. Com `retry: 1` nas queries, isso aparecia como "não foi possível carregar seus
+dados" — e a renovação da sessão, ao receber o 502, mandava o usuário para o login.
+
+**Decisão.** Ao abrir o app, `serverWake` bate no `/health`. Se a resposta não vier em cerca de
+2 segundos, um aviso "Acordando o servidor…" cobre o app até a API responder; depois de um minuto
+e meio sem resposta, o aviso oferece tentar de novo. A renovação da sessão só sai depois que o
+servidor responde.
+
+Para quando a API hiberna com o app aberto, as queries repetem só erros transitórios (rede,
+timeout, 502/503/504), com backoff de 1 s a 10 s, e as leituras têm timeout de 20 s. O Worker passou
+a responder 502 quando não consegue falar com a API, em vez de um erro genérico da Cloudflare.
+
+**Consequências.** O aviso só aparece quando a API está de fato dormindo: uma resposta em menos de
+2 segundos passa sem nada na tela.
+
+A parte delicada é o que **não** é repetido. Escritas não têm timeout nem retry: um POST abortado
+no meio pode já ter sido gravado, e repeti-lo duplicaria um lançamento. A renovação da sessão só
+repete 502/503, que é o proxy dizendo que o pedido não chegou à API; um 500 ou 504 pode ter vindo
+depois de a API rotacionar o refresh token, e reenviar o token antigo seria tratado como roubo de
+sessão, revogando todas as sessões do usuário.
+
+O aviso cobre só a abertura do app. Se a API hibernar com o app aberto, quem segura a espera é o
+retry das queries, sem aviso na tela: o usuário vê os dados que já estavam em cache, ou o
+carregamento, por mais tempo.
+
