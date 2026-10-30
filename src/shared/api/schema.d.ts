@@ -116,6 +116,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cria uma senha nova com o token do e-mail
+         * @description O token vale uma vez só. A senha segue as regras do cadastro, e todas as sessões do usuário são encerradas: depois disso é preciso entrar de novo.
+         */
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/register": {
         parameters: {
             query?: never;
@@ -196,6 +216,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/forgot-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pede um link para criar uma senha nova
+         * @description Responde sempre 202 com a mesma mensagem, exista ou não uma conta com o e-mail: a resposta não pode servir para descobrir quem tem cadastro. Quando a conta existe, o link sai por e-mail e vale por 30 minutos.
+         */
+        post: operations["forgotPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/categories/{id}": {
         parameters: {
             query?: never;
@@ -220,6 +260,23 @@ export interface paths {
             cookie?: never;
         };
         get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Diz se a API está no ar */
+        get: operations["health"];
         put?: never;
         post?: never;
         delete?: never;
@@ -391,6 +448,10 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        ResetPasswordRequest: {
+            token: string;
+            newPassword: string;
+        };
         RegisterRequest: {
             name: string;
             /** Format: email */
@@ -419,8 +480,19 @@ export interface components {
             email: string;
             password: string;
         };
+        ForgotPasswordRequest: {
+            /** Format: email */
+            email: string;
+        };
+        ForgotPasswordResponse: {
+            message: string;
+        };
         RenameCategoryRequest: {
             name: string;
+        };
+        Health: {
+            /** @example UP */
+            status: string;
         };
         Averages: {
             income: number;
@@ -802,6 +874,28 @@ export interface operations {
             };
         };
     };
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     register: {
         parameters: {
             query?: never;
@@ -894,6 +988,30 @@ export interface operations {
             };
         };
     };
+    forgotPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgotPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ForgotPasswordResponse"];
+                };
+            };
+        };
+    };
     rename: {
         parameters: {
             query?: never;
@@ -936,6 +1054,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["UserResponse"];
+                };
+            };
+        };
+    };
+    health: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Health"];
                 };
             };
         };

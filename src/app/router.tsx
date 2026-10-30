@@ -2,6 +2,8 @@ import { createBrowserRouter } from "react-router";
 import { AppShell } from "./AppShell";
 import { LoginPage } from "../features/auth/LoginPage";
 import { RegisterPage } from "../features/auth/RegisterPage";
+import { ForgotPasswordPage } from "../features/auth/ForgotPasswordPage";
+import { ResetPasswordPage } from "../features/auth/ResetPasswordPage";
 import { RequireAuth } from "../features/auth/RequireAuth";
 import { HomePage } from "../features/home/HomePage";
 import { NewTransactionPage } from "../features/transactions/NewTransactionPage";
@@ -14,6 +16,8 @@ import { AnalyticsPage } from "../features/analytics/AnalyticsPage";
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
+  { path: "/forgot-password", element: <ForgotPasswordPage /> },
+  { path: "/reset-password", element: <ResetPasswordPage /> },
   {
     element: <RequireAuth />,
     children: [
