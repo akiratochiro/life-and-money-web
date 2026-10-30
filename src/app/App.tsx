@@ -6,10 +6,14 @@ import { SessionProvider } from "../features/auth/SessionProvider";
 import { serverWake } from "../shared/api/serverWake";
 import { useServerStatus } from "../shared/api/useServerStatus";
 import { ServerWakeOverlay } from "./ServerWakeOverlay";
+import { retryDelay, shouldRetryQuery } from "../shared/api/retryPolicy";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: 1, staleTime: 30_000 },
+    // Só erros transitórios (rede, timeout, 502/503/504) são repetidos, com backoff: se a API
+    // hibernar com o app aberto, as queries esperam ela acordar em vez de mostrar erro. As
+    // mutações seguem sem retry, para um lançamento nunca ser gravado duas vezes.
+    queries: { retry: shouldRetryQuery, retryDelay, staleTime: 30_000 },
   },
 });
 

@@ -1,5 +1,6 @@
 import type { components } from "../api/schema";
 import { API_BASE } from "../api/base";
+import { MAX_QUERY_RETRIES, isUpstreamUnavailable, retryDelay } from "../api/retryPolicy";
 
 type TokenResponse = components["schemas"]["TokenResponse"];
 
@@ -77,20 +78,32 @@ export function renewSession(): Promise<string | null> {
   return renewal;
 }
 
+/**
+ * Sem timeout e com retry só para 502/503: é o proxy avisando que a API ainda não está de pé, ou
+ * seja, que o pedido nem chegou a ela. Qualquer outra falha pode ter acontecido depois de a API
+ * rotacionar o token, e repetir com o token antigo seria tratado como roubo de sessão — a API
+ * revogaria todas as sessões do usuário.
+ */
 async function requestRenewal(): Promise<string | null> {
   try {
-    const response = await fetch(`${API_BASE}/auth/refresh`, {
-      method: "POST",
-      headers: { [REFRESH_REQUEST_HEADER]: "1" },
-    });
+    for (let failures = 0; ; failures++) {
+      const response = await fetch(`${API_BASE}/auth/refresh`, {
+        method: "POST",
+        headers: { [REFRESH_REQUEST_HEADER]: "1" },
+      });
 
-    if (!response.ok) {
-      endSession();
-      return null;
+      if (response.ok) {
+        startSession((await response.json()) as TokenResponse);
+        return accessToken;
+      }
+
+      if (!isUpstreamUnavailable(response.status) || failures >= MAX_QUERY_RETRIES) {
+        endSession();
+        return null;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, retryDelay(failures)));
     }
-
-    startSession((await response.json()) as TokenResponse);
-    return accessToken;
   } catch {
     // Sem rede não há como saber se a sessão ainda vale; tratar como encerrada é o seguro.
     endSession();

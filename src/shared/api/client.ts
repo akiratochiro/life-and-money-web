@@ -1,6 +1,7 @@
 import createClient, { type Middleware } from "openapi-fetch";
 import type { paths } from "./schema";
 import { API_BASE } from "./base";
+import { withReadTimeout } from "./retryPolicy";
 import { currentAccessToken, endSession } from "../auth/session";
 
 export const api = createClient<paths>({
@@ -8,6 +9,9 @@ export const api = createClient<paths>({
     // Como o cookie tem Path=/api/auth, ele só é enviado nas chamadas de autenticação, e não em
     // toda requisição da API. Na mesma origem, "same-origin" (o padrão do fetch) já basta.
     credentials: "same-origin",
+    // Uma leitura pendurada (a API acordando) vira um erro de timeout, que o retry das queries
+    // trata como transitório e repete.
+    fetch: (request) => fetch(withReadTimeout(request)),
 });
 
 /** As rotas de /auth se autenticam pelo cookie ou pelo corpo, nunca pelo Bearer. */

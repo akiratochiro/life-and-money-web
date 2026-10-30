@@ -27,6 +27,15 @@ export default {
 
     // Método, headers (Cookie, Authorization, X-Refresh-Request) e corpo seguem iguais. Um
     // redirecionamento da API volta para o navegador em vez de ser seguido aqui.
-    return fetch(new Request(upstreamUrl(request.url, env.API_ORIGIN), request), { redirect: "manual" });
+    try {
+      return await fetch(new Request(upstreamUrl(request.url, env.API_ORIGIN), request), { redirect: "manual" });
+    } catch {
+      // Sem conexão com a API (o Render subindo, por exemplo). Um 502 diz ao front que o pedido
+      // não chegou lá, e que pode tentar de novo sem risco.
+      return Response.json(
+        { title: "Bad Gateway", status: 502, detail: "O servidor não respondeu. Tente de novo em instantes." },
+        { status: 502, headers: { "Content-Type": "application/problem+json" } },
+      );
+    }
   },
 };

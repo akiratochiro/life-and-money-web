@@ -62,6 +62,18 @@ describe("worker", () => {
     expect(response.headers.get("Set-Cookie")).toBe("refreshToken=novo; Path=/api/auth; HttpOnly");
   });
 
+  it("responde 502 quando não consegue falar com a API, para o front saber que pode tentar de novo", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => {
+      throw new TypeError("connection refused");
+    }));
+
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env());
+
+    expect(response.status).toBe(502);
+    expect(response.headers.get("Content-Type")).toBe("application/problem+json");
+    expect(await response.json()).toMatchObject({ status: 502 });
+  });
+
   it("não manda para a API o que não é /api, nem um caminho que só começa parecido", async () => {
     const upstream = captureUpstream();
     const bindings = env();
