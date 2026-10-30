@@ -57,6 +57,11 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
 - **Token de redefinição de senha:** a `ResetPasswordPage` lê o token da URL uma vez, para o
   estado, e o tira da URL com `navigate(..., { replace: true })`. O `index.html` tem
   `referrer no-referrer` para o app inteiro. Não carregue recursos de terceiros nessa tela.
+- **O Worker repassa o IP do usuário** em `X-Client-IP`, com o secret `PROXY_SHARED_SECRET` em
+  `X-Proxy-Auth`, e descarta essas versões vindas do navegador. Sem o secret, todos os usuários
+  dividiriam um único limite de tentativas na API.
+- **429:** `ApiError.retryAfterSeconds` + `useRetryCountdown` mostram quanto esperar e travam o
+  botão. A renovação da sessão espera o `Retry-After` e repete (o 429 vem antes de o token girar).
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 
