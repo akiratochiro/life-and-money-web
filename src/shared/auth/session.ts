@@ -59,8 +59,12 @@ export function startSession(response: TokenResponse): void {
   notify();
 }
 
-export function endSession(): void {
-  endedWhileActive = accessToken !== null;
+/**
+ * `expired: false` quando o fim da sessão foi pedido pelo próprio usuário (excluir a conta): aí a
+ * tela de login não deve dizer que a sessão expirou.
+ */
+export function endSession({ expired = true }: { expired?: boolean } = {}): void {
+  endedWhileActive = expired && accessToken !== null;
   accessToken = null;
   expiresAt = 0;
   notify();

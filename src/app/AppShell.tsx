@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router";
-import { ChartIcon, GaugeIcon, HomeIcon, ListIcon, PlusIcon, TagIcon, TargetIcon } from "../shared/ui/icons";
+import { ChartIcon, GaugeIcon, HomeIcon, ListIcon, PlusIcon, TagIcon, TargetIcon, UserIcon } from "../shared/ui/icons";
 
 const items = [
   { to: "/", label: "Início", icon: HomeIcon },
@@ -11,6 +11,7 @@ const items = [
 const desktopOnlyItems = [
   { to: "/analytics", label: "Análises", icon: ChartIcon },
   { to: "/categories", label: "Categorias", icon: TagIcon },
+  { to: "/account", label: "Minha conta", icon: UserIcon },
 ];
 function navClass({ isActive }: { isActive: boolean }) {
   return isActive ? "text-signal" : "text-text-muted hover:text-text";

@@ -16,6 +16,7 @@ export function LoginPage() {
 
   const from = (location.state as { from?: string } | null)?.from ?? "/";
   const expired = searchParams.get("expired") === "1";
+  const accountDeleted = (location.state as { accountDeleted?: boolean } | null)?.accountDeleted === true;
 
   const mutation = useMutation({
     mutationFn: login,
@@ -46,6 +47,12 @@ export function LoginPage() {
         <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">
           Que bom te ver de novo.
         </h1>
+
+        {accountDeleted && (
+          <p role="status" className="mt-6 rounded-2xl bg-ink-800 p-4 text-sm text-text-soft">
+            Sua conta foi excluída, com todos os dados dela.
+          </p>
+        )}
 
         {expired && (
           <p role="status" className="mt-6 rounded-2xl bg-ink-800 p-4 text-sm text-text-soft">

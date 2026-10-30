@@ -14,6 +14,9 @@ const base: IconProps = {
   "aria-hidden": true,
 };
 
+export const UserIcon = (p: IconProps) => (
+  <svg {...base} {...p}><circle cx="12" cy="8" r="4" /><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" /></svg>
+);
 export const HomeIcon = (p: IconProps) => (
   <svg {...base} {...p}><path d="M3 11l9-7 9 7" /><path d="M5 10v10h14V10" /></svg>
 );

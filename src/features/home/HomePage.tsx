@@ -6,10 +6,10 @@ import { AttentionSection } from "./AttentionSection";
 import { isAlert } from "./budgetAlerts";
 import { GoalsSection } from "./GoalsSection";
 import { BudgetSummary } from "./BudgetSummary";
-import { useLogout } from "../auth/useLogout";
 import { currentMonth, greeting, longDate } from "../../shared/lib/dates";
 import { useBudgetDashboard } from "../budget/budgetApi";
 import { Link } from "react-router";
+import { UserIcon } from "../../shared/ui/icons";
 
 export function HomePage() {
   const month = currentMonth();
@@ -17,7 +17,6 @@ export function HomePage() {
   const totals = useMonthlyTotals(1);
   const budget = useBudgetDashboard(month);
   const goals = useGoals();
-  const logout = useLogout();
 
   const firstName = me.data?.name?.split(" ")[0];
 
@@ -31,13 +30,14 @@ export function HomePage() {
             {firstName ? `, ${firstName}` : ""}
           </h1>
         </div>
-        <button
-          type="button"
-          onClick={logout}
-          className="h-11 rounded-full px-4 text-sm font-bold text-text-muted transition hover:text-text active:scale-95"
+        {/* Sair, exportar e excluir a conta ficam em "Minha conta". */}
+        <Link
+          to="/account"
+          aria-label="Minha conta"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface font-display text-base font-semibold text-signal transition active:scale-95"
         >
-          Sair
-        </button>
+          {firstName ? firstName.charAt(0).toUpperCase() : <UserIcon width={20} height={20} />}
+        </Link>
       </header>
 
       {totals.isPending || budget.isPending || goals.isPending ? (

@@ -12,6 +12,7 @@ import { CategoriesPage } from "../features/categories/CategoriesPage";
 import { BudgetPage } from "../features/budget/BudgetPage";
 import { GoalsPage } from "../features/goals/GoalsPage";
 import { AnalyticsPage } from "../features/analytics/AnalyticsPage";
+import { AccountPage } from "../features/account/AccountPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
           { path: "/budget", element: <BudgetPage /> },
           { path: "/goals", element: <GoalsPage /> },
           { path: "/analytics", element: <AnalyticsPage /> },
+          { path: "/account", element: <AccountPage /> },
         ],
       },
     ],

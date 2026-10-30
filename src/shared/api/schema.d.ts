@@ -262,6 +262,30 @@ export interface paths {
         get: operations["me"];
         put?: never;
         post?: never;
+        /**
+         * Exclui a conta e todos os dados dela
+         * @description Exige a senha atual. Apaga categorias, transações, orçamento, metas e sessões numa única transação, e não tem volta. Senha errada responde 403 (não 401, que o front trata como sessão encerrada); são 5 tentativas a cada 15 minutos.
+         */
+        delete: operations["deleteAccount"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exporta todos os dados da conta em JSON
+         * @description Perfil, categorias (inclusive arquivadas), transações, histórico do orçamento e metas, no mesmo formato das outras respostas. Vem como anexo para download.
+         */
+        get: operations["export"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -490,6 +514,17 @@ export interface components {
         RenameCategoryRequest: {
             name: string;
         };
+        AccountExport: {
+            /** Format: date-time */
+            exportedAt: string;
+            profile: components["schemas"]["UserResponse"];
+            /** @description Inclusive as arquivadas */
+            categories: components["schemas"]["CategoryResponse"][];
+            transactions: components["schemas"]["TransactionResponse"][];
+            /** @description Todo o histórico, inclusive itens encerrados */
+            budgetItems: components["schemas"]["BudgetItemResponse"][];
+            goals: components["schemas"]["SavingsGoalResponse"][];
+        };
         Health: {
             /** @example UP */
             status: string;
@@ -560,6 +595,9 @@ export interface components {
             usedPercentage?: number;
             /** @enum {string} */
             status: "OK" | "WARNING" | "EXCEEDED" | "IN_PROGRESS" | "REACHED";
+        };
+        DeleteAccountRequest: {
+            password: string;
         };
         GoalDeletionResponse: {
             /** Format: int64 */
@@ -1054,6 +1092,48 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["UserResponse"];
+                };
+            };
+        };
+    };
+    deleteAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteAccountRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AccountExport"];
                 };
             };
         };
