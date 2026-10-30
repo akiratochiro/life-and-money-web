@@ -7,6 +7,7 @@ const API_ORIGIN = "https://life-and-money-api.onrender.com";
 function env() {
   return {
     API_ORIGIN,
+    PROXY_SHARED_SECRET: "segredo",
     ASSETS: { fetch: vi.fn(async () => new Response("<!doctype html>")) },
   };
 }
@@ -50,6 +51,54 @@ describe("worker", () => {
     expect(sent.headers.get("X-Refresh-Request")).toBe("1");
     expect(await sent.text()).toBe('{"x":1}');
     expect(init?.redirect).toBe("manual");
+  });
+
+  it("repassa o IP real do usuário com o segredo, no lugar do que a Cloudflare escreveria", async () => {
+    const upstream = captureUpstream();
+
+    await worker.fetch(
+      new Request("https://front.workers.dev/api/auth/login", {
+        method: "POST",
+        headers: { "CF-Connecting-IP": "198.51.100.7" },
+      }),
+      env(),
+    );
+
+    const [sent] = upstream.mock.calls[0];
+    expect(sent.headers.get("X-Client-IP")).toBe("198.51.100.7");
+    expect(sent.headers.get("X-Proxy-Auth")).toBe("segredo");
+  });
+
+  it("descarta um X-Client-IP ou X-Proxy-Auth mandado pelo navegador", async () => {
+    const upstream = captureUpstream();
+
+    await worker.fetch(
+      new Request("https://front.workers.dev/api/auth/login", {
+        method: "POST",
+        headers: { "CF-Connecting-IP": "198.51.100.7", "X-Client-IP": "10.9.9.9", "X-Proxy-Auth": "chute" },
+      }),
+      env(),
+    );
+
+    const [sent] = upstream.mock.calls[0];
+    expect(sent.headers.get("X-Client-IP")).toBe("198.51.100.7");
+    expect(sent.headers.get("X-Proxy-Auth")).toBe("segredo");
+  });
+
+  it("sem o secret configurado, não manda IP nem segredo nenhum", async () => {
+    const upstream = captureUpstream();
+
+    await worker.fetch(
+      new Request("https://front.workers.dev/api/auth/login", {
+        method: "POST",
+        headers: { "CF-Connecting-IP": "198.51.100.7", "X-Proxy-Auth": "chute" },
+      }),
+      { ...env(), PROXY_SHARED_SECRET: undefined },
+    );
+
+    const [sent] = upstream.mock.calls[0];
+    expect(sent.headers.has("X-Client-IP")).toBe(false);
+    expect(sent.headers.has("X-Proxy-Auth")).toBe(false);
   });
 
   it("devolve a resposta da API como veio, incluindo o Set-Cookie", async () => {
