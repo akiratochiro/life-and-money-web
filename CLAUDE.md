@@ -62,6 +62,8 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   dividiriam um único limite de tentativas na API.
 - **429:** `ApiError.retryAfterSeconds` + `useRetryCountdown` mostram quanto esperar e travam o
   botão. A renovação da sessão espera o `Retry-After` e repete (o 429 vem antes de o token girar).
+- **Minha conta** (`features/account`) concentra sair, exportar e excluir; a Início só tem o atalho.
+  Depois de excluir, `endSession({ expired: false })`, para o login não dizer que a sessão expirou.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

@@ -28,6 +28,7 @@ Create an account to try it: new users start with a default set of categories.
 | Goals | How much is left, how much to save each month and the deadline of each goal |
 | Analytics | Expenses by category in a donut and month-by-month bars, with the average of closed months |
 | Categories | Create, rename and archive your own categories |
+| My account | Profile, export all your data as JSON, sign out, and delete the account (typing "EXCLUIR" plus the password) |
 
 ## Stack
 
