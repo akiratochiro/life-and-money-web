@@ -54,6 +54,9 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   transitórios (rede, timeout, 502/503/504) e leituras (GET) têm timeout de 20 s. **Escrita nunca
   ganha timeout nem retry** (duplicaria lançamentos), e o refresh só repete 502/503, porque
   reenviar um token já rotacionado revoga todas as sessões do usuário.
+- **Token de redefinição de senha:** a `ResetPasswordPage` lê o token da URL uma vez, para o
+  estado, e o tira da URL com `navigate(..., { replace: true })`. O `index.html` tem
+  `referrer no-referrer` para o app inteiro. Não carregue recursos de terceiros nessa tela.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

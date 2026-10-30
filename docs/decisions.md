@@ -194,3 +194,21 @@ O aviso cobre só a abertura do app. Se a API hibernar com o app aberto, quem se
 retry das queries, sem aviso na tela: o usuário vê os dados que já estavam em cache, ou o
 carregamento, por mais tempo.
 
+## 10. O token de redefinição de senha não fica na URL
+
+**Contexto.** O link do e-mail de "esqueci minha senha" leva o token na query string
+(`/reset-password?token=...`). Enquanto ele estiver na URL, fica no histórico do navegador, num
+print da tela, num link copiado e no cabeçalho `Referer` de qualquer requisição que a página fizer.
+
+**Decisão.** A `ResetPasswordPage` lê o token uma vez, para o estado do React, e logo em seguida
+navega para `/reset-password` com `replace`, sem a query. O `index.html` declara
+`<meta name="referrer" content="no-referrer">` para o app inteiro.
+
+**Consequências.** Depois do primeiro render, o token só existe na memória da aba, até ser enviado
+no corpo do `POST`. O meta vale para o app todo, e não só para essa tela, porque precisa estar no
+documento antes de qualquer requisição sair; como o front e a API estão na mesma origem, o
+`Referer` não tinha uso no app.
+
+Recarregar a página depois disso perde o token, e a tela pede para abrir o link do e-mail de novo.
+É o preço de não deixar o token na URL, e o link continua valendo até ser usado ou expirar.
+

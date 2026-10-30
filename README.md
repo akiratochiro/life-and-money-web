@@ -48,6 +48,9 @@ covers the same choices as questions and answers. In short:
   `HttpOnly` cookie that this code never reads
 - **Front and API on the same origin**: the Worker that serves the front proxies `/api/*` to the
   API, so the session cookie is not a third-party cookie and Safari does not block it
+- **The password reset token never lingers**: `/reset-password` reads the token from the emailed
+  link into memory and removes it from the URL right away, and the whole app sends no `Referer`
+  (`<meta name="referrer" content="no-referrer">`)
 - **A sleeping API does not look like an error**: the free Render instance hibernates, so the app
   checks `/api/health` on start and, if it takes more than about 2 seconds, shows a "waking up the
   server" screen until the API answers. Queries retry only transient failures (network, timeout,
