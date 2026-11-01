@@ -1,6 +1,6 @@
 # Decisões de arquitetura — front-end
 
-Mesmo formato do [docs/decisions.md da API](https://github.com/akiratochiro/life-and-money/blob/main/docs/decisions.md):
+Mesmo formato do [docs/decisions.md da API](https://github.com/akiratochiro/life-and-money-api/blob/main/docs/decisions.md):
 contexto, decisão e consequências. Só entram aqui as escolhas que não são óbvias pelo código.
 
 ## 1. Os tipos da API são gerados, nunca escritos à mão
