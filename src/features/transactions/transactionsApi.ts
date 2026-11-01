@@ -13,11 +13,13 @@ export function useTransactions(month: string) {
   });
 }
 
+// "bills" porque uma transação pode ser o pagamento de uma conta: excluí-la desfaz o pagamento,
+// e editá-la muda o valor pago.
 function useInvalidateMoneyData() {
   const queryClient = useQueryClient();
   return () =>
     Promise.all(
-      ["dashboard", "goals", "transactions"].map((key) => queryClient.invalidateQueries({ queryKey: [key] })),
+      ["dashboard", "goals", "transactions", "bills"].map((key) => queryClient.invalidateQueries({ queryKey: [key] })),
     );
 }
 
