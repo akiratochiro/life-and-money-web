@@ -10,10 +10,13 @@ const mocks = vi.hoisted(() => ({ GET: vi.fn() }));
 vi.mock("../../shared/api/client", () => ({ api: mocks }));
 
 function occurrence(overrides: Partial<BillOccurrence>): BillOccurrence {
+  // Sem dizer o contrário, o vencimento cai num dia útil e o prazo é o próprio dia.
+  const dueDate = overrides.dueDate ?? "2026-11-16";
   return {
     billId: 1,
     month: "2026-11",
-    dueDate: "2026-11-16",
+    dueDate,
+    payableUntil: dueDate,
     name: "Aluguel",
     categoryId: 1,
     type: "EXPENSE",

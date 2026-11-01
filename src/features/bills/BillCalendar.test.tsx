@@ -5,10 +5,13 @@ import { BillCalendar } from "./BillCalendar";
 import type { BillOccurrence } from "./billsApi";
 
 function occurrence(overrides: Partial<BillOccurrence>): BillOccurrence {
+  // Sem dizer o contrário, o vencimento cai num dia útil e o prazo é o próprio dia.
+  const dueDate = overrides.dueDate ?? "2026-11-10";
   return {
     billId: 1,
     month: "2026-11",
-    dueDate: "2026-11-10",
+    dueDate,
+    payableUntil: dueDate,
     name: "Aluguel",
     categoryId: 1,
     type: "EXPENSE",
@@ -69,6 +72,31 @@ describe("BillCalendar", () => {
 
     expect(days()).toHaveLength(28);
     expect(screen.getByRole("button", { name: "28 de fevereiro: 1 pendente" })).toBeInTheDocument();
+  });
+
+  it("destaca o dia de feriado sem tratá-lo como conta", () => {
+    render(
+      <BillCalendar
+        month="2026-11"
+        occurrences={[occurrence({ dueDate: "2026-11-20" })]}
+        holidays={new Map([["2026-11-02", "Finados"], ["2026-11-20", "Dia da consciência negra"]])}
+        today="2026-11-01"
+        selectedDay={null}
+        onSelectDay={vi.fn()}
+      />,
+    );
+
+    const finados = screen.getByRole("button", { name: "2 de novembro, feriado: Finados" });
+    expect(finados).toHaveAttribute("data-holiday", "true");
+    expect(finados.querySelector("[data-status]")).toBeNull();
+
+    // um feriado com conta mostra os dois: o destaque do dia e o marcador da conta
+    const blackConsciousness = screen.getByRole("button", { name: "20 de novembro, feriado: Dia da consciência negra: 1 pendente" });
+    expect(blackConsciousness).toHaveAttribute("data-holiday", "true");
+    expect(blackConsciousness.querySelector('[data-status="PENDING"]')).not.toBeNull();
+
+    expect(screen.getByRole("button", { name: "3 de novembro" })).not.toHaveAttribute("data-holiday");
+    expect(screen.getByText("Feriado nacional")).toBeInTheDocument();
   });
 
   it("tocar num dia seleciona; tocar de novo limpa", async () => {

@@ -3,6 +3,7 @@ import { useCategories } from "../categories/categoriesApi";
 import { BillCalendar } from "./BillCalendar";
 import { BillForm } from "./BillForm";
 import { OccurrenceItem } from "./OccurrenceItem";
+import { holidaysByDate, useHolidays } from "./holidaysApi";
 import {
   useBillOccurrences,
   useBills,
@@ -24,6 +25,8 @@ export function BillsPage() {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [editing, setEditing] = useState<Editing>(null);
   const occurrences = useBillOccurrences(month);
+  const holidaysOfYear = useHolidays(Number(month.slice(0, 4)));
+  const holidays = holidaysByDate(holidaysOfYear.data?.holidays ?? []);
   const today = todayIso();
 
   function changeMonth(next: string) {
@@ -72,10 +75,12 @@ export function BillsPage() {
           <BillCalendar
             month={month}
             occurrences={all}
+            holidays={holidays}
             today={today}
             selectedDay={selectedDay}
             onSelectDay={setSelectedDay}
           />
+          <HolidayNotice unavailable={holidaysOfYear.isError || holidaysOfYear.data?.available === false} />
           <MonthTotals occurrences={all} />
           <section className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-2">
@@ -88,6 +93,11 @@ export function BillsPage() {
                 </button>
               )}
             </div>
+            {selectedDay && holidays.has(selectedDay) && (
+              <p className="rounded-2xl bg-saving/15 px-4 py-3 text-sm font-semibold text-saving-soft">
+                Feriado nacional: {holidays.get(selectedDay)}
+              </p>
+            )}
             {visible.length === 0 ? (
               <EmptyState filtered={selectedDay !== null} onCreate={() => setEditing({ mode: "create" })} />
             ) : (
@@ -105,6 +115,20 @@ export function BillsPage() {
         </>
       )}
     </div>
+  );
+}
+
+/**
+ * A BrasilAPI só cobre feriados nacionais: quem tem feriado estadual ou municipal precisa saber
+ * que ele não aparece aqui, nem adia o prazo.
+ */
+function HolidayNotice({ unavailable }: { unavailable: boolean }) {
+  return (
+    <p role={unavailable ? "status" : undefined} className="-mt-3 px-1 text-xs leading-snug text-text-muted">
+      {unavailable
+        ? "Não foi possível carregar os feriados agora. Os prazos consideram só os fins de semana."
+        : "Só feriados nacionais, segundo a BrasilAPI. Feriados estaduais e municipais não aparecem nem adiam o prazo."}
+    </p>
   );
 }
 
