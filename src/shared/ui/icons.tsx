@@ -67,3 +67,11 @@ export const ChartIcon = (p: IconProps) => (
     <path d="M21 20H3" />
   </svg>
 );
+export const CalendarIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <rect x="4" y="5" width="16" height="15" rx="3" />
+    <path d="M4 10h16" />
+    <path d="M9 3v4" />
+    <path d="M15 3v4" />
+  </svg>
+);

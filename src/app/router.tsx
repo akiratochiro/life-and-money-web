@@ -13,6 +13,7 @@ import { BudgetPage } from "../features/budget/BudgetPage";
 import { GoalsPage } from "../features/goals/GoalsPage";
 import { AnalyticsPage } from "../features/analytics/AnalyticsPage";
 import { AccountPage } from "../features/account/AccountPage";
+import { BillsPage } from "../features/bills/BillsPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
           { path: "/transactions/new", element: <NewTransactionPage /> },
           { path: "/budget", element: <BudgetPage /> },
           { path: "/goals", element: <GoalsPage /> },
+          { path: "/bills", element: <BillsPage /> },
           { path: "/analytics", element: <AnalyticsPage /> },
           { path: "/account", element: <AccountPage /> },
         ],

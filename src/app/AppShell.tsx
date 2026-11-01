@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router";
-import { ChartIcon, GaugeIcon, HomeIcon, ListIcon, PlusIcon, TagIcon, TargetIcon, UserIcon } from "../shared/ui/icons";
+import { CalendarIcon, ChartIcon, GaugeIcon, HomeIcon, ListIcon, PlusIcon, TagIcon, TargetIcon, UserIcon } from "../shared/ui/icons";
 
 const items = [
   { to: "/", label: "Início", icon: HomeIcon },
@@ -8,7 +8,10 @@ const items = [
   { to: "/goals", label: "Metas", icon: TargetIcon },
 ];
 
+// No celular, a barra de baixo só tem espaço para quatro itens e o botão de lançar; essas telas
+// são alcançadas pelos atalhos da Início.
 const desktopOnlyItems = [
+  { to: "/bills", label: "Contas", icon: CalendarIcon },
   { to: "/analytics", label: "Análises", icon: ChartIcon },
   { to: "/categories", label: "Categorias", icon: TagIcon },
   { to: "/account", label: "Minha conta", icon: UserIcon },
