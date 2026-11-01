@@ -148,6 +148,18 @@ describe("BillsPage", () => {
     expect(screen.getByRole("button", { name: "2 de novembro" })).not.toHaveAttribute("data-holiday");
   });
 
+  it("um vencimento em dia não útil mostra até quando dá para pagar", async () => {
+    mocks.GET.mockImplementation((path: string) => {
+      if (path === "/bills/occurrences")
+        return ok([occurrence({ name: "Condomínio", dueDate: "2026-11-14", payableUntil: "2026-11-16", status: "PENDING" })]);
+      if (path === "/holidays") return ok(NOVEMBER_HOLIDAYS);
+      throw new Error(`GET inesperado: ${path}`);
+    });
+    open();
+
+    expect(await screen.findByText("vence sáb 14 → pague até seg 16")).toBeInTheDocument();
+  });
+
   it("tocar num dia do calendário mostra só o que vence nele", async () => {
     open();
     await screen.findByText("Aluguel");

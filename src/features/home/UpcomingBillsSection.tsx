@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { useUpcomingBills, type BillOccurrence } from "../bills/billsApi";
 import { byUrgency } from "../bills/calendar";
 import { Marker } from "../bills/BillCalendar";
+import { Deadline } from "../bills/OccurrenceItem";
 import { Badge } from "../../shared/ui/Badge";
 import { Money } from "../../shared/ui/Money";
 import { dayLabel } from "../../shared/lib/dates";
@@ -63,6 +64,7 @@ function UpcomingList({ occurrences }: { occurrences: BillOccurrence[] }) {
               <span className="text-xs text-text-muted">
                 {occurrence.type === "INCOME" ? "A receber" : "A pagar"} · {dayLabel(occurrence.dueDate)}
               </span>
+              <Deadline occurrence={occurrence} />
             </div>
             <div className="flex flex-col items-end gap-1">
               <Money value={occurrence.expectedAmount} className="text-sm font-bold" />

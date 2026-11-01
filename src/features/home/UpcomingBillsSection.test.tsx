@@ -73,6 +73,15 @@ describe("UpcomingBillsSection", () => {
     expect(mocks.GET).toHaveBeenCalledWith("/bills/upcoming");
   });
 
+  it("um recebimento em dia não útil diz até quando ele pode chegar", async () => {
+    respond([
+      occurrence({ name: "Cliente X", type: "INCOME", dueDate: "2026-11-20", payableUntil: "2026-11-23" }),
+    ]);
+    open();
+
+    expect(await screen.findByText("vence sex 20 → receba até seg 23")).toBeInTheDocument();
+  });
+
   it("mostra até quatro e leva para a tela de contas com o resto", async () => {
     respond(
       Array.from({ length: 6 }, (_, index) =>

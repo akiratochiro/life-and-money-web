@@ -6,7 +6,7 @@ import { Badge, type BadgeTone } from "../../shared/ui/Badge";
 import { Money } from "../../shared/ui/Money";
 import { AmountInput } from "../../shared/ui/AmountInput";
 import { toCents } from "../../shared/lib/money";
-import { formatDate, todayIso } from "../../shared/lib/dates";
+import { formatDate, todayIso, weekdayAndDay } from "../../shared/lib/dates";
 
 const STATUS: Record<BillOccurrence["status"], { label: string; tone: BadgeTone }> = {
   OVERDUE: { label: "Atrasada", tone: "danger" },
@@ -37,6 +37,7 @@ export function OccurrenceItem({ occurrence, onEdit }: Props) {
           <p className="text-sm text-text-soft">
             {receivable ? "A receber" : "A pagar"} · vence {formatDate(occurrence.dueDate)}
           </p>
+          {!paid && <Deadline occurrence={occurrence} />}
           <p className="text-sm text-text-soft">
             {paid ? (
               <>
@@ -92,6 +93,20 @@ export function OccurrenceItem({ occurrence, onEdit }: Props) {
         </p>
       )}
     </li>
+  );
+}
+
+/**
+ * Quando o vencimento cai num fim de semana ou feriado, o prazo vai para o próximo dia útil, e é
+ * ele que decide se a conta está atrasada: "vence sáb 14 → pague até seg 16".
+ */
+export function Deadline({ occurrence }: { occurrence: BillOccurrence }) {
+  if (occurrence.payableUntil === occurrence.dueDate) return null;
+  const verb = occurrence.type === "INCOME" ? "receba" : "pague";
+  return (
+    <p className="text-xs font-semibold text-saving-soft">
+      vence {weekdayAndDay(occurrence.dueDate)} → {verb} até {weekdayAndDay(occurrence.payableUntil)}
+    </p>
   );
 }
 
