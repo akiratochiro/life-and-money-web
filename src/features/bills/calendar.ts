@@ -47,16 +47,20 @@ const STATUS_WORDS: Record<BillStatus, [string, string]> = {
   PAID: ["paga", "pagas"],
 };
 
-/** O texto que um leitor de tela lê para o dia: "15 de novembro: 1 atrasada, 2 pendentes". */
-export function dayLabel(isoDate: string, summary: DaySummary): string {
+/**
+ * O texto que um leitor de tela lê para o dia: "15 de novembro, feriado: Proclamação da
+ * República: 1 pendente".
+ */
+export function dayLabel(isoDate: string, summary: DaySummary, holiday?: string): string {
   const [year, month, day] = isoDate.split("-").map(Number);
   const date = new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long" }).format(
     new Date(year, month - 1, day),
   );
+  const head = holiday ? `${date}, feriado: ${holiday}` : date;
   const parts = (["OVERDUE", "PENDING", "PAID"] as const)
     .filter((status) => summary[status] > 0)
     .map((status) => `${summary[status]} ${STATUS_WORDS[status][summary[status] === 1 ? 0 : 1]}`);
-  return parts.length === 0 ? date : `${date}: ${parts.join(", ")}`;
+  return parts.length === 0 ? head : `${head}: ${parts.join(", ")}`;
 }
 
 /** Atrasadas primeiro, depois pela data de vencimento. */

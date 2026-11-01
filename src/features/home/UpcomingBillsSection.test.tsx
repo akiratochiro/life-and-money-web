@@ -10,10 +10,13 @@ const mocks = vi.hoisted(() => ({ GET: vi.fn() }));
 vi.mock("../../shared/api/client", () => ({ api: mocks }));
 
 function occurrence(overrides: Partial<BillOccurrence>): BillOccurrence {
+  // Sem dizer o contrário, o vencimento cai num dia útil e o prazo é o próprio dia.
+  const dueDate = overrides.dueDate ?? "2026-11-16";
   return {
     billId: 1,
     month: "2026-11",
-    dueDate: "2026-11-16",
+    dueDate,
+    payableUntil: dueDate,
     name: "Aluguel",
     categoryId: 1,
     type: "EXPENSE",
@@ -68,6 +71,15 @@ describe("UpcomingBillsSection", () => {
     expect(within(items[0]).getByText("Atrasada")).toBeInTheDocument();
     expect(within(items[1]).getByText(/A receber/)).toBeInTheDocument();
     expect(mocks.GET).toHaveBeenCalledWith("/bills/upcoming");
+  });
+
+  it("um recebimento em dia não útil diz até quando ele pode chegar", async () => {
+    respond([
+      occurrence({ name: "Cliente X", type: "INCOME", dueDate: "2026-11-20", payableUntil: "2026-11-23" }),
+    ]);
+    open();
+
+    expect(await screen.findByText("vence sex 20 → receba até seg 23")).toBeInTheDocument();
   });
 
   it("mostra até quatro e leva para a tela de contas com o resto", async () => {

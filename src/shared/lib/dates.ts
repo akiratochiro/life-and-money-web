@@ -80,3 +80,12 @@ export function shortMonthName(month: string): string {
     .format(new Date(year, monthNumber - 1, 1))
     .replace(".", "");
 }
+
+/** "sáb 15": o dia da semana curto, sem o ponto da abreviação, e o dia do mês. */
+export function weekdayAndDay(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "short" })
+    .format(new Date(year, month - 1, day))
+    .replace(".", "");
+  return `${weekday} ${day}`;
+}

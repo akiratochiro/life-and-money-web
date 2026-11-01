@@ -3,10 +3,13 @@ import { byDueDate, byUrgency, dayLabel, monthGrid, summarize } from "./calendar
 import type { BillOccurrence } from "./billsApi";
 
 function occurrence(overrides: Partial<BillOccurrence>): BillOccurrence {
+  // Sem dizer o contrário, o vencimento cai num dia útil e o prazo é o próprio dia.
+  const dueDate = overrides.dueDate ?? "2026-11-10";
   return {
     billId: 1,
     month: "2026-11",
-    dueDate: "2026-11-10",
+    dueDate,
+    payableUntil: dueDate,
     name: "Aluguel",
     categoryId: 1,
     type: "EXPENSE",
@@ -81,6 +84,13 @@ describe("dayLabel", () => {
       "15 de novembro: 1 atrasada, 2 pendentes",
     );
     expect(dayLabel("2026-11-15", { OVERDUE: 0, PENDING: 0, PAID: 1 })).toBe("15 de novembro: 1 paga");
+  });
+
+  it("um feriado entra no rótulo, antes das contas", () => {
+    expect(dayLabel("2026-11-15", { OVERDUE: 0, PENDING: 1, PAID: 0 }, "Proclamação da República")).toBe(
+      "15 de novembro, feriado: Proclamação da República: 1 pendente",
+    );
+    expect(dayLabel("2026-11-02", { OVERDUE: 0, PENDING: 0, PAID: 0 }, "Finados")).toBe("2 de novembro, feriado: Finados");
   });
 
   it("um dia sem contas é só a data", () => {

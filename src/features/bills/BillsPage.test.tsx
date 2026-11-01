@@ -23,10 +23,13 @@ const ok = (data: unknown, status = 200) => Promise.resolve({ data, response: ne
 const noContent = () => Promise.resolve({ response: new Response(null, { status: 204 }) });
 
 function occurrence(overrides: Partial<BillOccurrence>): BillOccurrence {
+  // Sem dizer o contrário, o vencimento cai num dia útil e o prazo é o próprio dia.
+  const dueDate = overrides.dueDate ?? "2026-11-10";
   return {
     billId: 1,
     month: "2026-11",
-    dueDate: "2026-11-10",
+    dueDate,
+    payableUntil: dueDate,
     name: "Aluguel",
     categoryId: 1,
     type: "EXPENSE",
@@ -53,6 +56,16 @@ const NOVEMBER = [
     transactionId: 99,
   }),
 ];
+
+const NOVEMBER_HOLIDAYS = {
+  year: 2026,
+  available: true,
+  holidays: [
+    { date: "2026-11-02", name: "Finados" },
+    { date: "2026-11-15", name: "Proclamação da República" },
+    { date: "2026-11-20", name: "Dia da consciência negra" },
+  ],
+};
 
 const CATEGORIES = [
   { id: 1, name: "Casa", type: "EXPENSE", archived: false },
@@ -81,6 +94,7 @@ beforeEach(() => {
     if (path === "/bills/occurrences") return ok(NOVEMBER);
     if (path === "/categories") return ok(CATEGORIES);
     if (path === "/bills") return ok([]);
+    if (path === "/holidays") return ok(NOVEMBER_HOLIDAYS);
     throw new Error(`GET inesperado: ${path}`);
   });
 });
@@ -105,11 +119,52 @@ describe("BillsPage", () => {
     expect(screen.getByText("Falta receber").nextSibling).toHaveTextContent("R$ 0,00");
   });
 
+  it("destaca os feriados nacionais e avisa que estaduais e municipais não entram", async () => {
+    open();
+    await screen.findByText("Aluguel");
+
+    expect(mocks.GET).toHaveBeenCalledWith("/holidays", { params: { query: { year: 2026 } } });
+    expect(await screen.findByRole("button", { name: "2 de novembro, feriado: Finados" })).toBeInTheDocument();
+    expect(
+      screen.getByText("Só feriados nacionais, segundo a BrasilAPI. Feriados estaduais e municipais não aparecem nem adiam o prazo."),
+    ).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "15 de novembro, feriado: Proclamação da República" }));
+    expect(screen.getByText("Feriado nacional: Proclamação da República")).toBeInTheDocument();
+    expect(screen.getByText("Nada vence neste dia.")).toBeInTheDocument();
+  });
+
+  it("sem a BrasilAPI, avisa que os prazos consideram só os fins de semana", async () => {
+    mocks.GET.mockImplementation((path: string) => {
+      if (path === "/bills/occurrences") return ok(NOVEMBER);
+      if (path === "/holidays") return ok({ year: 2026, available: false, holidays: [] });
+      throw new Error(`GET inesperado: ${path}`);
+    });
+    open();
+
+    expect(
+      await screen.findByText("Não foi possível carregar os feriados agora. Os prazos consideram só os fins de semana."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "2 de novembro" })).not.toHaveAttribute("data-holiday");
+  });
+
+  it("um vencimento em dia não útil mostra até quando dá para pagar", async () => {
+    mocks.GET.mockImplementation((path: string) => {
+      if (path === "/bills/occurrences")
+        return ok([occurrence({ name: "Condomínio", dueDate: "2026-11-14", payableUntil: "2026-11-16", status: "PENDING" })]);
+      if (path === "/holidays") return ok(NOVEMBER_HOLIDAYS);
+      throw new Error(`GET inesperado: ${path}`);
+    });
+    open();
+
+    expect(await screen.findByText("vence sáb 14 → pague até seg 16")).toBeInTheDocument();
+  });
+
   it("tocar num dia do calendário mostra só o que vence nele", async () => {
     open();
     await screen.findByText("Aluguel");
 
-    await userEvent.click(screen.getByRole("button", { name: "20 de novembro: 1 pendente" }));
+    await userEvent.click(screen.getByRole("button", { name: "20 de novembro, feriado: Dia da consciência negra: 1 pendente" }));
 
     expect(screen.getByRole("heading", { name: /Vence em 20 de nov/ })).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")).toHaveLength(1);

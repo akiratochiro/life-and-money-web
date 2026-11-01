@@ -352,6 +352,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/holidays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Feriados nacionais do ano
+         * @description Fonte: BrasilAPI. Nunca falha: sem a BrasilAPI, responde available=false e lista vazia
+         */
+        get: operations["listHolidays"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -649,6 +669,11 @@ export interface components {
             month: string;
             /** Format: date */
             dueDate: string;
+            /**
+             * Format: date
+             * @description Último dia para pagar sem atraso: o vencimento ou, se ele cair num fim de semana ou feriado nacional, o próximo dia útil. É dele que sai o status OVERDUE
+             */
+            payableUntil: string;
             name: string;
             /** Format: int64 */
             categoryId: number;
@@ -759,6 +784,20 @@ export interface components {
             validFrom: string;
             /** @example 2027-10 */
             validTo?: string;
+        };
+        Holiday: {
+            /** Format: date */
+            date: string;
+            /** @example Finados */
+            name: string;
+        };
+        HolidaysResponse: {
+            /** Format: int32 */
+            year: number;
+            /** @description Falso quando a BrasilAPI não respondeu: a lista vem vazia, e os prazos das contas consideram só os fins de semana */
+            available: boolean;
+            /** @description Só feriados nacionais; estaduais e municipais não entram */
+            holidays: components["schemas"]["Holiday"][];
         };
         Health: {
             /** @example UP */
@@ -1509,6 +1548,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AccountExport"];
+                };
+            };
+        };
+    };
+    listHolidays: {
+        parameters: {
+            query: {
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HolidaysResponse"];
                 };
             };
         };

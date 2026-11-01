@@ -252,3 +252,26 @@ mutações de transação passam a invalidar também `["bills"]`, e as de catego
 contas desatualizada depois de excluir uma transação no extrato é exatamente o tipo de erro que o
 compilador não pega. Por isso a regra ficou escrita no comentário de cada módulo de API, e não só
 aqui.
+
+## 13. Feriados no calendário: destaque do dia, não uma conta, e o prazo vem da API
+
+**Contexto.** O calendário de contas precisava mostrar os feriados nacionais, e uma conta que vence
+num fim de semana ou feriado pode ser paga no próximo dia útil sem atraso (decisão 11 da API).
+
+**Decisão.** O dia de feriado pinta o quadrado inteiro (fundo azulado e uma estrela no canto), em
+vez de ganhar um marcador como os das contas, e o rótulo para leitor de tela inclui o nome do
+feriado. Os feriados vêm de `GET /holidays`, da própria API, que os busca na BrasilAPI. O prazo de
+cada ocorrência (`payableUntil`) também vem pronto da API: quando ele não é o próprio vencimento,
+a conta mostra "vence sáb 14 → pague até seg 16".
+
+**Consequências.** O front não calcula dia útil: se calculasse, haveria duas regras para a mesma
+pergunta ("está atrasada?"), e as duas poderiam discordar. Ele só posiciona o feriado no
+calendário e mostra o prazo que recebeu.
+
+A consulta de feriados fica em cache para sempre (`staleTime: Infinity`) quando a resposta veio
+completa, porque os feriados de um ano não mudam. Quando a BrasilAPI estava fora do ar
+(`available: false`), a resposta vale só um minuto, para a tela tentar de novo sozinha.
+
+A BrasilAPI só cobre feriados nacionais. Um aviso fixo embaixo do calendário diz isso, para quem
+tem feriado estadual ou municipal não achar que ele foi esquecido, nem contar com ele para adiar o
+prazo. Sem a BrasilAPI, o aviso muda e diz que os prazos consideram só os fins de semana.
