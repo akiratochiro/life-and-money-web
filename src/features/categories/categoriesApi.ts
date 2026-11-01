@@ -19,6 +19,8 @@ function useInvalidateCategories() {
     Promise.all([
       queryClient.invalidateQueries({ queryKey: ["categories"] }),
       queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+      // Arquivar encerra as contas da categoria; renomear muda o nome mostrado nelas.
+      queryClient.invalidateQueries({ queryKey: ["bills"] }),
     ]);
 }
 

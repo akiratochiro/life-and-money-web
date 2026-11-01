@@ -52,6 +52,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bills/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Muda a conta do mês atual em diante */
+        put: operations["updateBill"];
+        post?: never;
+        /** Apaga a conta, ou a encerra se já teve pagamento */
+        delete: operations["removeBill"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/transactions": {
         parameters: {
             query?: never;
@@ -111,6 +129,48 @@ export interface paths {
         put?: never;
         post: operations["archive"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** As contas, com os termos em vigor */
+        get: operations["listBills"];
+        put?: never;
+        /** Cria uma conta a pagar ou a receber */
+        post: operations["createBill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bills/{id}/occurrences/{month}/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Marca a ocorrência como paga
+         * @description Cria a transação real. Sem corpo, usa o valor previsto e a data de hoje
+         */
+        post: operations["payBill"];
+        /**
+         * Desfaz o pagamento
+         * @description Apaga a transação criada ao pagar
+         */
+        delete: operations["undoBillPayment"];
         options?: never;
         head?: never;
         patch?: never;
@@ -373,6 +433,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bills/upcoming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * O que pede atenção
+         * @description Atrasadas dos últimos 12 meses e o que vence de hoje até daqui a 7 dias, sem as pagas
+         */
+        get: operations["upcomingBills"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bills/occurrences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ocorrências do mês
+         * @description Calculadas a partir das contas, com o status de cada uma
+         */
+        get: operations["billOccurrences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -457,6 +557,38 @@ export interface components {
             validTo?: string;
             active: boolean;
         };
+        UpdateBillRequest: {
+            name: string;
+            /** Format: int64 */
+            categoryId: number;
+            amount: number;
+            /** Format: int32 */
+            dueDay: number;
+            /**
+             * @description Último mês; ausente para não ter fim
+             * @example 2027-10
+             */
+            endMonth?: string;
+        };
+        ScheduledBillResponse: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            /** Format: int64 */
+            categoryId: number;
+            amount: number;
+            /** Format: int32 */
+            dueDay: number;
+            /** @enum {string} */
+            recurrence: "ONCE" | "MONTHLY" | "YEARLY";
+            /** @example 2026-11 */
+            startMonth: string;
+            /**
+             * @description Ausente enquanto a conta não tem fim
+             * @example 2027-10
+             */
+            endMonth?: string;
+        };
         CreateCategoryRequest: {
             name: string;
             /** @enum {string} */
@@ -471,6 +603,77 @@ export interface components {
             archived: boolean;
             /** Format: date-time */
             createdAt: string;
+        };
+        CreateBillRequest: {
+            name: string;
+            /**
+             * Format: int64
+             * @description Categoria de receita (a receber) ou de despesa (a pagar)
+             */
+            categoryId: number;
+            amount: number;
+            /**
+             * Format: int32
+             * @description Num mês sem esse dia, a conta vence no último dia do mês
+             */
+            dueDay: number;
+            /** @enum {string} */
+            recurrence: "ONCE" | "MONTHLY" | "YEARLY";
+            /**
+             * @description Primeiro mês; nas anuais, também o mês de vencimento
+             * @example 2026-11
+             */
+            startMonth: string;
+            /**
+             * @description Último mês, opcional; ignorado nas contas únicas
+             * @example 2027-10
+             */
+            endMonth?: string;
+        };
+        PayBillRequest: {
+            /** @description Valor efetivo; ausente para usar o previsto (a conta de luz raramente bate) */
+            amount?: number;
+            /**
+             * Format: date
+             * @description Data do pagamento; ausente para hoje
+             */
+            paidOn?: string;
+        };
+        BillOccurrenceResponse: {
+            /** Format: int64 */
+            billId: number;
+            /**
+             * @description Identifica a ocorrência junto com billId
+             * @example 2026-11
+             */
+            month: string;
+            /** Format: date */
+            dueDate: string;
+            name: string;
+            /** Format: int64 */
+            categoryId: number;
+            /**
+             * @description EXPENSE é a pagar; INCOME é a receber
+             * @enum {string}
+             */
+            type: "INCOME" | "EXPENSE" | "SAVING";
+            /** @enum {string} */
+            recurrence: "ONCE" | "MONTHLY" | "YEARLY";
+            expectedAmount: number;
+            /** @enum {string} */
+            status: "PENDING" | "PAID" | "OVERDUE";
+            /** @description Valor da transação do pagamento; só quando paga */
+            paidAmount?: number;
+            /**
+             * Format: date
+             * @description Data da transação do pagamento; só quando paga
+             */
+            paidOn?: string;
+            /**
+             * Format: int64
+             * @description Transação criada ao pagar; só quando paga
+             */
+            transactionId?: number;
         };
         ResetPasswordRequest: {
             token: string;
@@ -524,6 +727,38 @@ export interface components {
             /** @description Todo o histórico, inclusive itens encerrados */
             budgetItems: components["schemas"]["BudgetItemResponse"][];
             goals: components["schemas"]["SavingsGoalResponse"][];
+            /** @description Contas a pagar e a receber, com todo o histórico */
+            bills: components["schemas"]["BillExport"][];
+        };
+        BillExport: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            recurrence: "ONCE" | "MONTHLY" | "YEARLY";
+            /** @example 2026-11 */
+            startMonth: string;
+            /** @example 2027-10 */
+            endMonth?: string;
+            terms: components["schemas"]["Terms"][];
+            payments: components["schemas"]["Payment"][];
+        };
+        Payment: {
+            /** @example 2026-11 */
+            month: string;
+            /** Format: int64 */
+            transactionId: number;
+        };
+        Terms: {
+            name: string;
+            /** Format: int64 */
+            categoryId: number;
+            amount: number;
+            /** Format: int32 */
+            dueDay: number;
+            /** @example 2026-11 */
+            validFrom: string;
+            /** @example 2027-10 */
+            validTo?: string;
         };
         Health: {
             /** @example UP */
@@ -754,6 +989,52 @@ export interface operations {
             };
         };
     };
+    updateBill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBillRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ScheduledBillResponse"];
+                };
+            };
+        };
+    };
+    removeBill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     list: {
         parameters: {
             query: {
@@ -909,6 +1190,100 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["CategoryResponse"];
                 };
+            };
+        };
+    };
+    listBills: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ScheduledBillResponse"][];
+                };
+            };
+        };
+    };
+    createBill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBillRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ScheduledBillResponse"];
+                };
+            };
+        };
+    };
+    payBill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                /** @example 2026-11 */
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PayBillRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BillOccurrenceResponse"];
+                };
+            };
+        };
+    };
+    undoBillPayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                /** @example 2026-11 */
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1242,6 +1617,48 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["BudgetItemResponse"][];
+                };
+            };
+        };
+    };
+    upcomingBills: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BillOccurrenceResponse"][];
+                };
+            };
+        };
+    };
+    billOccurrences: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BillOccurrenceResponse"][];
                 };
             };
         };
