@@ -36,7 +36,8 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   `src/app/` tem o shell, rotas e providers.
 - **TanStack Query é o único dono do estado do servidor.** Não crie store global. Cada feature
   expõe hooks e as mutações invalidam as chaves afetadas (uma transação invalida
-  `["transactions"]`, `["dashboard"]` e `["goals"]`). `useState` só para estado de interface.
+  `["transactions"]`, `["dashboard"]`, `["goals"]` e `["bills"]`, porque pode ser o pagamento de
+  uma conta; pagar uma conta invalida `["bills"]`, `["transactions"]` e `["dashboard"]`). `useState` só para estado de interface.
 - **Dinheiro em centavos nos formulários.** `AmountInput` guarda um inteiro em centavos;
   `PercentInput`, centésimos de ponto percentual. A conversão para reais (`cents / 100`)
   acontece só na fronteira com a API, na hora de enviar.
@@ -64,6 +65,12 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   botão. A renovação da sessão espera o `Retry-After` e repete (o 429 vem antes de o token girar).
 - **Minha conta** (`features/account`) concentra sair, exportar e excluir; a Início só tem o atalho.
   Depois de excluir, `endSession({ expired: false })`, para o login não dizer que a sessão expirou.
+- **Datas como texto `AAAA-MM-DD`, nunca `new Date("AAAA-MM-DD")`**, que é lido em UTC e cai no
+  dia anterior no Brasil. Para montar datas, use o construtor local `new Date(ano, mês - 1, dia)`
+  (`shared/lib/dates.ts`, `features/bills/calendar.ts`).
+- **Contas** (`features/bills`): o calendário é CSS grid sem biblioteca (decisão 11), e o status
+  aparece por forma além da cor. O vencimento (inclusive dia 31 em fevereiro) é calculado pela API;
+  o front só posiciona a data. No celular, a tela é alcançada pelo card da Início.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

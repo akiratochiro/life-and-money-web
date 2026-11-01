@@ -212,3 +212,43 @@ documento antes de qualquer requisição sair; como o front e a API estão na me
 Recarregar a página depois disso perde o token, e a tela pede para abrir o link do e-mail de novo.
 É o preço de não deixar o token na URL, e o link continua valendo até ser usado ou expirar.
 
+
+## 11. O calendário de contas é CSS grid, e as datas nunca passam por UTC
+
+**Contexto.** A tela Contas precisa de um calendário mensal com marcadores por status em cada
+dia. Bibliotecas de calendário resolvem isso, mas trazem um componente inteiro (seleção de
+intervalo, localização, estilos próprios) para uma grade de sete colunas, e uma dependência a mais
+para manter.
+
+**Decisão.** O calendário é um `grid-cols-7` do Tailwind. O dia 1 recebe `grid-column-start`
+igual ao dia da semana dele, então não existem casas vazias no HTML. A grade sai de uma função pura
+(`monthGrid`) que só usa o construtor local `new Date(ano, mês, dia)`. As datas da API trafegam
+como texto `AAAA-MM-DD`.
+
+O status de cada dia aparece com forma própria além da cor: ponto cheio (atrasada), anel
+(pendente) e visto (paga). Cada dia é um botão com um rótulo para leitor de tela, como "10 de
+novembro: 1 atrasada, 1 paga".
+
+**Consequências.** Nenhuma dependência nova, e o calendário tem exatamente o comportamento
+desta tela: tocar num dia filtra a lista, e tocar de novo limpa o filtro.
+
+O cuidado com o fuso é o ponto delicado. `new Date("2026-02-28")` é lido como meia-noite em UTC e,
+no Brasil (UTC−3), vira o dia 27 às 21h: uma conta do dia 28 apareceria no dia 27. O construtor
+local não tem esse problema, e os testes da grade passam de UTC−10 a UTC+14. Quem decide o dia de
+vencimento, inclusive o dia 31 em fevereiro, é a API; o front só posiciona a data que recebe.
+
+Em troca, coisas que uma biblioteca daria de graça ficam por fazer, como navegar pelo teclado com
+as setas entre os dias. Hoje se navega com Tab, dia a dia.
+
+## 12. As contas também são invalidadas por transações e categorias
+
+**Contexto.** Pagar uma conta cria uma transação, e excluir essa transação pelo extrato desfaz o
+pagamento (decisão 10 da API). Arquivar uma categoria encerra as contas dela.
+
+**Decisão.** Pagar e desfazer invalidam `["bills"]`, `["transactions"]` e `["dashboard"]`. As
+mutações de transação passam a invalidar também `["bills"]`, e as de categoria também.
+
+**Consequências.** O contrato implícito das chaves de cache (decisão 2) cresceu: uma tela de
+contas desatualizada depois de excluir uma transação no extrato é exatamente o tipo de erro que o
+compilador não pega. Por isso a regra ficou escrita no comentário de cada módulo de API, e não só
+aqui.
