@@ -84,6 +84,11 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   o porquê das escolhas e os trade-offs, para eu conseguir defendê-las numa entrevista.
 - **Passos pequenos, um commit por passo**, em Conventional Commits (`feat:`, `fix:`, `test:`,
   `docs:`, `build:`, `ci:`, `chore:`, `refactor:`).
+- **Commits direto na `main`, sem branches nem pull requests.** Cada passo vira um commit na
+  `main`, e o push é feito ao fim da tarefa, depois de os testes e o build passarem na máquina.
+  Push na `main` vai para o ar (a API no Render, o front no Cloudflare Workers) e a CI só roda
+  depois, então nada quebrado pode ser enviado. Quando a mudança atravessa os dois repositórios,
+  o push da API vem primeiro, e o do front só depois que o deploy da API terminar.
 - **Toda regra de negócio nova precisa de teste.** Vitest + Testing Library em jsdom, configurados
   no bloco `test` do `vite.config.ts` (setup em `src/test/setup.ts`). O arquivo de teste fica ao
   lado do código (`money.ts` → `money.test.ts`), com imports explícitos de `vitest` (sem globals).
