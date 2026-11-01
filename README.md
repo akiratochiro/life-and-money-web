@@ -26,7 +26,7 @@ Create an account to try it: new users start with a default set of categories.
 | Statement | The month's transactions grouped by day, with editing and deletion |
 | Budget | A limit per category, as a fixed amount or a percentage of income, effective by month |
 | Goals | How much is left, how much to save each month and the deadline of each goal |
-| Bills | A monthly calendar of what is due, payable and receivable, with overdue, pending and paid markers on each day; mark one as paid (with the real amount) or undo it |
+| Bills | A monthly calendar of what is due, payable and receivable, with overdue, pending and paid markers on each day and national holidays highlighted; mark one as paid (with the real amount) or undo it |
 | Analytics | Expenses by category in a donut and month-by-month bars, with the average of closed months |
 | Categories | Create, rename and archive your own categories |
 | My account | Profile, export all your data as JSON, sign out, and delete the account (typing "EXCLUIR" plus the password) |
@@ -60,6 +60,11 @@ covers the same choices as questions and answers. In short:
   `grid-column-start`, and dates handled as `YYYY-MM-DD` text built with the local `Date` constructor,
   so a bill due on the 28th never shows up on the 27th because of UTC. Status uses shape as well as
   color, and the home screen shows what is overdue or due in the next 7 days
+- **National holidays shape the deadline, not just the calendar**: holiday days are highlighted
+  (from the [BrasilAPI](https://brasilapi.com.br), through the API), and a bill due on a weekend or
+  holiday shows "vence sáb 14 → pague até seg 16". The deadline comes ready from the API, so the
+  front never has a second rule for "is it overdue?". State and municipal holidays are not covered,
+  and the screen says so
 - **A sleeping API does not look like an error**: the free Render instance hibernates, so the app
   checks `/api/health` on start and, if it takes more than about 2 seconds, shows a "waking up the
   server" screen until the API answers. Queries retry only transient failures (network, timeout,

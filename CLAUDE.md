@@ -71,6 +71,10 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
 - **Contas** (`features/bills`): o calendário é CSS grid sem biblioteca (decisão 11), e o status
   aparece por forma além da cor. O vencimento (inclusive dia 31 em fevereiro) é calculado pela API;
   o front só posiciona a data. No celular, a tela é alcançada pelo card da Início.
+- **Feriados e prazo** (decisão 13): o feriado pinta o dia no calendário, sem virar marcador de
+  conta. O prazo (`payableUntil`) e o status vêm da API; **o front não calcula dia útil**. A
+  consulta de feriados (`features/bills/holidaysApi.ts`) fica em cache para sempre quando
+  `available`, e um minuto quando não. Sempre deixe claro na tela que só entram feriados nacionais.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 
