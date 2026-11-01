@@ -6,6 +6,7 @@ import { AttentionSection } from "./AttentionSection";
 import { isAlert } from "./budgetAlerts";
 import { GoalsSection } from "./GoalsSection";
 import { BudgetSummary } from "./BudgetSummary";
+import { UpcomingBillsSection } from "./UpcomingBillsSection";
 import { currentMonth, greeting, longDate } from "../../shared/lib/dates";
 import { useBudgetDashboard } from "../budget/budgetApi";
 import { Link } from "react-router";
@@ -102,6 +103,7 @@ function Feed({ month, totals, lines, goals }: FeedProps) {
         Ver para onde foi o dinheiro
       </Link>
       <AttentionSection lines={lines} overdueGoals={overdueGoals} />
+      <UpcomingBillsSection />
       <GoalsSection goals={otherGoals} />
       <BudgetSummary lines={calmLines} hasAnyBudget={lines.length > 0} />
     </>
