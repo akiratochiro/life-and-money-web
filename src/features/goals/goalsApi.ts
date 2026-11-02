@@ -1,7 +1,8 @@
 import { api } from "../../shared/api/client";
 import { unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInvalidate } from "../../shared/api/invalidation";
 
 
 export type Goal = components["schemas"]["SavingsGoalResponse"];
@@ -17,12 +18,8 @@ export function useGoals() {
 
 
 function useInvalidateGoals() {
-  const queryClient = useQueryClient();
-  return () =>
-    Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["goals"] }),
-      queryClient.invalidateQueries({ queryKey: ["transactions"] }),
-    ]);
+  const invalidate = useInvalidate();
+  return () => invalidate("goal");
 }
 
 export function useCreateGoal() {

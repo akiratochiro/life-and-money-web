@@ -1,4 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInvalidate } from "../../shared/api/invalidation";
 import { api } from "../../shared/api/client";
 import { expectNoContent, unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
@@ -13,14 +14,10 @@ export function useTransactions(month: string) {
   });
 }
 
-// "bills" porque uma transação pode ser o pagamento de uma conta: excluí-la desfaz o pagamento,
-// e editá-la muda o valor pago.
+// O que uma transação deixa desatualizado está em shared/api/invalidation.ts ("transaction").
 function useInvalidateMoneyData() {
-  const queryClient = useQueryClient();
-  return () =>
-    Promise.all(
-      ["dashboard", "goals", "transactions", "bills"].map((key) => queryClient.invalidateQueries({ queryKey: [key] })),
-    );
+  const invalidate = useInvalidate();
+  return () => invalidate("transaction");
 }
 
 export function useCreateTransaction() {

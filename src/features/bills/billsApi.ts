@@ -1,4 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInvalidate } from "../../shared/api/invalidation";
 import { api } from "../../shared/api/client";
 import { expectNoContent, unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
@@ -33,22 +34,15 @@ export function useUpcomingBills() {
   });
 }
 
-/** Mudar a conta só mexe nas contas. */
+// O que cada mudança deixa desatualizado está em shared/api/invalidation.ts.
 function useInvalidateBills() {
-  const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: ["bills"] });
+  const invalidate = useInvalidate();
+  return () => invalidate("bill");
 }
 
-/**
- * Pagar ou desfazer cria ou apaga uma transação: o extrato, o saldo e o orçamento mudam junto.
- * As metas ficam de fora porque contas não aceitam categoria de poupança.
- */
 function useInvalidateBillsAndMoney() {
-  const queryClient = useQueryClient();
-  return () =>
-    Promise.all(
-      ["bills", "transactions", "dashboard"].map((key) => queryClient.invalidateQueries({ queryKey: [key] })),
-    );
+  const invalidate = useInvalidate();
+  return () => invalidate("billPayment");
 }
 
 export function useCreateBill() {

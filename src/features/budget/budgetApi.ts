@@ -1,4 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInvalidate } from "../../shared/api/invalidation";
 import { api } from "../../shared/api/client";
 import { expectNoContent, unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
@@ -15,12 +16,8 @@ export function useBudgetDashboard(month: string) {
 }
 
 function useInvalidateBudget() {
-  const queryClient = useQueryClient();
-  return () =>
-    Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
-      queryClient.invalidateQueries({ queryKey: ["budgets"] }),
-    ]);
+  const invalidate = useInvalidate();
+  return () => invalidate("budget");
 }
 
 export function useSetBudget() {

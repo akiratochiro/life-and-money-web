@@ -1,7 +1,8 @@
 import { api } from "../../shared/api/client";
 import { unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInvalidate } from "../../shared/api/invalidation";
 
 export type Category = components["schemas"]["CategoryResponse"];
 export type CategoryType = Category["type"];
@@ -14,14 +15,8 @@ export function useCategories(includeArchived = false) {
   });
 }
 function useInvalidateCategories() {
-  const queryClient = useQueryClient();
-  return () =>
-    Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["categories"] }),
-      queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
-      // Arquivar encerra as contas da categoria; renomear muda o nome mostrado nelas.
-      queryClient.invalidateQueries({ queryKey: ["bills"] }),
-    ]);
+  const invalidate = useInvalidate();
+  return () => invalidate("category");
 }
 
 export function useCreateCategory() {
