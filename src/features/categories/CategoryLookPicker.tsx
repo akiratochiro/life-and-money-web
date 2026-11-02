@@ -20,7 +20,7 @@ export function CategoryLookPicker({ color, icon, onChange }: Props) {
         <legend className="mb-2 text-sm font-semibold text-text-muted">Cor</legend>
         <div className="grid grid-cols-6 gap-2">
           {COLOR_ORDER.map((option) => (
-            <label key={option} className="flex cursor-pointer items-center justify-center">
+            <label key={option} className="flex min-h-11 cursor-pointer items-center justify-center">
               <input
                 type="radio"
                 name={`${name}-color`}

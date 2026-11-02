@@ -48,7 +48,7 @@ export function AccountPage() {
           type="button"
           onClick={() => exportData.mutate()}
           disabled={exportData.isPending}
-          className="self-start text-sm font-bold text-link disabled:opacity-60"
+          className="-my-2 flex min-h-11 items-center self-start text-sm font-bold text-link disabled:opacity-60"
         >
           <PendingLabel pending={exportData.isPending} pendingText="Preparando o arquivo…">Exportar meus dados</PendingLabel>
         </button>
@@ -60,7 +60,7 @@ export function AccountPage() {
       </Card>
 
       <Card>
-        <button type="button" onClick={logout} className="text-sm font-bold text-text">
+        <button type="button" onClick={logout} className="-my-3 flex min-h-11 items-center text-sm font-bold text-text">
           Sair da conta
         </button>
       </Card>
@@ -124,7 +124,7 @@ function DeleteAccountSection() {
         <p className="text-sm leading-relaxed text-text-soft">
           Apaga a conta e todos os dados dela. Não dá para desfazer.
         </p>
-        <button type="button" onClick={() => setOpen(true)} className="self-start text-sm font-bold text-danger-strong">
+        <button type="button" onClick={() => setOpen(true)} className="-my-2 flex min-h-11 items-center self-start text-sm font-bold text-danger-strong">
           Quero excluir minha conta
         </button>
       </Card>

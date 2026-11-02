@@ -85,7 +85,7 @@ export function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Link to="/forgot-password" className="-mt-2 self-end text-sm font-bold text-link">
+          <Link to="/forgot-password" className="-my-2 flex min-h-11 items-center self-end text-sm font-bold text-link">
             Esqueci minha senha
           </Link>
 

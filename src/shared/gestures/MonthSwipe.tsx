@@ -4,14 +4,23 @@ import { addMonths } from "../lib/dates";
 import { DURATION } from "../ui/motion";
 import { startsAtEdge, swipeDirection } from "./gestures";
 
-type Props = { month: string; onChange: (month: string) => void; children: ReactNode };
+type Props = {
+  month: string;
+  onChange: (month: string) => void;
+  children: ReactNode;
+  /**
+   * A área que aceita o gesto. O padrão ocupa pelo menos meia tela: num mês vazio, o conteúdo
+   * encolhe, e sem isso o dedo cairia fora dela ao tentar voltar.
+   */
+  className?: string;
+};
 
 /**
  * Arrastar para o lado troca o mês: para a esquerda, o próximo; para a direita, o anterior, como
  * virar a página. O conteúdo do mês novo entra pelo lado de onde veio. É um atalho para o toque:
  * o MonthSwitcher continua sendo o caminho para teclado e leitor de tela.
  */
-export function MonthSwipe({ month, onChange, children }: Props) {
+export function MonthSwipe({ month, onChange, children, className = "min-h-[55dvh]" }: Props) {
   const start = useRef<{ x: number; y: number } | null>(null);
   const [from, setFrom] = useState(0);
 
@@ -32,7 +41,7 @@ export function MonthSwipe({ month, onChange, children }: Props) {
   }
 
   return (
-    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-month-swipe>
+    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-month-swipe className={className}>
       <m.div
         key={month}
         initial={from === 0 ? false : { opacity: 0, x: from * 32 }}

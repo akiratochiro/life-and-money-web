@@ -33,7 +33,7 @@ export function AnalyticsPage() {
       <section className="flex flex-col gap-5 rounded-hero bg-surface p-6 shadow-card">
         <h2 className="font-display text-base font-semibold">Para onde foi o dinheiro</h2>
         <MonthSwitcher month={month} onChange={setMonth} />
-        <MonthSwipe month={month} onChange={setMonth}>
+        <MonthSwipe month={month} onChange={setMonth} className="">
           {expenses.isPending ? (
             <DonutSkeleton />
           ) : expenses.isError ? (
@@ -54,7 +54,7 @@ export function AnalyticsPage() {
                 type="button"
                 aria-pressed={range === option}
                 onClick={() => setRange(option)}
-                className={`h-9 rounded-full px-3 text-xs font-bold transition active:scale-95 ${
+                className={`h-11 rounded-full px-3 text-xs font-bold transition active:scale-95 ${
                   range === option ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"
                 }`}
               >
