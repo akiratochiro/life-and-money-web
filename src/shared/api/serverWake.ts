@@ -26,8 +26,6 @@ type Options = {
   retryDelayMs: number;
 };
 
-export type ServerWake = ReturnType<typeof createServerWake>;
-
 export function createServerWake({ check, slowAfterMs, giveUpAfterMs, retryDelayMs }: Options) {
   let status: ServerStatus = "checking";
   let ready: Promise<void> | null = null;
