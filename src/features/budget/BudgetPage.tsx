@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useBudgetDashboard, type BudgetLine, type BudgetStatus } from "./budgetApi";
+import { budgetDashboardQuery, useBudgetDashboard, type BudgetLine, type BudgetStatus } from "./budgetApi";
 import { BudgetLineCard } from "./BudgetLineCard";
 import { BudgetEditor } from "./BudgetEditor";
 import { useCategories } from "../categories/categoriesApi";
@@ -8,6 +8,7 @@ import { Money } from "../../shared/ui/Money";
 import { currentMonth, monthLabel } from "../../shared/lib/dates";
 import { toCents } from "../../shared/lib/money";
 import { BudgetSkeleton } from "./BudgetSkeleton";
+import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 
 const SEVERITY: Record<BudgetStatus, number> = {
   EXCEEDED: 0,
@@ -27,6 +28,7 @@ export function BudgetPage() {
   const [month, setMonth] = useState(thisMonth);
   const [definingId, setDefiningId] = useState<number | null>(null);
   const dashboard = useBudgetDashboard(month);
+  usePrefetchAdjacentMonths(month, budgetDashboardQuery);
   const categories = useCategories();
 
   const editable = month === thisMonth;

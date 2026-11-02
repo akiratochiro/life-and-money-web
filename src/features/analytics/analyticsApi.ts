@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
 import { unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
@@ -7,11 +7,15 @@ export type ExpensesByCategory = components["schemas"]["ExpensesByCategoryRespon
 export type MonthlyTotal = components["schemas"]["MonthlyTotal"];
 export type Averages = components["schemas"]["Averages"];
 
-export function useExpensesByCategory(month: string) {
-  return useQuery({
+export function expensesByCategoryQuery(month: string) {
+  return queryOptions({
     queryKey: ["dashboard", "expenses-by-category", month],
     queryFn: () => unwrap(api.GET("/dashboard/expenses-by-category", { params: { query: { month } } })),
   });
+}
+
+export function useExpensesByCategory(month: string) {
+  return useQuery(expensesByCategoryQuery(month));
 }
 
 export function useMonthlyTotals(months: number) {

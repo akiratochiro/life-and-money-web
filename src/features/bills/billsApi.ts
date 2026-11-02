@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { useInvalidate } from "../../shared/api/invalidation";
 import { api } from "../../shared/api/client";
 import { expectNoContent, unwrap } from "../../shared/api/problem";
@@ -19,11 +19,15 @@ export function useBills() {
   });
 }
 
-export function useBillOccurrences(month: string) {
-  return useQuery({
+export function billOccurrencesQuery(month: string) {
+  return queryOptions({
     queryKey: ["bills", "occurrences", month],
     queryFn: () => unwrap(api.GET("/bills/occurrences", { params: { query: { month } } })),
   });
+}
+
+export function useBillOccurrences(month: string) {
+  return useQuery(billOccurrencesQuery(month));
 }
 
 /** Atrasadas e o que vence nos próximos 7 dias, sem as pagas: o card da Início. */

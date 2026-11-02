@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery, useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
 import { api } from "../../shared/api/client";
 import { expectNoContent, unwrap } from "../../shared/api/problem";
 import { invalidate } from "../../shared/api/invalidation";
@@ -11,10 +11,10 @@ export type Transaction = components["schemas"]["TransactionResponse"];
 export type TransactionInput = components["schemas"]["TransactionRequest"];
 
 export function transactionsQuery(month: string) {
-  return {
+  return queryOptions({
     queryKey: ["transactions", month],
     queryFn: () => unwrap(api.GET("/transactions", { params: { query: { month } } })),
-  };
+  });
 }
 
 export function useTransactions(month: string) {

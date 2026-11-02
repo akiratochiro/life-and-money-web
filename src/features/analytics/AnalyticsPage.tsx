@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useExpensesByCategory, useMonthlyTotals } from "./analyticsApi";
+import { expensesByCategoryQuery, useExpensesByCategory, useMonthlyTotals } from "./analyticsApi";
 import { ExpensesDonut } from "./ExpensesDonut";
 import { MonthlyBars } from "./MonthlyBars";
 import { MonthSwitcher } from "../../shared/ui/MonthSwitcher";
 import { Money } from "../../shared/ui/Money";
 import { currentMonth } from "../../shared/lib/dates";
 import { BarsSkeleton, DonutSkeleton } from "./AnalyticsSkeletons";
+import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 
 const RANGES = [3, 6, 12];
 
@@ -13,6 +14,7 @@ export function AnalyticsPage() {
   const [month, setMonth] = useState(currentMonth());
   const [range, setRange] = useState(6);
   const expenses = useExpensesByCategory(month);
+  usePrefetchAdjacentMonths(month, expensesByCategoryQuery);
   const totals = useMonthlyTotals(range);
   const averages = totals.data?.averages ?? null;
 

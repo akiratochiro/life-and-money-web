@@ -5,13 +5,14 @@ import {
   type Category,
   type CategoryType,
 } from "../categories/categoriesApi";
-import { useTransactions, type Transaction } from "./transactionsApi";
+import { transactionsQuery, useTransactions, type Transaction } from "./transactionsApi";
 import { EditTransactionDialog } from "./EditTransactionDialog";
 import { MonthSwitcher } from "../../shared/ui/MonthSwitcher";
 import { Money } from "../../shared/ui/Money";
 import { currentMonth, dayLabel, monthLabel } from "../../shared/lib/dates";
 import { toCents } from "../../shared/lib/money";
 import { TransactionListSkeleton } from "./TransactionListSkeleton";
+import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 
 const TYPE_STYLE: Record<
   CategoryType,
@@ -52,6 +53,7 @@ export function TransactionsPage() {
   const [month, setMonth] = useState(currentMonth());
   const [editing, setEditing] = useState<Transaction | null>(null);
   const transactions = useTransactions(month);
+  usePrefetchAdjacentMonths(month, transactionsQuery);
   const categories = useCategories(true);
 
   const categoryById = new Map<number, Category>(

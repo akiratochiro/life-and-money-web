@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { useInvalidate } from "../../shared/api/invalidation";
 import { api } from "../../shared/api/client";
 import { expectNoContent, unwrap } from "../../shared/api/problem";
@@ -8,11 +8,15 @@ export type BudgetLine = components["schemas"]["BudgetLine"];
 export type BudgetMode = BudgetLine["mode"];
 export type BudgetStatus = BudgetLine["status"];
 
-export function useBudgetDashboard(month: string) {
-  return useQuery({
+export function budgetDashboardQuery(month: string) {
+  return queryOptions({
     queryKey: ["dashboard", "budget", month],
     queryFn: () => unwrap(api.GET("/dashboard/budget", { params: { query: { month } } })),
   });
+}
+
+export function useBudgetDashboard(month: string) {
+  return useQuery(budgetDashboardQuery(month));
 }
 
 function useInvalidateBudget() {

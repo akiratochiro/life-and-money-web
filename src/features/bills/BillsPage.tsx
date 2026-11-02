@@ -3,8 +3,9 @@ import { useCategories } from "../categories/categoriesApi";
 import { BillCalendar } from "./BillCalendar";
 import { BillForm } from "./BillForm";
 import { OccurrenceItem } from "./OccurrenceItem";
-import { holidaysByDate, useHolidays } from "./holidaysApi";
+import { holidaysByDate, holidaysQuery, useHolidays } from "./holidaysApi";
 import {
+  billOccurrencesQuery,
   useBillOccurrences,
   useBills,
   useCreateBill,
@@ -19,6 +20,7 @@ import { PlusIcon } from "../../shared/ui/icons";
 import { currentMonth, formatDate, todayIso } from "../../shared/lib/dates";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { BillsSkeleton } from "./BillsSkeleton";
+import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 
 type Editing = { mode: "create" } | { mode: "edit"; billId: number } | null;
 
@@ -27,6 +29,8 @@ export function BillsPage() {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [editing, setEditing] = useState<Editing>(null);
   const occurrences = useBillOccurrences(month);
+  usePrefetchAdjacentMonths(month, billOccurrencesQuery);
+  usePrefetchAdjacentMonths(month, (neighbor) => holidaysQuery(Number(neighbor.slice(0, 4))));
   const holidaysOfYear = useHolidays(Number(month.slice(0, 4)));
   const holidays = holidaysByDate(holidaysOfYear.data?.holidays ?? []);
   const today = todayIso();
