@@ -9,6 +9,7 @@ import { BarsSkeleton, DonutSkeleton } from "./AnalyticsSkeletons";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 import { useCategories } from "../categories/categoriesApi";
 import { CATEGORY_COLORS } from "../categories/categoryLook";
+import { MonthSwipe } from "../../shared/gestures/MonthSwipe";
 
 const RANGES = [3, 6, 12];
 
@@ -32,13 +33,15 @@ export function AnalyticsPage() {
       <section className="flex flex-col gap-5 rounded-hero bg-surface p-6 shadow-card">
         <h2 className="font-display text-base font-semibold">Para onde foi o dinheiro</h2>
         <MonthSwitcher month={month} onChange={setMonth} />
-        {expenses.isPending ? (
-          <DonutSkeleton />
-        ) : expenses.isError ? (
-          <p role="alert" className="text-sm text-text-soft">Não foi possível carregar os gastos.</p>
-        ) : (
-          <ExpensesDonut key={month} data={expenses.data} colorOf={colorOf} />
-        )}
+        <MonthSwipe month={month} onChange={setMonth}>
+          {expenses.isPending ? (
+            <DonutSkeleton />
+          ) : expenses.isError ? (
+            <p role="alert" className="text-sm text-text-soft">Não foi possível carregar os gastos.</p>
+          ) : (
+            <ExpensesDonut key={month} data={expenses.data} colorOf={colorOf} />
+          )}
+        </MonthSwipe>
       </section>
 
       <section className="flex flex-col gap-5 rounded-hero bg-surface p-6 shadow-card">

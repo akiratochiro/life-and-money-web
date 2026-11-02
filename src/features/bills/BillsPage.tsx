@@ -23,6 +23,7 @@ import { BillsSkeleton } from "./BillsSkeleton";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 import { AnimatePresence } from "motion/react";
 import { EmptyState } from "../../shared/ui/EmptyState";
+import { MonthSwipe } from "../../shared/gestures/MonthSwipe";
 
 type Editing = { mode: "create" } | { mode: "edit"; billId: number } | null;
 
@@ -65,62 +66,66 @@ export function BillsPage() {
       {editing?.mode === "edit" && <EditBill billId={editing.billId} onClose={() => setEditing(null)} />}
 
       <MonthSwitcher month={month} onChange={changeMonth} />
+      <MonthSwipe month={month} onChange={changeMonth}>
+        <div className="flex flex-col gap-6">
 
-      {occurrences.isPending ? (
-        <BillsSkeleton />
-      ) : occurrences.isError ? (
-        <div role="alert" className="flex flex-col items-start gap-3 rounded-card bg-surface p-5">
-          <p className="text-sm text-text-soft">Não foi possível carregar suas contas agora.</p>
-          <button type="button" onClick={() => occurrences.refetch()} className="text-sm font-bold text-link">
-            Tentar de novo
-          </button>
-        </div>
-      ) : (
-        <>
-          <BillCalendar
-            month={month}
-            occurrences={all}
-            holidays={holidays}
-            today={today}
-            selectedDay={selectedDay}
-            onSelectDay={setSelectedDay}
-          />
-          <HolidayNotice unavailable={holidaysOfYear.isError || holidaysOfYear.data?.available === false} />
-          <MonthTotals occurrences={all} />
-          <section className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="font-display text-base font-semibold">
-                {selectedDay ? `Vence em ${formatDate(selectedDay)}` : "Vencimentos do mês"}
-              </h2>
-              {selectedDay && (
-                <button type="button" onClick={() => setSelectedDay(null)} className="py-3 text-sm font-bold text-link">
-                  Ver o mês todo
-                </button>
-              )}
+          {occurrences.isPending ? (
+            <BillsSkeleton />
+          ) : occurrences.isError ? (
+            <div role="alert" className="flex flex-col items-start gap-3 rounded-card bg-surface p-5">
+              <p className="text-sm text-text-soft">Não foi possível carregar suas contas agora.</p>
+              <button type="button" onClick={() => occurrences.refetch()} className="text-sm font-bold text-link">
+                Tentar de novo
+              </button>
             </div>
-            {selectedDay && holidays.has(selectedDay) && (
-              <p className="rounded-2xl bg-saving-soft px-4 py-3 text-sm font-semibold text-saving-strong">
-                Feriado nacional: {holidays.get(selectedDay)}
-              </p>
-            )}
-            {visible.length === 0 ? (
-              <BillsEmpty filtered={selectedDay !== null} onCreate={() => setEditing({ mode: "create" })} />
-            ) : (
-              <ul className="flex flex-col gap-3">
-                <AnimatePresence initial={false}>
-                  {visible.map((occurrence) => (
-                    <OccurrenceItem
-                      key={`${occurrence.billId}@${occurrence.month}`}
-                      occurrence={occurrence}
-                      onEdit={(billId) => setEditing({ mode: "edit", billId })}
-                    />
-                  ))}
-                </AnimatePresence>
-              </ul>
-            )}
-          </section>
-        </>
-      )}
+          ) : (
+            <>
+              <BillCalendar
+                month={month}
+                occurrences={all}
+                holidays={holidays}
+                today={today}
+                selectedDay={selectedDay}
+                onSelectDay={setSelectedDay}
+              />
+              <HolidayNotice unavailable={holidaysOfYear.isError || holidaysOfYear.data?.available === false} />
+              <MonthTotals occurrences={all} />
+              <section className="flex flex-col gap-3">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="font-display text-base font-semibold">
+                    {selectedDay ? `Vence em ${formatDate(selectedDay)}` : "Vencimentos do mês"}
+                  </h2>
+                  {selectedDay && (
+                    <button type="button" onClick={() => setSelectedDay(null)} className="py-3 text-sm font-bold text-link">
+                      Ver o mês todo
+                    </button>
+                  )}
+                </div>
+                {selectedDay && holidays.has(selectedDay) && (
+                  <p className="rounded-2xl bg-saving-soft px-4 py-3 text-sm font-semibold text-saving-strong">
+                    Feriado nacional: {holidays.get(selectedDay)}
+                  </p>
+                )}
+                {visible.length === 0 ? (
+                  <BillsEmpty filtered={selectedDay !== null} onCreate={() => setEditing({ mode: "create" })} />
+                ) : (
+                  <ul className="flex flex-col gap-3">
+                    <AnimatePresence initial={false}>
+                      {visible.map((occurrence) => (
+                        <OccurrenceItem
+                          key={`${occurrence.billId}@${occurrence.month}`}
+                          occurrence={occurrence}
+                          onEdit={(billId) => setEditing({ mode: "edit", billId })}
+                        />
+                      ))}
+                    </AnimatePresence>
+                  </ul>
+                )}
+              </section>
+            </>
+          )}
+        </div>
+      </MonthSwipe>
     </div>
   );
 }

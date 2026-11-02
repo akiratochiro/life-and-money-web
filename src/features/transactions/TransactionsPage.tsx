@@ -17,6 +17,8 @@ import { AnimatePresence, m } from "motion/react";
 import { listItem } from "../../shared/ui/motion";
 import { EmptyState } from "../../shared/ui/EmptyState";
 import { CategoryTile } from "../categories/CategoryGlyph";
+import { MonthSwipe } from "../../shared/gestures/MonthSwipe";
+import { PullToRefresh } from "../../shared/gestures/PullToRefresh";
 
 const TYPE_STYLE: Record<
   CategoryType,
@@ -75,96 +77,103 @@ export function TransactionsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-semibold">Extrato</h1>
-        <Link
-          to="/categories"
-          className="flex h-11 items-center px-2 text-sm font-bold text-link"
-        >
-          Categorias
-        </Link>
-      </header>
-      <MonthSwitcher month={month} onChange={setMonth} />
+    <PullToRefresh>
+      <div className="flex flex-col gap-6">
+        <header className="flex items-center justify-between gap-3">
+          <h1 className="font-display text-2xl font-semibold">Extrato</h1>
+          <Link
+            to="/categories"
+            className="flex h-11 items-center px-2 text-sm font-bold text-link"
+          >
+            Categorias
+          </Link>
+        </header>
+        <MonthSwitcher month={month} onChange={setMonth} />
+        <MonthSwipe month={month} onChange={setMonth}>
+          <div className="flex flex-col gap-6">
 
-      <dl className="grid grid-cols-3 gap-2 rounded-card bg-surface p-5">
-        <Total label="Entrou" cents={totals.INCOME} className="text-income-strong" />
-        <Total label="Saiu" cents={totals.EXPENSE} className="text-expense-strong" />
-        <Total
-          label="Guardou"
-          cents={totals.SAVING}
-          className="text-saving-strong"
-        />
-      </dl>
+            <dl className="grid grid-cols-3 gap-2 rounded-card bg-surface p-5">
+              <Total label="Entrou" cents={totals.INCOME} className="text-income-strong" />
+              <Total label="Saiu" cents={totals.EXPENSE} className="text-expense-strong" />
+              <Total
+                label="Guardou"
+                cents={totals.SAVING}
+                className="text-saving-strong"
+              />
+            </dl>
 
-      {transactions.isPending || categories.isPending ? (
-        <TransactionListSkeleton />
-      ) : list.length === 0 ? (
-        <EmptyState
-          action={
-            <Link to="/transactions/new" className="text-sm font-bold text-link">
-              Lançar uma transação
-            </Link>
-          }
-        >
-          Nenhuma transação em {monthLabel(month).toLowerCase()}.
-        </EmptyState>
-      ) : (
-        <div className="flex flex-col gap-5">
-          {groupByDate(list).map((group) => (
-            <section key={group.date} className="flex flex-col gap-1">
-              <h2 className="px-3 pb-1 text-xs font-bold uppercase tracking-wide text-text-muted">
-                {dayLabel(group.date)}
-              </h2>
-              <AnimatePresence initial={false}>
-                {group.items.map((transaction) => {
-                  const category = categoryById.get(transaction.categoryId);
-                  const style = TYPE_STYLE[category?.type ?? "EXPENSE"];
-                  return (
-                    <m.button
-                      {...listItem}
-                      key={transaction.id}
-                      type="button"
-                      onClick={() => setEditing(transaction)}
-                      className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-surface active:scale-[0.99]"
-                    >
-                      {category ? (
-                        <CategoryTile color={category.color} icon={category.icon} />
-                      ) : (
-                        <span className="h-10 w-10 shrink-0 rounded-2xl bg-sunken" />
-                      )}
-                      <span className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate font-bold">
-                          {category?.name ?? "Categoria"}
-                        </span>
-                        {transaction.description && (
-                          <span className="truncate text-sm text-text-muted">
-                            {transaction.description}
-                          </span>
-                        )}
-                      </span>
-                      <span className={`shrink-0 font-bold ${style.amount}`}>
-                        {style.sign}
-                        <Money value={transaction.amount} />
-                      </span>
-                    </m.button>
-                  );
-                })}
-              </AnimatePresence>
-            </section>
-          ))}
-        </div>
-      )}
+            {transactions.isPending || categories.isPending ? (
+              <TransactionListSkeleton />
+            ) : list.length === 0 ? (
+              <EmptyState
+                action={
+                  <Link to="/transactions/new" className="text-sm font-bold text-link">
+                    Lançar uma transação
+                  </Link>
+                }
+              >
+                Nenhuma transação em {monthLabel(month).toLowerCase()}.
+              </EmptyState>
+            ) : (
+              <div className="flex flex-col gap-5">
+                {groupByDate(list).map((group) => (
+                  <section key={group.date} className="flex flex-col gap-1">
+                    <h2 className="px-3 pb-1 text-xs font-bold uppercase tracking-wide text-text-muted">
+                      {dayLabel(group.date)}
+                    </h2>
+                    <AnimatePresence initial={false}>
+                      {group.items.map((transaction) => {
+                        const category = categoryById.get(transaction.categoryId);
+                        const style = TYPE_STYLE[category?.type ?? "EXPENSE"];
+                        return (
+                          <m.button
+                            {...listItem}
+                            key={transaction.id}
+                            type="button"
+                            onClick={() => setEditing(transaction)}
+                            className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-surface active:scale-[0.99]"
+                          >
+                            {category ? (
+                              <CategoryTile color={category.color} icon={category.icon} />
+                            ) : (
+                              <span className="h-10 w-10 shrink-0 rounded-2xl bg-sunken" />
+                            )}
+                            <span className="flex min-w-0 flex-1 flex-col">
+                              <span className="truncate font-bold">
+                                {category?.name ?? "Categoria"}
+                              </span>
+                              {transaction.description && (
+                                <span className="truncate text-sm text-text-muted">
+                                  {transaction.description}
+                                </span>
+                              )}
+                            </span>
+                            <span className={`shrink-0 font-bold ${style.amount}`}>
+                              {style.sign}
+                              <Money value={transaction.amount} />
+                            </span>
+                          </m.button>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </section>
+                ))}
+              </div>
+            )}
 
-      {editing && (
-        <EditTransactionDialog
-          key={editing.id}
-          transaction={editing}
-          category={categoryById.get(editing.categoryId)}
-          onClose={() => setEditing(null)}
-        />
-      )}
-    </div>
+          </div>
+        </MonthSwipe>
+
+        {editing && (
+          <EditTransactionDialog
+            key={editing.id}
+            transaction={editing}
+            category={categoryById.get(editing.categoryId)}
+            onClose={() => setEditing(null)}
+          />
+        )}
+      </div>
+    </PullToRefresh>
   );
 }
 

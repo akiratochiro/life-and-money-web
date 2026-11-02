@@ -12,6 +12,7 @@ import { useBudgetDashboard } from "../budget/budgetApi";
 import { Link } from "react-router";
 import { UserIcon } from "../../shared/ui/icons";
 import { HomeSkeleton } from "./HomeSkeleton";
+import { PullToRefresh } from "../../shared/gestures/PullToRefresh";
 
 export function HomePage() {
   const month = currentMonth();
@@ -23,56 +24,58 @@ export function HomePage() {
   const firstName = me.data?.name?.split(" ")[0];
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="flex items-center justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <p className="text-sm font-semibold text-text-muted">{longDate()}</p>
-          <h1 className="font-display text-2xl font-semibold">
-            {greeting()}
-            {firstName ? `, ${firstName}` : ""}
-          </h1>
-        </div>
-        {/* Sair, exportar e excluir a conta ficam em "Minha conta". */}
-        <Link
-          to="/account"
-          aria-label="Minha conta"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface font-display text-base font-semibold text-link transition active:scale-95"
-        >
-          {firstName ? firstName.charAt(0).toUpperCase() : <UserIcon width={20} height={20} />}
-        </Link>
-      </header>
-
-      {totals.isPending || budget.isPending || goals.isPending ? (
-        <HomeSkeleton />
-      ) : totals.isError || budget.isError || goals.isError ? (
-        <div
-          role="alert"
-          className="flex flex-col items-start gap-3 rounded-card bg-surface p-5"
-        >
-          <p className="text-sm text-text-soft">
-            Não foi possível carregar seus dados agora.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              totals.refetch();
-              budget.refetch();
-              goals.refetch();
-            }}
-            className="text-sm font-bold text-link"
+    <PullToRefresh>
+      <div className="flex flex-col gap-6">
+        <header className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-semibold text-text-muted">{longDate()}</p>
+            <h1 className="font-display text-2xl font-semibold">
+              {greeting()}
+              {firstName ? `, ${firstName}` : ""}
+            </h1>
+          </div>
+          {/* Sair, exportar e excluir a conta ficam em "Minha conta". */}
+          <Link
+            to="/account"
+            aria-label="Minha conta"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface font-display text-base font-semibold text-link transition active:scale-95"
           >
-            Tentar de novo
-          </button>
-        </div>
-      ) : (
-        <Feed
-          month={month}
-          totals={totals.data}
-          lines={budget.data.items}
-          goals={goals.data ?? []}
-        />
-      )}
-    </div>
+            {firstName ? firstName.charAt(0).toUpperCase() : <UserIcon width={20} height={20} />}
+          </Link>
+        </header>
+
+        {totals.isPending || budget.isPending || goals.isPending ? (
+          <HomeSkeleton />
+        ) : totals.isError || budget.isError || goals.isError ? (
+          <div
+            role="alert"
+            className="flex flex-col items-start gap-3 rounded-card bg-surface p-5"
+          >
+            <p className="text-sm text-text-soft">
+              Não foi possível carregar seus dados agora.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                totals.refetch();
+                budget.refetch();
+                goals.refetch();
+              }}
+              className="text-sm font-bold text-link"
+            >
+              Tentar de novo
+            </button>
+          </div>
+        ) : (
+          <Feed
+            month={month}
+            totals={totals.data}
+            lines={budget.data.items}
+            goals={goals.data ?? []}
+          />
+        )}
+      </div>
+    </PullToRefresh>
   );
 }
 

@@ -10,6 +10,7 @@ import { toCents } from "../../shared/lib/money";
 import { BudgetSkeleton } from "./BudgetSkeleton";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 import { EmptyState } from "../../shared/ui/EmptyState";
+import { MonthSwipe } from "../../shared/gestures/MonthSwipe";
 
 const SEVERITY: Record<BudgetStatus, number> = {
   EXCEEDED: 0,
@@ -57,75 +58,85 @@ export function BudgetPage() {
           setDefiningId(null);
         }}
       />
+      <MonthSwipe
+        month={month}
+        onChange={(next) => {
+          setMonth(next);
+          setDefiningId(null);
+        }}
+      >
+        <div className="flex flex-col gap-6">
 
-      {!editable && (
-        <p role="status" className="rounded-2xl bg-sunken p-4 text-sm leading-snug text-text-soft">
-          {month < thisMonth
-            ? `Você está vendo o orçamento que valia em ${monthLabel(month).toLowerCase()}. Meses passados não podem ser alterados.`
-            : `Alterações no orçamento valem a partir do mês atual. Volte para ${monthLabel(thisMonth).toLowerCase()} para editar.`}
-        </p>
-      )}
+          {!editable && (
+            <p role="status" className="rounded-2xl bg-sunken p-4 text-sm leading-snug text-text-soft">
+              {month < thisMonth
+                ? `Você está vendo o orçamento que valia em ${monthLabel(month).toLowerCase()}. Meses passados não podem ser alterados.`
+                : `Alterações no orçamento valem a partir do mês atual. Volte para ${monthLabel(thisMonth).toLowerCase()} para editar.`}
+            </p>
+          )}
 
-      {dashboard.isPending ? (
-        <BudgetSkeleton />
-      ) : (
-        <>
-          <section className="flex flex-col gap-4 rounded-hero bg-surface p-6 shadow-card">
-            <dl className="grid grid-cols-3 gap-2">
-              <Figure label="Receita do mês" cents={toCents(income)} className="text-income-strong" />
-              <Figure label="Planejado" cents={plannedCents} className="text-text" />
-              <Figure label="Gasto" cents={spentCents} className="text-expense-strong" />
-            </dl>
-            {plannedCents > toCents(income) && income > 0 && (
-              <p className="rounded-2xl bg-sunken px-4 py-3 text-sm leading-snug text-text-soft">
-                Seus limites de gastos somam mais do que a receita do mês. Vale rever o plano.
-              </p>
-            )}
-            {!dashboard.data?.closed && hasPercentage && (
-              <p className="text-xs leading-snug text-text-muted">
-                Os limites em porcentagem acompanham a receita, e ainda podem mudar até o fim do mês.
-              </p>
-            )}
-          </section>
-
-          {lines.length === 0 ? (
-            <EmptyState>Nenhuma categoria com orçamento em {monthLabel(month).toLowerCase()}.</EmptyState>
+          {dashboard.isPending ? (
+            <BudgetSkeleton />
           ) : (
-            <div className="flex flex-col gap-3">
-              {lines.map((line) => (
-                <BudgetLineCard key={`${month}-${line.categoryId}`} line={line} editable={editable} />
-              ))}
-            </div>
-          )}
+            <>
+              <section className="flex flex-col gap-4 rounded-hero bg-surface p-6 shadow-card">
+                <dl className="grid grid-cols-3 gap-2">
+                  <Figure label="Receita do mês" cents={toCents(income)} className="text-income-strong" />
+                  <Figure label="Planejado" cents={plannedCents} className="text-text" />
+                  <Figure label="Gasto" cents={spentCents} className="text-expense-strong" />
+                </dl>
+                {plannedCents > toCents(income) && income > 0 && (
+                  <p className="rounded-2xl bg-sunken px-4 py-3 text-sm leading-snug text-text-soft">
+                    Seus limites de gastos somam mais do que a receita do mês. Vale rever o plano.
+                  </p>
+                )}
+                {!dashboard.data?.closed && hasPercentage && (
+                  <p className="text-xs leading-snug text-text-muted">
+                    Os limites em porcentagem acompanham a receita, e ainda podem mudar até o fim do mês.
+                  </p>
+                )}
+              </section>
 
-          {editable && unbudgeted.length > 0 && (
-            <section className="flex flex-col gap-2">
-              <h2 className="px-1 font-display text-base font-semibold">Sem orçamento</h2>
-              <ul className="flex flex-col gap-2">
-                {unbudgeted.map((category) => (
-                  <li key={category.id} className="flex flex-col gap-2 rounded-card bg-surface p-3">
-                    <div className="flex items-center justify-between gap-2 px-2">
-                      <span className="truncate font-bold">{category.name}</span>
-                      {definingId !== category.id && (
-                        <button
-                          type="button"
-                          onClick={() => setDefiningId(category.id)}
-                          className="h-11 px-2 text-sm font-bold text-link"
-                        >
-                          Definir limite
-                        </button>
-                      )}
-                    </div>
-                    {definingId === category.id && (
-                      <BudgetEditor categoryId={category.id} onDone={() => setDefiningId(null)} />
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </section>
+              {lines.length === 0 ? (
+                <EmptyState>Nenhuma categoria com orçamento em {monthLabel(month).toLowerCase()}.</EmptyState>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {lines.map((line) => (
+                    <BudgetLineCard key={`${month}-${line.categoryId}`} line={line} editable={editable} />
+                  ))}
+                </div>
+              )}
+
+              {editable && unbudgeted.length > 0 && (
+                <section className="flex flex-col gap-2">
+                  <h2 className="px-1 font-display text-base font-semibold">Sem orçamento</h2>
+                  <ul className="flex flex-col gap-2">
+                    {unbudgeted.map((category) => (
+                      <li key={category.id} className="flex flex-col gap-2 rounded-card bg-surface p-3">
+                        <div className="flex items-center justify-between gap-2 px-2">
+                          <span className="truncate font-bold">{category.name}</span>
+                          {definingId !== category.id && (
+                            <button
+                              type="button"
+                              onClick={() => setDefiningId(category.id)}
+                              className="h-11 px-2 text-sm font-bold text-link"
+                            >
+                              Definir limite
+                            </button>
+                          )}
+                        </div>
+                        {definingId === category.id && (
+                          <BudgetEditor categoryId={category.id} onDone={() => setDefiningId(null)} />
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </>
           )}
-        </>
-      )}
+        </div>
+      </MonthSwipe>
     </div>
   );
 }
