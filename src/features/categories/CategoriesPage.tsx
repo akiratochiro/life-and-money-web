@@ -4,24 +4,17 @@ import {
   useCategories,
   useCreateCategory,
   useUpdateCategory,
+  categoryErrorMessage,
   type Category,
   type CategoryType,
 } from "./categoriesApi";
-import { ApiError } from "../../shared/api/problem";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { CategoriesSkeleton } from "./CategoriesSkeleton";
 import { CategoryLookPicker } from "./CategoryLookPicker";
-import { type CategoryColor, type CategoryIcon } from "./categoryLook";
+import { DEFAULT_LOOK } from "./categoryLook";
 import { CategoryTile } from "./CategoryGlyph";
-
-/** O mesmo padrão que a API aplica quando a categoria vem sem cor ou ícone. */
-const DEFAULT_LOOK: Record<CategoryType, { color: CategoryColor; icon: CategoryIcon }> = {
-  INCOME: { color: "MINT", icon: "COIN" },
-  EXPENSE: { color: "CORAL", icon: "OTHER" },
-  SAVING: { color: "PINK", icon: "PIGGY_BANK" },
-};
 
 const SECTIONS: { type: CategoryType; title: string; dot: string }[] = [
   { type: "EXPENSE", title: "Despesas", dot: "bg-expense" },
@@ -34,13 +27,6 @@ const TYPE_LABEL: Record<CategoryType, string> = {
   INCOME: "Receita",
   SAVING: "Poupança",
 };
-
-function conflictMessage(error: Error | null): string | undefined {
-  if (error instanceof ApiError && error.status === 409) {
-    return "Já existe uma categoria ativa com esse nome e esse tipo.";
-  }
-  return error?.message;
-}
 
 export function CategoriesPage() {
   const categories = useCategories(true);
@@ -137,7 +123,7 @@ function NewCategoryForm() {
     );
   }
 
-  const errorMessage = conflictMessage(createCategory.error);
+  const errorMessage = categoryErrorMessage(createCategory.error);
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-hero bg-surface p-5 shadow-card">
@@ -194,7 +180,7 @@ function CategoryRow({ category }: { category: Category }) {
   const id = category.id;
 
   if (mode === "edit") {
-    const errorMessage = conflictMessage(updateCategory.error);
+    const errorMessage = categoryErrorMessage(updateCategory.error);
     const cancel = () => {
       setName(category.name);
       setLook({ color: category.color, icon: category.icon });

@@ -2,6 +2,14 @@ import type { components } from "../../shared/api/schema";
 
 export type CategoryColor = components["schemas"]["CategoryResponse"]["color"];
 export type CategoryIcon = components["schemas"]["CategoryResponse"]["icon"];
+type CategoryType = components["schemas"]["CategoryResponse"]["type"];
+
+/** O mesmo padrão que a API aplica quando a categoria vem sem cor ou ícone. */
+export const DEFAULT_LOOK: Record<CategoryType, { color: CategoryColor; icon: CategoryIcon }> = {
+  INCOME: { color: "MINT", icon: "COIN" },
+  EXPENSE: { color: "CORAL", icon: "OTHER" },
+  SAVING: { color: "PINK", icon: "PIGGY_BANK" },
+};
 
 /**
  * Como cada cor da API aparece. As classes são literais de propósito: o Tailwind só gera o que

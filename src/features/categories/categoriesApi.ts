@@ -1,5 +1,5 @@
 import { api } from "../../shared/api/client";
-import { unwrap } from "../../shared/api/problem";
+import { ApiError, unwrap } from "../../shared/api/problem";
 import type { components } from "../../shared/api/schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { invalidate, useInvalidate } from "../../shared/api/invalidation";
@@ -20,12 +20,36 @@ function useInvalidateCategories() {
   return () => invalidate("category");
 }
 
+/** O 409 da API é o nome repetido; o resto já vem explicado no ProblemDetail. */
+export function categoryErrorMessage(error: Error | null): string | undefined {
+  if (error instanceof ApiError && error.status === 409) {
+    return "Já existe uma categoria ativa com esse nome e esse tipo.";
+  }
+  return error?.message;
+}
+
+/**
+ * A categoria criada entra nas listas do cache assim que o servidor responde, na ordem por nome
+ * que a API usa. Assim quem a criou (o "+" da nova transação) já pode mostrá-la selecionada, sem
+ * esperar a lista ser buscada de novo; a busca vem logo depois e confirma.
+ */
 export function useCreateCategory() {
+  const queryClient = useQueryClient();
   const invalidate = useInvalidateCategories();
   return useMutation({
     mutationFn: (body: NewCategory) => unwrap(api.POST("/categories", { body })),
-    onSuccess: invalidate,
+    onSuccess: (created) => {
+      queryClient.setQueriesData<Category[]>({ queryKey: ["categories"] }, (list) =>
+        list ? insertByName(list, created) : list,
+      );
+      return invalidate();
+    },
   });
+}
+
+export function insertByName(list: Category[], category: Category): Category[] {
+  if (list.some((item) => item.id === category.id)) return list;
+  return [...list, category].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 }
 
 export type CategoryUpdate = components["schemas"]["UpdateCategoryRequest"];

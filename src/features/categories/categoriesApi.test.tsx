@@ -2,7 +2,7 @@ import { act, render, renderHook, screen, waitFor } from "@testing-library/react
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { archiveIn, useArchiveCategory, type Category } from "./categoriesApi";
+import { archiveIn, insertByName, useArchiveCategory, useCreateCategory, type Category } from "./categoriesApi";
 import { ToastProvider } from "../../shared/toast/ToastProvider";
 
 const mocks = vi.hoisted(() => ({ GET: vi.fn(), POST: vi.fn() }));
@@ -60,5 +60,29 @@ describe("arquivar categoria", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Não foi possível arquivar a categoria. Categoria não encontrada.",
     );
+  });
+});
+
+describe("insertByName", () => {
+  it("põe a categoria nova na ordem por nome, como a API devolve", () => {
+    const fun = { ...HOME, id: 3, name: "Lazer" };
+    expect(insertByName([GYM, HOME], fun).map((c) => c.name)).toEqual(["Academia", "Lazer", "Moradia"]);
+  });
+
+  it("não duplica uma categoria que a lista já tem", () => {
+    expect(insertByName([GYM, HOME], GYM)).toEqual([GYM, HOME]);
+  });
+});
+
+describe("criar categoria", () => {
+  it("entra nas listas do cache assim que o servidor responde, sem esperar a nova busca", async () => {
+    const fun = { ...HOME, id: 3, name: "Lazer" };
+    mocks.POST.mockResolvedValue({ data: fun, response: new Response(null, { status: 201 }) });
+    const { result } = renderHook(() => useCreateCategory(), { wrapper });
+
+    act(() => result.current.mutate({ name: "Lazer", type: "EXPENSE" }));
+
+    await waitFor(() => expect(active()?.map((c) => c.name)).toEqual(["Moradia", "Academia", "Lazer"].sort()));
+    expect(all()?.map((c) => c.id)).toContain(3);
   });
 });
