@@ -46,6 +46,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 toast.tone === "error" ? "bg-danger-strong text-on-accent" : "bg-surface-raised text-text"
               }`}
             >
+              {toast.tone === "success" && <AnimatedCheck />}
               <p className="flex-1 leading-snug">{toast.message}</p>
               <button
                 type="button"
@@ -60,5 +61,29 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         </AnimatePresence>
       </div>
     </ToastContext.Provider>
+  );
+}
+
+/**
+ * O check do "salvo": o traço se desenha em 420 ms. Para quem pediu menos movimento, ele já
+ * aparece desenhado (a animação é motion-safe e, sem ela, o traço fica inteiro).
+ */
+function AnimatedCheck() {
+  return (
+    <span aria-hidden="true" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-income-soft text-income-strong">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path
+          d="M3.5 8.5l3 3 6-7"
+          pathLength={1}
+          strokeDasharray={1}
+          stroke="currentColor"
+          strokeWidth={2.2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="motion-safe:animate-draw"
+          data-check
+        />
+      </svg>
+    </span>
   );
 }

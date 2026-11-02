@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-export type ToastTone = "error" | "info";
+export type ToastTone = "error" | "info" | "success";
 export type Toast = { id: number; message: string; tone: ToastTone };
 export type ToastApi = { show: (message: string, tone?: ToastTone) => void };
 

@@ -140,6 +140,7 @@
   --animate-fade-in: fade-in 300ms ease-out;
   --animate-float: float 9s ease-in-out infinite;
   --animate-draw: draw 420ms ease-out 80ms both;
+  --animate-confetti: confetti 1500ms cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
 
   @keyframes fade-in {
     from {
@@ -155,6 +156,18 @@
     }
     50% {
       transform: translate3d(0, -14px, 0) rotate(6deg);
+    }
+  }
+
+  /* Cada peça do confete sai do centro para a própria direção (--dx, --dy, --spin) e some. */
+  @keyframes confetti {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translate3d(var(--dx), var(--dy), 0) rotate(var(--spin));
+      opacity: 0;
     }
   }
 

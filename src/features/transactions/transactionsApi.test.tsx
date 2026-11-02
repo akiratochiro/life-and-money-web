@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCreateTransaction, useDeleteTransaction, useUpdateTransaction, type Transaction } from "./transactionsApi";
 import { ToastProvider } from "../../shared/toast/ToastProvider";
+import { CelebrateProvider } from "../../shared/celebrate/CelebrateProvider";
 import type { Goal } from "../goals/goalsApi";
 
 const mocks = vi.hoisted(() => ({ GET: vi.fn(), POST: vi.fn(), PUT: vi.fn(), DELETE: vi.fn() }));
@@ -33,7 +34,9 @@ let queryClient: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>{children}</ToastProvider>
+      <ToastProvider>
+        <CelebrateProvider>{children}</CelebrateProvider>
+      </ToastProvider>
     </QueryClientProvider>
   );
 }
@@ -154,5 +157,57 @@ describe("apagar transação", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Não foi possível apagar a transação. Transação não encontrada.",
     );
+  });
+});
+
+describe("microinterações", () => {
+  it("salvar mostra o check de salvo, só depois que o servidor confirma", async () => {
+    const response = deferred<ReturnType<typeof ok>>();
+    mocks.POST.mockReturnValue(response.promise);
+    renderToasts();
+    const { result } = renderHook(() => useCreateTransaction(), { wrapper });
+
+    act(() => result.current.mutate({ categoryId: 3, amount: 50, transactionDate: "2026-10-20" }));
+    await waitFor(() => expect(october()).toHaveLength(3));
+    expect(screen.queryByText("Transação salva.")).not.toBeInTheDocument();
+
+    response.resolve(ok(tx(10, "2026-10-20"), 201));
+    const toast = await screen.findByRole("status");
+    expect(toast).toHaveTextContent("Transação salva.");
+    expect(toast.querySelector("[data-check]")).not.toBeNull();
+  });
+
+  it("um aporte que conclui a meta solta confete e avisa", async () => {
+    mocks.POST.mockResolvedValue(ok(tx(10, "2026-10-20", { goalId: 7, amount: 700 }), 201));
+    renderToasts();
+    const { result } = renderHook(() => useCreateTransaction(), { wrapper });
+
+    act(() => result.current.mutate({ categoryId: 3, goalId: 7, amount: 700, transactionDate: "2026-10-20" }));
+
+    expect(await screen.findByText("Você chegou à meta Viagem!")).toBeInTheDocument();
+    expect(document.querySelector("[data-confetti]")).not.toBeNull();
+  });
+
+  it("um aporte que não conclui a meta não solta confete", async () => {
+    mocks.POST.mockResolvedValue(ok(tx(10, "2026-10-20", { goalId: 7, amount: 50 }), 201));
+    renderToasts();
+    const { result } = renderHook(() => useCreateTransaction(), { wrapper });
+
+    act(() => result.current.mutate({ categoryId: 3, goalId: 7, amount: 50, transactionDate: "2026-10-20" }));
+
+    await screen.findByText("Transação salva.");
+    expect(document.querySelector("[data-confetti]")).toBeNull();
+  });
+
+  it("se o servidor recusar, não há comemoração", async () => {
+    mocks.POST.mockResolvedValue(problem(409, "Esta categoria está arquivada."));
+    renderToasts();
+    const { result } = renderHook(() => useCreateTransaction(), { wrapper });
+
+    act(() => result.current.mutate({ categoryId: 3, goalId: 7, amount: 700, transactionDate: "2026-10-20" }));
+
+    await screen.findByRole("alert");
+    expect(screen.queryByText(/Você chegou à meta/)).not.toBeInTheDocument();
+    expect(document.querySelector("[data-confetti]")).toBeNull();
   });
 });
