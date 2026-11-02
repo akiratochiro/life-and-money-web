@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { login } from "./authApi";
 import { ApiError } from "../../shared/api/problem";
 import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
@@ -9,6 +9,7 @@ import { Button } from "../../shared/ui/Button";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
@@ -20,7 +21,12 @@ export function LoginPage() {
 
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: () => navigate(from, { replace: true }),
+    // Entrar com outra conta sem ter saído não encerra a sessão anterior, então o cache dela
+    // também precisa ir embora aqui.
+    onSuccess: () => {
+      queryClient.clear();
+      navigate(from, { replace: true });
+    },
   });
 
   function handleSubmit(event: FormEvent) {

@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
@@ -41,5 +41,26 @@ describe("LoginPage", () => {
     act(() => vi.advanceTimersByTime(59_000));
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Entrar" })).toBeEnabled();
+  });
+
+  it("entrar com outra conta apaga o cache da anterior", async () => {
+    mocks.login.mockResolvedValue(undefined);
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(["dashboard", "expenses-by-category", "2026-10"], { total: 600 });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <LoginPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await userEvent.type(screen.getByLabelText("E-mail"), "bia@exemplo.dev");
+    await userEvent.type(screen.getByLabelText("Senha"), "senha12345");
+    await userEvent.click(screen.getByRole("button", { name: "Entrar" }));
+
+    await waitFor(() =>
+      expect(queryClient.getQueryData(["dashboard", "expenses-by-category", "2026-10"])).toBeUndefined(),
+    );
   });
 });

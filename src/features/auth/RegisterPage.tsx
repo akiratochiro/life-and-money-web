@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { register } from "./authApi";
 import { ApiError } from "../../shared/api/problem";
 import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
@@ -9,13 +9,19 @@ import { Button } from "../../shared/ui/Button";
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const mutation = useMutation({
     mutationFn: register,
-    onSuccess: () => navigate("/", { replace: true }),
+    // Entrar com outra conta sem ter saído não encerra a sessão anterior, então o cache dela
+    // também precisa ir embora aqui.
+    onSuccess: () => {
+      queryClient.clear();
+      navigate("/", { replace: true });
+    },
   });
 
   function handleSubmit(event: FormEvent) {
