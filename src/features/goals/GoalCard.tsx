@@ -7,6 +7,7 @@ import { Badge, type BadgeTone } from "../../shared/ui/Badge";
 import { Money } from "../../shared/ui/Money";
 import { formatDate } from "../../shared/lib/dates";
 import { toCents } from "../../shared/lib/money";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 type GoalStatus = Goal["status"];
 
@@ -98,7 +99,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
               onClick={() => deleteGoal.mutate(id)}
               className="h-11 flex-1 rounded-full bg-danger font-bold text-[#1a0710] transition active:scale-95 disabled:opacity-60"
             >
-              {deleteGoal.isPending ? "Apagando..." : "Apagar meta"}
+              <PendingLabel pending={deleteGoal.isPending} pendingText="Apagando…">Apagar meta</PendingLabel>
             </button>
             <button
               type="button"

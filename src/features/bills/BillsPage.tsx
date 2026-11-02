@@ -17,6 +17,7 @@ import { MonthSwitcher } from "../../shared/ui/MonthSwitcher";
 import { Money } from "../../shared/ui/Money";
 import { PlusIcon } from "../../shared/ui/icons";
 import { currentMonth, formatDate, todayIso } from "../../shared/lib/dates";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 type Editing = { mode: "create" } | { mode: "edit"; billId: number } | null;
 
@@ -222,7 +223,7 @@ function EditBillForm({ bill, kind, onClose }: { bill: Bill; kind: "EXPENSE" | "
                   onClick={() => remove.mutate(bill.id, { onSuccess: onClose })}
                   className="h-11 flex-1 rounded-full bg-danger text-sm font-bold text-[#1a0710] transition active:scale-95 disabled:opacity-60"
                 >
-                  {remove.isPending ? "Excluindo..." : "Confirmar exclusão"}
+                  <PendingLabel pending={remove.isPending} pendingText="Excluindo…">Confirmar exclusão</PendingLabel>
                 </button>
                 <button
                   type="button"

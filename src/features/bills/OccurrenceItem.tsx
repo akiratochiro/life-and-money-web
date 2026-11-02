@@ -7,6 +7,7 @@ import { Money } from "../../shared/ui/Money";
 import { AmountInput } from "../../shared/ui/AmountInput";
 import { toCents } from "../../shared/lib/money";
 import { formatDate, todayIso, weekdayAndDay } from "../../shared/lib/dates";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 const STATUS: Record<BillOccurrence["status"], { label: string; tone: BadgeTone }> = {
   OVERDUE: { label: "Atrasada", tone: "danger" },
@@ -67,7 +68,7 @@ export function OccurrenceItem({ occurrence, onEdit }: Props) {
               onClick={() => undo.mutate({ billId: occurrence.billId, month: occurrence.month })}
               className="h-11 rounded-full bg-ink-800 px-4 text-sm font-bold text-text transition active:scale-95 disabled:opacity-60"
             >
-              {undo.isPending ? "Desfazendo..." : "Desfazer"}
+              <PendingLabel pending={undo.isPending} pendingText="Desfazendo…">Desfazer</PendingLabel>
             </button>
           ) : (
             <button
@@ -149,7 +150,7 @@ function PayPanel({ occurrence, onDone }: { occurrence: BillOccurrence; onDone: 
           disabled={cents <= 0 || !paidOn || pay.isPending}
           className="h-12 flex-1 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95 disabled:opacity-60"
         >
-          {pay.isPending ? "Salvando..." : "Confirmar"}
+          <PendingLabel pending={pay.isPending} pendingText="Salvando…">Confirmar</PendingLabel>
         </button>
         <button
           type="button"

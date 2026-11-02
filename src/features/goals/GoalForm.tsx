@@ -4,6 +4,7 @@ import { ApiError } from "../../shared/api/problem";
 import { AmountInput } from "../../shared/ui/AmountInput";
 import { TextField } from "../../shared/ui/TextField";
 import { firstDayOfNextMonth } from "../../shared/lib/dates";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 type Props = {
   initial?: { name: string; cents: number; deadline: string };
@@ -65,7 +66,7 @@ export function GoalForm({ initial, submitLabel, pending, error, onSubmit, onCan
           disabled={!name.trim() || cents <= 0 || !deadline || pending}
           className="h-12 flex-1 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95 disabled:opacity-60"
         >
-          {pending ? "Salvando..." : submitLabel}
+          <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
         </button>
         <button
           type="button"

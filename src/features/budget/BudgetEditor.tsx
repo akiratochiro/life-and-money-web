@@ -4,6 +4,7 @@ import { ApiError } from "../../shared/api/problem";
 import { AmountInput } from "../../shared/ui/AmountInput";
 import { PercentInput } from "../../shared/ui/PercentInput";
 import { toCents } from "../../shared/lib/money";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 type Props = {
   categoryId: number;
@@ -73,7 +74,7 @@ export function BudgetEditor({ categoryId, initialMode, initialLimit, onDone }: 
           disabled={value <= 0 || setBudget.isPending}
           className="h-12 flex-1 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95 disabled:opacity-60"
         >
-          {setBudget.isPending ? "Salvando..." : "Salvar"}
+          <PendingLabel pending={setBudget.isPending} pendingText="Salvando…">Salvar</PendingLabel>
         </button>
         <button
           type="button"

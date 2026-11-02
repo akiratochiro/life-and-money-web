@@ -3,6 +3,7 @@ import { useRemoveBudget, type BudgetLine, type BudgetStatus } from "./budgetApi
 import { BudgetEditor } from "./BudgetEditor";
 import { Badge, type BadgeTone } from "../../shared/ui/Badge";
 import { Money } from "../../shared/ui/Money";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 const STATUS: Record<BudgetStatus, { label: string; tone: BadgeTone; bar: string }> = {
   OK: { label: "Em dia", tone: "income", bar: "bg-income" },
@@ -79,7 +80,7 @@ export function BudgetLineCard({ line, editable }: Props) {
               onClick={() => removeBudget.mutate(categoryId, { onSuccess: () => setMode("view") })}
               className="h-11 flex-1 rounded-full bg-warning font-bold text-[#1f1400] transition active:scale-95 disabled:opacity-60"
             >
-              {removeBudget.isPending ? "Removendo..." : "Remover"}
+              <PendingLabel pending={removeBudget.isPending} pendingText="Removendo…">Remover</PendingLabel>
             </button>
             <button
               type="button"

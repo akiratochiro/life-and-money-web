@@ -6,6 +6,7 @@ import { ApiError } from "../../shared/api/problem";
 import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -66,7 +67,7 @@ export function ForgotPasswordPage() {
               )}
 
               <Button type="submit" disabled={mutation.isPending || wait > 0}>
-                {mutation.isPending ? "Enviando..." : "Enviar link"}
+                <PendingLabel pending={mutation.isPending} pendingText="Enviando…">Enviar link</PendingLabel>
               </Button>
             </form>
           </>

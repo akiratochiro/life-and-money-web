@@ -5,6 +5,7 @@ import { resetPassword } from "./authApi";
 import { ApiError } from "../../shared/api/problem";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 export function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ export function ResetPasswordPage() {
               />
 
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? "Salvando..." : "Salvar senha nova"}
+                <PendingLabel pending={mutation.isPending} pendingText="Salvando…">Salvar senha nova</PendingLabel>
               </Button>
             </form>
           </>

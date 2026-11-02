@@ -8,6 +8,7 @@ import { TextField } from "../../shared/ui/TextField";
 import { MonthSwitcher } from "../../shared/ui/MonthSwitcher";
 import { toCents } from "../../shared/lib/money";
 import { currentMonth, todayIso } from "../../shared/lib/dates";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 type Kind = "EXPENSE" | "INCOME";
 
@@ -265,7 +266,7 @@ export function BillForm(props: CreateProps | EditProps) {
           disabled={!canSubmit}
           className="h-12 flex-1 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95 disabled:opacity-60"
         >
-          {props.pending ? "Salvando..." : editing ? "Salvar" : "Criar conta"}
+          <PendingLabel pending={props.pending} pendingText="Salvando…">{editing ? "Salvar" : "Criar conta"}</PendingLabel>
         </button>
         <button
           type="button"

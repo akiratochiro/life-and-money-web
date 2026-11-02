@@ -6,6 +6,7 @@ import { ApiError } from "../../shared/api/problem";
 import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -96,7 +97,7 @@ export function RegisterPage() {
           )}
 
           <Button type="submit" disabled={mutation.isPending || wait > 0}>
-            {mutation.isPending ? "Criando sua conta..." : "Criar conta"}
+            <PendingLabel pending={mutation.isPending} pendingText="Criando sua conta…">Criar conta</PendingLabel>
           </Button>
         </form>
 

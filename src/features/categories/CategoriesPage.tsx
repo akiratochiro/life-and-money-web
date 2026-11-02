@@ -10,6 +10,7 @@ import {
 import { ApiError } from "../../shared/api/problem";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 const SECTIONS: { type: CategoryType; title: string; dot: string }[] = [
   { type: "EXPENSE", title: "Despesas", dot: "bg-expense" },
@@ -139,7 +140,7 @@ function NewCategoryForm() {
         </p>
       )}
       <Button type="submit" disabled={!name.trim() || createCategory.isPending}>
-        {createCategory.isPending ? "Criando..." : "Criar categoria"}
+        <PendingLabel pending={createCategory.isPending} pendingText="Criando…">Criar categoria</PendingLabel>
       </Button>
     </form>
   );

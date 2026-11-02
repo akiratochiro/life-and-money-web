@@ -8,6 +8,7 @@ import { AmountInput } from "../../shared/ui/AmountInput";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { todayIso, yesterdayIso } from "../../shared/lib/dates";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 export type TransactionFormValues = {
   type: CategoryType;
@@ -195,7 +196,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
       )}
 
       <Button type="submit" disabled={!canSubmit}>
-        {pending ? "Salvando..." : submitLabel}
+        <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
       </Button>
 
       {footer}

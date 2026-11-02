@@ -9,6 +9,7 @@ import { ApiError } from "../../shared/api/problem";
 import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
 import { Card } from "../../shared/ui/Card";
 import { TextField } from "../../shared/ui/TextField";
+import { PendingLabel } from "../../shared/ui/PendingLabel";
 
 export function AccountPage() {
   const me = useMe();
@@ -49,7 +50,7 @@ export function AccountPage() {
           disabled={exportData.isPending}
           className="self-start text-sm font-bold text-signal disabled:opacity-60"
         >
-          {exportData.isPending ? "Preparando o arquivo..." : "Exportar meus dados"}
+          <PendingLabel pending={exportData.isPending} pendingText="Preparando o arquivo…">Exportar meus dados</PendingLabel>
         </button>
         {exportData.error && (
           <p role="alert" className="text-sm font-semibold text-danger">
@@ -158,7 +159,7 @@ function DeleteAccountSection() {
             disabled={!confirmed || mutation.isPending || wait > 0}
             className="h-14 rounded-full bg-danger px-6 font-bold text-ink-900 transition active:scale-95 disabled:opacity-40"
           >
-            {mutation.isPending ? "Excluindo..." : "Excluir minha conta"}
+            <PendingLabel pending={mutation.isPending} pendingText="Excluindo…">Excluir minha conta</PendingLabel>
           </button>
           <button
             type="button"
