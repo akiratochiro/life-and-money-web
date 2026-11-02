@@ -159,6 +159,13 @@
     }
   }
 
+  /* A bottom sheet subindo da base. */
+  @keyframes sheet-up {
+    from {
+      transform: translateY(100%);
+    }
+  }
+
   /* Cada peça do confete sai do centro para a própria direção (--dx, --dy, --spin) e some. */
   @keyframes confetti {
     0% {

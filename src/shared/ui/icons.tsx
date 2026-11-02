@@ -75,3 +75,10 @@ export const CalendarIcon = (p: IconProps) => (
     <path d="M15 3v4" />
   </svg>
 );
+export const MoreIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <circle cx="5" cy="12" r="1.6" />
+    <circle cx="12" cy="12" r="1.6" />
+    <circle cx="19" cy="12" r="1.6" />
+  </svg>
+);
