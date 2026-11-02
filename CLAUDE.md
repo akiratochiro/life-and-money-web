@@ -38,6 +38,20 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   expõe hooks e as mutações invalidam as chaves afetadas (uma transação invalida
   `["transactions"]`, `["dashboard"]`, `["goals"]` e `["bills"]`, porque pode ser o pagamento de
   uma conta; pagar uma conta invalida `["bills"]`, `["transactions"]` e `["dashboard"]`). `useState` só para estado de interface.
+- **Design system "Cofrinho de argila"** (decisões 18 a 20), tokens no `@theme` do `src/index.css`:
+  - **nunca cor fixa** (`#...`, `text-[#...]`) em componente: use o token pelo papel;
+  - **`accent` só para ação primária e ponto de atenção**; selecionado/segmentado usa argila neutra
+    (`bg-surface shadow-clay-sm`), link usa `text-link`;
+  - **texto semântico usa o tom `-strong`** (`text-income-strong`); `bg-income` é preenchimento,
+    `bg-income-soft` é fundo de selo;
+  - cor nova no tema precisa passar no `src/theme.test.ts` (contraste AA);
+  - cor e ícone de categoria vêm de `features/categories/categoryLook.ts` (dados) e
+    `CategoryGlyph.tsx` (desenho); valor novo da API exige entrada nos dois e tokens `cat-*`.
+- **Formas flutuantes** (`shared/brand/FloatingShapes`): só no login e no `EmptyState`, nunca atrás de
+  números; só `transform`, `motion-safe`. Ilustrações de terceiros são CC BY 4.0: manter o crédito em
+  Minha conta e no README.
+- **Comemoração só depois do servidor**: check de salvo e confete (`useCelebrate`) no `onSuccess`,
+  nunca no `onMutate` da otimista.
 - **O que cada mutação recarrega está em `shared/api/invalidation.ts`** (`AFFECTS`), com um teste
   por linha. Mutação nova usa `useInvalidate()`/`invalidate()` com o `Change` certo; mudança que
   afeta outra tela entra no mapa e no teste, nunca numa lista solta no módulo.

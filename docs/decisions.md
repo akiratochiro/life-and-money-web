@@ -357,3 +357,73 @@ mantêm a largura: o texto fica invisível e o spinner aparece por cima (`Pendin
 `prefetchQuery` respeita o `staleTime`, então ir e voltar não multiplica as chamadas, mas cada mês
 novo custa duas requisições a mais, que contam no limite de 100.000 por dia do Workers. O CLS das
 Análises caiu de 0,109 para 0,034, e o da Início de 0,038 para 0,021.
+
+## 18. "Cofrinho de argila": claymorphism pastel, com tokens semânticos e contraste testado
+
+**Contexto.** A direção "Tinta e Sinal" (azul-tinta e laranja neon) dava ao app uma cara de painel
+técnico, e o logo era só texto. A identidade nova devia ter o porco como símbolo, cores pastel e o
+visual de argila (claymorphism).
+
+**Decisão.** Um tema claro, em que o volume vem da sombra: cada card tem uma sombra externa macia
+tingida de rosa, um brilho interno no topo e uma sombra interna na base, e o botão primário afunda
+quando é pressionado. Os tokens no `@theme` passaram a ter nomes de papel, não de tom:
+
+- fundos (`canvas`, `surface`, `sunken`), texto em três intensidades com o marrom do porco
+  (`#493b30`), e `link`;
+- os rosas do porco como marca (`pig-*`), para logo e decoração, nunca para texto pequeno: o
+  `#a5627a` da paleta fica abaixo de 4,5:1 sobre o fundo;
+- um único destaque, a framboesa (`accent`, `#b8395f`), reservado a ações primárias e pontos de
+  atenção (o item ativo do menu, o dia de hoje). Controles segmentados e chips selecionados usam
+  argila neutra;
+- entrou, saiu, guardou e alerta em três papéis cada: preenchimento (barras, pontos), fundo suave
+  (selos) e um tom forte, o único seguro para texto;
+- raios, sombras, espaçamento (`gutter`, `card`, `section`) e uma escala tipográfica com nome
+  (`display`, `title`, `heading`, `label`). Títulos em Fredoka, arredondada.
+
+**Consequências.** Trocar o tema inteiro foi, em boa parte, trocar os tokens: os componentes já
+usavam nomes como `bg-surface` e `text-text-muted`. O que não era semântico (`ink-900`, `signal`,
+cores fixas como `text-[#1a0710]`) foi migrado por script e revisado à mão onde o papel dependia
+do contexto.
+
+Num tema claro, uma cor de gráfico raramente serve como texto, e por isso o tom forte separado. O
+`src/theme.test.ts` relê o `index.css` e confere o contraste AA de todo par de texto e fundo,
+inclusive a tinta de cada cor de categoria; a lista de cores vem do mesmo `categoryLook` que o app
+usa, que o tipo gerado da API obriga a estar completo. Uma cor nova da API sem token, ou um ajuste
+de tom que derrube a legibilidade, quebra o teste.
+
+O app deixou de ter tema escuro. Os tokens com nome de papel deixam um tema escuro possível depois,
+redefinindo os valores num `@media (prefers-color-scheme: dark)`.
+
+## 19. O porco, a moeda e as formas flutuantes
+
+**Contexto.** O porco devia fazer parte da identidade, junto com uma moeda, e o app ganharia formas
+flutuantes discretas.
+
+**Decisão.** O rosto do porco, o porco inteiro (EmojiOne) e a moeda (Twemoji) viraram componentes
+com o SVG embutido, sem requisição extra. Os dois conjuntos são CC BY 4.0: os desenhos não foram
+alterados, e o crédito está em "Minha conta" e no README, como a licença pede. O logo junta o rosto
+do porco num ladrilho de argila com o nome em Fredoka.
+
+As formas flutuantes (moedas, porcos e manchas de argila) aparecem só no login e nos estados vazios,
+que viraram um componente único, `EmptyState`. Elas ficam em baixa opacidade, animam só com
+`transform`, param com `prefers-reduced-motion` e são invisíveis para leitor de tela e para o mouse.
+
+**Consequências.** Nunca ficam atrás de números: um valor com algo se mexendo por trás é mais
+difícil de ler. `transform` é composto pela GPU, sem refazer layout nem pintura a cada quadro. O
+custo das ilustrações é o tamanho dos SVGs no bundle, cerca de 7 kB antes da compressão, menos do
+que três requisições de imagem.
+
+## 20. Microinterações que só comemoram o que o servidor confirmou
+
+**Contexto.** Salvar uma transação e atingir uma meta mereciam um retorno visual, mas a transação é
+otimista (decisão 15): a tela muda antes de o servidor responder.
+
+**Decisão.** O check animado de "Transação salva." e o confete de meta atingida saem no `onSuccess`,
+não no `onMutate`. A meta concluída é detectada na própria atualização otimista (o status passou de
+em andamento para concluída) e só é celebrada quando o servidor aceita. O confete são 36 peças em
+CSS, só `transform` e `opacity`, que somem em 1,6 s, sem biblioteca.
+
+**Consequências.** A comemoração nunca precisa ser desfeita: se o servidor recusar, a tela volta,
+aparece o erro, e não houve confete. Em troca, o check chega uma fração de segundo depois da
+mudança na tela, o tempo da resposta. Com movimento reduzido, o check já aparece desenhado e o
+confete não sai, mas o aviso de meta atingida continua.

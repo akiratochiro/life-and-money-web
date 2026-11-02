@@ -31,9 +31,21 @@ Create an account to try it: new users start with a default set of categories.
 | Categories | Create, rename and archive your own categories |
 | My account | Profile, export all your data as JSON, sign out, and delete the account (typing "EXCLUIR" plus the password) |
 
+## Visual identity
+
+"Cofrinho de argila" (clay piggy bank): claymorphism in pastel tones, with the pig as the symbol.
+Light surfaces get their volume from soft pink-tinted shadows and an inner highlight; a single
+strong accent (raspberry) is reserved for primary actions and points of attention. Colors are
+semantic tokens in Tailwind's `@theme`, and a test checks the WCAG AA contrast of every text and
+background pair. Categories have a color and an icon from closed lists defined by the API.
+
+Pig and coin illustrations: [EmojiOne](https://github.com/EmojiTwo/emojitwo) and
+[Twemoji](https://github.com/jdecked/twemoji), licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), unmodified.
+
 ## Stack
 
-React 19 · TypeScript · Vite · React Router · TanStack Query · Tailwind CSS 4 · openapi-fetch + openapi-typescript
+React 19 · TypeScript · Vite · React Router · TanStack Query · Tailwind CSS 4 · Motion · openapi-fetch + openapi-typescript
 
 ## Architecture decisions
 
