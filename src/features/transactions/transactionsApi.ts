@@ -7,6 +7,7 @@ import { useToast } from "../../shared/toast/toastContext";
 import { useCelebrate } from "../../shared/celebrate/celebrateContext";
 import type { Goal } from "../goals/goalsApi";
 import { applyToGoal, insertTransaction, monthOf, provisionalTransaction, removeTransaction } from "./optimistic";
+import { confirmHaptic } from "../../shared/lib/haptics";
 
 export type Transaction = components["schemas"]["TransactionResponse"];
 export type TransactionInput = components["schemas"]["TransactionRequest"];
@@ -87,7 +88,10 @@ function useOptimisticHandlers(failure: string, saved?: string) {
   return {
     queryClient,
     onSuccess: (_data: unknown, _variables: unknown, context: Context | undefined) => {
-      if (saved) toast.show(saved, "success");
+      if (saved) {
+        toast.show(saved, "success");
+        confirmHaptic();
+      }
       if (context?.reachedGoal) {
         celebrate();
         toast.show(`Você chegou à meta ${context.reachedGoal}!`, "success");

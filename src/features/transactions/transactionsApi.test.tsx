@@ -177,6 +177,22 @@ describe("microinterações", () => {
     expect(toast.querySelector("[data-check]")).not.toBeNull();
   });
 
+  it("vibra curto quando o servidor confirma, e não antes", async () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", { value: vibrate, configurable: true });
+    const response = deferred<ReturnType<typeof ok>>();
+    mocks.POST.mockReturnValue(response.promise);
+    const { result } = renderHook(() => useCreateTransaction(), { wrapper });
+
+    act(() => result.current.mutate({ categoryId: 3, amount: 50, transactionDate: "2026-10-20" }));
+    await waitFor(() => expect(october()).toHaveLength(3));
+    expect(vibrate).not.toHaveBeenCalled();
+
+    response.resolve(ok(tx(10, "2026-10-20"), 201));
+    await waitFor(() => expect(vibrate).toHaveBeenCalledWith(15));
+    Reflect.deleteProperty(navigator, "vibrate");
+  });
+
   it("um aporte que conclui a meta solta confete e avisa", async () => {
     mocks.POST.mockResolvedValue(ok(tx(10, "2026-10-20", { goalId: 7, amount: 700 }), 201));
     renderToasts();

@@ -45,9 +45,11 @@ type Props = {
   error: Error | null;
   onSubmit: (input: TransactionInput) => void;
   footer?: ReactNode;
+  /** Tela cheia no celular: foco direto no valor e o botão preso na base, acima do teclado. */
+  fullScreen?: boolean;
 };
 
-export function TransactionForm({ initial, submitLabel, pending, error, onSubmit, footer }: Props) {
+export function TransactionForm({ initial, submitLabel, pending, error, onSubmit, footer, fullScreen = false }: Props) {
   const categories = useCategories(true);
   const goals = useGoals();
 
@@ -109,7 +111,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
         ))}
       </div>
 
-      <AmountInput label="Valor" cents={cents} onChange={setCents} />
+      <AmountInput label="Valor" cents={cents} onChange={setCents} autoFocus={fullScreen} />
 
       <fieldset className="flex flex-col gap-3">
         <legend className="mb-3 text-sm font-semibold text-text-muted">Categoria</legend>
@@ -197,9 +199,18 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
         </p>
       )}
 
-      <Button type="submit" disabled={!canSubmit}>
-        <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
-      </Button>
+      {fullScreen ? (
+        // Preso na base no celular, acima da área segura; no desktop, no fluxo normal.
+        <div className="sticky bottom-0 -mx-gutter bg-canvas/95 px-gutter pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur md:static md:mx-0 md:bg-transparent md:p-0">
+          <Button type="submit" disabled={!canSubmit} className="w-full">
+            <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
+          </Button>
+        </div>
+      ) : (
+        <Button type="submit" disabled={!canSubmit}>
+          <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
+        </Button>
+      )}
 
       {footer}
     </form>

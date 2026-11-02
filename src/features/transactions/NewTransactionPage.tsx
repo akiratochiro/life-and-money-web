@@ -25,6 +25,7 @@ export function NewTransactionPage() {
         </Link>
       </header>
       <TransactionForm
+        fullScreen
         initial={initial}
         submitLabel="Salvar"
         pending={false}
