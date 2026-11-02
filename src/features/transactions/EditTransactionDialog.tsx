@@ -55,9 +55,14 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
           goalId: transaction.goalId ?? null,
         }}
         submitLabel="Salvar alterações"
-        pending={updateTransaction.isPending}
-        error={updateTransaction.error ?? deleteTransaction.error}
-        onSubmit={(input) => updateTransaction.mutate({ id, body: input }, { onSuccess: close })}
+        // Otimista: o diálogo fecha na hora e o extrato já mostra a mudança. Um erro desfaz a
+        // mudança e aparece como aviso (useUpdateTransaction, useDeleteTransaction).
+        pending={false}
+        error={null}
+        onSubmit={(input) => {
+          updateTransaction.mutate({ id, body: input });
+          close();
+        }}
         footer={
           confirmingDelete ? (
             <div className="flex flex-col gap-3 rounded-2xl bg-surface p-4">
@@ -65,11 +70,13 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
               <div className="flex gap-2">
                 <button
                   type="button"
-                  disabled={deleteTransaction.isPending}
-                  onClick={() => deleteTransaction.mutate(id, { onSuccess: close })}
-                  className="h-11 flex-1 rounded-full bg-danger font-bold text-[#1a0710] transition active:scale-95 disabled:opacity-60"
+                  onClick={() => {
+                    deleteTransaction.mutate(id);
+                    close();
+                  }}
+                  className="h-11 flex-1 rounded-full bg-danger font-bold text-[#1a0710] transition active:scale-95"
                 >
-                  {deleteTransaction.isPending ? "Apagando..." : "Apagar"}
+                  Apagar
                 </button>
                 <button
                   type="button"

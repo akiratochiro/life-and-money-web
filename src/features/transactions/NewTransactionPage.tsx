@@ -27,11 +27,14 @@ export function NewTransactionPage() {
       <TransactionForm
         initial={initial}
         submitLabel="Salvar"
-        pending={createTransaction.isPending}
-        error={createTransaction.error}
-        onSubmit={(input) =>
-          createTransaction.mutate(input, { onSuccess: () => navigate(returnTo, { replace: true }) })
-        }
+        pending={false}
+        error={null}
+        // Otimista: volta na hora, com a transação já na lista. Se o servidor recusar, ela some e
+        // um aviso diz o motivo (useCreateTransaction).
+        onSubmit={(input) => {
+          createTransaction.mutate(input);
+          navigate(returnTo, { replace: true });
+        }}
       />
     </div>
   );
