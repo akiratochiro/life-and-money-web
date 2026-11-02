@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router/dom";
 import { router } from "./router";
 import { PrivacyProvider } from "../shared/privacy/PrivacyProvider";
+import { ToastProvider } from "../shared/toast/ToastProvider";
 import { SessionProvider } from "../features/auth/SessionProvider";
 import { serverWake } from "../shared/api/serverWake";
 import { useServerStatus } from "../shared/api/useServerStatus";
@@ -25,11 +26,13 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
         <PrivacyProvider>
-          {/* Enquanto o aviso cobre a tela, o que está atrás dele não recebe foco nem cliques. */}
-          <div inert={blocked}>
-            <RouterProvider router={router} />
-          </div>
-          {blocked && <ServerWakeOverlay status={serverStatus} onRetry={serverWake.retry} />}
+          <ToastProvider>
+            {/* Enquanto o aviso cobre a tela, o que está atrás dele não recebe foco nem cliques. */}
+            <div inert={blocked}>
+              <RouterProvider router={router} />
+            </div>
+            {blocked && <ServerWakeOverlay status={serverStatus} onRetry={serverWake.retry} />}
+          </ToastProvider>
         </PrivacyProvider>
       </SessionProvider>
     </QueryClientProvider>
