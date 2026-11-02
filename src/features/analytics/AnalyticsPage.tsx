@@ -7,6 +7,8 @@ import { Money } from "../../shared/ui/Money";
 import { currentMonth } from "../../shared/lib/dates";
 import { BarsSkeleton, DonutSkeleton } from "./AnalyticsSkeletons";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
+import { useCategories } from "../categories/categoriesApi";
+import { CATEGORY_COLORS } from "../categories/categoryLook";
 
 const RANGES = [3, 6, 12];
 
@@ -14,6 +16,11 @@ export function AnalyticsPage() {
   const [month, setMonth] = useState(currentMonth());
   const [range, setRange] = useState(6);
   const expenses = useExpensesByCategory(month);
+  const categories = useCategories(true);
+  const colorOf = (categoryId: number) => {
+    const color = categories.data?.find((category) => category.id === categoryId)?.color;
+    return color ? CATEGORY_COLORS[color].fill : undefined;
+  };
   usePrefetchAdjacentMonths(month, expensesByCategoryQuery);
   const totals = useMonthlyTotals(range);
   const averages = totals.data?.averages ?? null;
@@ -30,7 +37,7 @@ export function AnalyticsPage() {
         ) : expenses.isError ? (
           <p role="alert" className="text-sm text-text-soft">Não foi possível carregar os gastos.</p>
         ) : (
-          <ExpensesDonut key={month} data={expenses.data} />
+          <ExpensesDonut key={month} data={expenses.data} colorOf={colorOf} />
         )}
       </section>
 
@@ -45,7 +52,7 @@ export function AnalyticsPage() {
                 aria-pressed={range === option}
                 onClick={() => setRange(option)}
                 className={`h-9 rounded-full px-3 text-xs font-bold transition active:scale-95 ${
-                  range === option ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
+                  range === option ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"
                 }`}
               >
                 {option} meses

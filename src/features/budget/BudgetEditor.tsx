@@ -45,7 +45,7 @@ export function BudgetEditor({ categoryId, initialMode, initialLimit, onDone }: 
             aria-pressed={mode === option.value}
             onClick={() => setMode(option.value)}
             className={`h-11 rounded-full text-sm font-bold transition active:scale-95 ${
-              mode === option.value ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
+              mode === option.value ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"
             }`}
           >
             {option.label}

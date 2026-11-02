@@ -309,7 +309,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["rename"];
+        /** Edita nome, cor ou ícone da categoria */
+        patch: operations["updateCategory"];
         trace?: never;
     };
     "/users/me": {
@@ -613,6 +614,16 @@ export interface components {
             name: string;
             /** @enum {string} */
             type: "INCOME" | "EXPENSE" | "SAVING";
+            /**
+             * @description Opcional; sem ela, vale a cor padrão do tipo
+             * @enum {string}
+             */
+            color?: "ROSE" | "PINK" | "PEACH" | "CORAL" | "AMBER" | "LIME" | "MINT" | "TEAL" | "SKY" | "LAVENDER" | "PLUM" | "SAND";
+            /**
+             * @description Opcional; sem ele, vale o ícone padrão do tipo
+             * @enum {string}
+             */
+            icon?: "HOME" | "CART" | "FOOD" | "TRANSPORT" | "CAR" | "HEALTH" | "EDUCATION" | "LEISURE" | "TRAVEL" | "PET" | "CLOTHES" | "BILLS" | "PHONE" | "GIFT" | "SALARY" | "INVESTMENT" | "PIGGY_BANK" | "COIN" | "HEART" | "OTHER";
         };
         CategoryResponse: {
             /** Format: int64 */
@@ -620,6 +631,10 @@ export interface components {
             name: string;
             /** @enum {string} */
             type: "INCOME" | "EXPENSE" | "SAVING";
+            /** @enum {string} */
+            color: "ROSE" | "PINK" | "PEACH" | "CORAL" | "AMBER" | "LIME" | "MINT" | "TEAL" | "SKY" | "LAVENDER" | "PLUM" | "SAND";
+            /** @enum {string} */
+            icon: "HOME" | "CART" | "FOOD" | "TRANSPORT" | "CAR" | "HEALTH" | "EDUCATION" | "LEISURE" | "TRAVEL" | "PET" | "CLOTHES" | "BILLS" | "PHONE" | "GIFT" | "SALARY" | "INVESTMENT" | "PIGGY_BANK" | "COIN" | "HEART" | "OTHER";
             archived: boolean;
             /** Format: date-time */
             createdAt: string;
@@ -739,8 +754,19 @@ export interface components {
         ForgotPasswordResponse: {
             message: string;
         };
-        RenameCategoryRequest: {
-            name: string;
+        UpdateCategoryRequest: {
+            /** @description Opcional; ausente para manter o nome */
+            name?: string;
+            /**
+             * @description Opcional; ausente para manter a cor
+             * @enum {string}
+             */
+            color?: "ROSE" | "PINK" | "PEACH" | "CORAL" | "AMBER" | "LIME" | "MINT" | "TEAL" | "SKY" | "LAVENDER" | "PLUM" | "SAND";
+            /**
+             * @description Opcional; ausente para manter o ícone
+             * @enum {string}
+             */
+            icon?: "HOME" | "CART" | "FOOD" | "TRANSPORT" | "CAR" | "HEALTH" | "EDUCATION" | "LEISURE" | "TRAVEL" | "PET" | "CLOTHES" | "BILLS" | "PHONE" | "GIFT" | "SALARY" | "INVESTMENT" | "PIGGY_BANK" | "COIN" | "HEART" | "OTHER";
         };
         AccountExport: {
             /** Format: date-time */
@@ -1464,7 +1490,7 @@ export interface operations {
             };
         };
     };
-    rename: {
+    updateCategory: {
         parameters: {
             query?: never;
             header?: never;
@@ -1475,7 +1501,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RenameCategoryRequest"];
+                "application/json": components["schemas"]["UpdateCategoryRequest"];
             };
         };
         responses: {

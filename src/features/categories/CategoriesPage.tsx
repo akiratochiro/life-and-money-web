@@ -3,7 +3,7 @@ import {
   useArchiveCategory,
   useCategories,
   useCreateCategory,
-  useRenameCategory,
+  useUpdateCategory,
   type Category,
   type CategoryType,
 } from "./categoriesApi";
@@ -12,6 +12,16 @@ import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { CategoriesSkeleton } from "./CategoriesSkeleton";
+import { CategoryLookPicker } from "./CategoryLookPicker";
+import { type CategoryColor, type CategoryIcon } from "./categoryLook";
+import { CategoryTile } from "./CategoryGlyph";
+
+/** O mesmo padrão que a API aplica quando a categoria vem sem cor ou ícone. */
+const DEFAULT_LOOK: Record<CategoryType, { color: CategoryColor; icon: CategoryIcon }> = {
+  INCOME: { color: "MINT", icon: "COIN" },
+  EXPENSE: { color: "CORAL", icon: "OTHER" },
+  SAVING: { color: "PINK", icon: "PIGGY_BANK" },
+};
 
 const SECTIONS: { type: CategoryType; title: string; dot: string }[] = [
   { type: "EXPENSE", title: "Despesas", dot: "bg-expense" },
@@ -84,8 +94,11 @@ export function CategoriesPage() {
           {showArchived && (
             <ul className="flex flex-col rounded-card border border-dashed border-line p-2">
               {archived.map((category) => (
-                <li key={category.id} className="flex items-center justify-between gap-3 px-3 py-3 text-text-muted">
-                  <span className="truncate">{category.name}</span>
+                <li key={category.id} className="flex items-center gap-3 px-3 py-3 text-text-muted">
+                  <span className="opacity-60">
+                    <CategoryTile color={category.color} icon={category.icon} size="sm" />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{category.name}</span>
                   <span className="shrink-0 text-xs font-semibold">{TYPE_LABEL[category.type]}</span>
                 </li>
               ))}
@@ -101,10 +114,27 @@ function NewCategoryForm() {
   const createCategory = useCreateCategory();
   const [name, setName] = useState("");
   const [type, setType] = useState<CategoryType>("EXPENSE");
+  const [look, setLook] = useState(DEFAULT_LOOK.EXPENSE);
+  // Enquanto o usuário não escolhe cor e ícone, eles seguem o padrão do tipo.
+  const [lookTouched, setLookTouched] = useState(false);
+
+  function changeType(next: CategoryType) {
+    setType(next);
+    if (!lookTouched) setLook(DEFAULT_LOOK[next]);
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    createCategory.mutate({ name: name.trim(), type }, { onSuccess: () => setName("") });
+    createCategory.mutate(
+      { name: name.trim(), type, ...look },
+      {
+        onSuccess: () => {
+          setName("");
+          setLookTouched(false);
+          setLook(DEFAULT_LOOK[type]);
+        },
+      },
+    );
   }
 
   const errorMessage = conflictMessage(createCategory.error);
@@ -125,9 +155,9 @@ function NewCategoryForm() {
             key={section.type}
             type="button"
             aria-pressed={type === section.type}
-            onClick={() => setType(section.type)}
+            onClick={() => changeType(section.type)}
             className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-bold transition active:scale-95 ${
-              type === section.type ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
+              type === section.type ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"
             }`}
           >
             <span className={`h-2 w-2 rounded-full ${section.dot}`} />
@@ -135,6 +165,14 @@ function NewCategoryForm() {
           </button>
         ))}
       </div>
+      <CategoryLookPicker
+        color={look.color}
+        icon={look.icon}
+        onChange={(next) => {
+          setLook(next);
+          setLookTouched(true);
+        }}
+      />
       {errorMessage && (
         <p role="alert" className="text-sm font-semibold text-danger-strong">
           {errorMessage}
@@ -148,50 +186,70 @@ function NewCategoryForm() {
 }
 
 function CategoryRow({ category }: { category: Category }) {
-  const [mode, setMode] = useState<"view" | "rename" | "archive">("view");
+  const [mode, setMode] = useState<"view" | "edit" | "archive">("view");
   const [name, setName] = useState(category.name);
-  const renameCategory = useRenameCategory();
+  const [look, setLook] = useState({ color: category.color, icon: category.icon });
+  const updateCategory = useUpdateCategory();
   const archiveCategory = useArchiveCategory();
   const id = category.id;
 
-  if (mode === "rename") {
-    const errorMessage = conflictMessage(renameCategory.error);
+  if (mode === "edit") {
+    const errorMessage = conflictMessage(updateCategory.error);
+    const cancel = () => {
+      setName(category.name);
+      setLook({ color: category.color, icon: category.icon });
+      setMode("view");
+    };
     return (
       <li className="px-1 py-1">
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            renameCategory.mutate({ id, name: name.trim() }, { onSuccess: () => setMode("view") });
+            // Só manda o que mudou: o PATCH é parcial.
+            const trimmed = name.trim();
+            updateCategory.mutate(
+              {
+                id,
+                body: {
+                  name: trimmed !== category.name ? trimmed : undefined,
+                  color: look.color !== category.color ? look.color : undefined,
+                  icon: look.icon !== category.icon ? look.icon : undefined,
+                },
+              },
+              { onSuccess: () => setMode("view") },
+            );
           }}
-          className="flex flex-col gap-2 rounded-2xl bg-sunken p-3"
+          className="flex flex-col gap-4 rounded-2xl bg-sunken p-3"
         >
           <label className="flex flex-col gap-2">
-            <span className="sr-only">Novo nome de {category.name}</span>
+            <span className="text-sm font-semibold text-text-muted">Nome</span>
             <input
               autoFocus
               required
               maxLength={100}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="h-12 rounded-xl border border-line bg-canvas px-3 text-text outline-none focus:border-accent"
+              className="h-12 rounded-control border border-line bg-surface px-3 text-text outline-none focus:border-accent"
             />
           </label>
+          <CategoryLookPicker color={look.color} icon={look.icon} onChange={setLook} />
           {errorMessage && <p role="alert" className="text-sm font-semibold text-danger-strong">{errorMessage}</p>}
           <div className="flex gap-2">
             <button
               type="submit"
-              disabled={!name.trim() || renameCategory.isPending}
+              disabled={
+                !name.trim() ||
+                updateCategory.isPending ||
+                (name.trim() === category.name && look.color === category.color && look.icon === category.icon)
+              }
               className="h-11 flex-1 rounded-full bg-accent font-bold text-on-accent shadow-clay-accent transition active:scale-95 disabled:opacity-60"
             >
-              Salvar
+              <PendingLabel pending={updateCategory.isPending} pendingText="Salvando…">Salvar</PendingLabel>
             </button>
             <button
               type="button"
-              onClick={() => {
-                setName(category.name);
-                setMode("view");
-              }}
-              className="h-11 flex-1 rounded-full bg-surface font-bold text-text transition active:scale-95"
+              onClick={cancel}
+              className="h-11 flex-1 rounded-full bg-surface font-bold text-text shadow-clay-sm transition active:scale-95"
             >
               Cancelar
             </button>
@@ -233,10 +291,11 @@ function CategoryRow({ category }: { category: Category }) {
   }
 
   return (
-    <li className="flex items-center gap-2 px-3 py-1.5">
+    <li className="flex items-center gap-3 px-3 py-1.5">
+      <CategoryTile color={category.color} icon={category.icon} size="sm" />
       <span className="min-w-0 flex-1 truncate font-bold">{category.name}</span>
-      <button type="button" onClick={() => setMode("rename")} className="h-11 px-3 text-sm font-bold text-text-muted hover:text-text">
-        Renomear
+      <button type="button" onClick={() => setMode("edit")} className="h-11 px-3 text-sm font-bold text-text-muted hover:text-text">
+        Editar
       </button>
       <button type="button" onClick={() => setMode("archive")} className="h-11 px-3 text-sm font-bold text-text-muted hover:text-warning-strong">
         Arquivar

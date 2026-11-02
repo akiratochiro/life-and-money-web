@@ -16,23 +16,21 @@ import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentM
 import { AnimatePresence, m } from "motion/react";
 import { listItem } from "../../shared/ui/motion";
 import { EmptyState } from "../../shared/ui/EmptyState";
+import { CategoryTile } from "../categories/CategoryGlyph";
 
 const TYPE_STYLE: Record<
   CategoryType,
-  { tile: string; amount: string; sign: string }
+  { amount: string; sign: string }
 > = {
   INCOME: {
-    tile: "bg-income-soft text-income-strong",
     amount: "text-income-strong",
     sign: "+ ",
   },
   EXPENSE: {
-    tile: "bg-expense-soft text-expense-strong",
     amount: "text-text",
     sign: "− ",
   },
   SAVING: {
-    tile: "bg-saving-soft text-saving-strong",
     amount: "text-saving-strong",
     sign: "",
   },
@@ -130,11 +128,11 @@ export function TransactionsPage() {
                       onClick={() => setEditing(transaction)}
                       className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-surface active:scale-[0.99]"
                     >
-                      <span
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl font-display text-sm font-semibold ${style.tile}`}
-                      >
-                        {category?.name.charAt(0) ?? "?"}
-                      </span>
+                      {category ? (
+                        <CategoryTile color={category.color} icon={category.icon} />
+                      ) : (
+                        <span className="h-10 w-10 shrink-0 rounded-2xl bg-sunken" />
+                      )}
                       <span className="flex min-w-0 flex-1 flex-col">
                         <span className="truncate font-bold">
                           {category?.name ?? "Categoria"}

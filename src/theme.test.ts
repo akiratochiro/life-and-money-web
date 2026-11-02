@@ -4,6 +4,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { COLOR_ORDER } from "./features/categories/categoryLook";
 
 /** O mesmo index.css que o app usa; o Vitest roda a partir da raiz do projeto. */
 const css = readFileSync(resolve(process.cwd(), "src/index.css"), "utf8");
@@ -33,7 +34,8 @@ function contrast(a: string, b: string): number {
 /** WCAG AA para texto normal. */
 const AA = 4.5;
 const BACKGROUNDS = ["canvas", "surface", "surface-raised", "sunken"];
-const CATEGORY_COLORS = ["rose", "pink", "peach", "coral", "amber", "lime", "mint", "teal", "sky", "lavender", "plum", "sand"];
+/** As cores que a API conhece (o tipo gerado obriga o categoryLook a ter todas). */
+const CATEGORY_COLORS = COLOR_ORDER.map((color) => color.toLowerCase());
 
 describe("contraste do tema", () => {
   it.each(["text", "text-soft", "text-muted", "link", "accent"])("o texto %s passa AA em todo fundo", (text) => {

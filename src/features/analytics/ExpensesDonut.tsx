@@ -3,25 +3,27 @@ import type { ExpensesByCategory } from "./analyticsApi";
 import { Money } from "../../shared/ui/Money";
 import { toCents } from "../../shared/lib/money";
 
-const PALETTE = ["#ff7a45", "#ffb020", "#ff4d6d", "#ffd08a", "#c9546f", "#ff9a6b"];
-const OTHERS_COLOR = "#4a5480";
-const MAX_SLICES = PALETTE.length;
+/** Até seis fatias; da sexta em diante, as menores viram "Outras", num tom neutro. */
+const MAX_SLICES = 6;
+const OTHERS_COLOR = "var(--color-text-muted)";
+const UNKNOWN_COLOR = "var(--color-track)";
 
 type Slice = { key: string; name: string; cents: number; percentage: number; color: string };
 
 const percentFormat = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
 
-function toSlices(data: ExpensesByCategory): Slice[] {
+/** Cada fatia usa a cor da própria categoria, a mesma do extrato e da nova transação. */
+function toSlices(data: ExpensesByCategory, colorOf: (categoryId: number) => string | undefined): Slice[] {
   const categories = data.categories;
   const fitsAll = categories.length <= MAX_SLICES;
   const shown = fitsAll ? categories : categories.slice(0, MAX_SLICES - 1);
 
-  const slices: Slice[] = shown.map((category, index) => ({
+  const slices: Slice[] = shown.map((category) => ({
     key: String(category.categoryId),
     name: category.name,
     cents: toCents(category.total),
     percentage: category.percentage,
-    color: PALETTE[index],
+    color: colorOf(category.categoryId) ?? UNKNOWN_COLOR,
   }));
 
   if (!fitsAll) {
@@ -50,9 +52,15 @@ function buildArcs(slices: Slice[], circumference: number): Arc[] {
   return arcs;
 }
 
-export function ExpensesDonut({ data }: { data: ExpensesByCategory }) {
+export function ExpensesDonut({
+  data,
+  colorOf,
+}: {
+  data: ExpensesByCategory;
+  colorOf: (categoryId: number) => string | undefined;
+}) {
   const [selected, setSelected] = useState<string | null>(null);
-  const slices = toSlices(data);
+  const slices = toSlices(data, colorOf);
 
   if (slices.length === 0) {
     return <p className="text-sm text-text-soft">Nenhum gasto registrado neste mês.</p>;

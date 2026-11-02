@@ -28,11 +28,14 @@ export function useCreateCategory() {
   });
 }
 
-export function useRenameCategory() {
+export type CategoryUpdate = components["schemas"]["UpdateCategoryRequest"];
+
+/** Edição parcial: nome, cor e ícone; o que não vier no corpo fica como está. */
+export function useUpdateCategory() {
   const invalidate = useInvalidateCategories();
   return useMutation({
-    mutationFn: ({ id, name }: { id: number; name: string }) =>
-      unwrap(api.PATCH("/categories/{id}", { params: { path: { id } }, body: { name } })),
+    mutationFn: ({ id, body }: { id: number; body: CategoryUpdate }) =>
+      unwrap(api.PATCH("/categories/{id}", { params: { path: { id } }, body })),
     onSuccess: invalidate,
   });
 }

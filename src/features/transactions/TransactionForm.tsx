@@ -9,6 +9,7 @@ import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { todayIso, yesterdayIso } from "../../shared/lib/dates";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
+import { CategoryTile } from "../categories/CategoryGlyph";
 
 export type TransactionFormValues = {
   type: CategoryType;
@@ -99,7 +100,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
             aria-pressed={type === option.value}
             onClick={() => changeType(option.value)}
             className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-bold transition active:scale-95 ${
-              type === option.value ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
+              type === option.value ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"
             }`}
           >
             <span className={`h-2 w-2 rounded-full ${option.dot}`} />
@@ -127,8 +128,9 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
                 type="button"
                 aria-pressed={categoryId === category.id}
                 onClick={() => setCategoryId(category.id)}
-                className={chipClass(categoryId === category.id)}
+                className={`${chipClass(categoryId === category.id)} pl-1.5`}
               >
+                <CategoryTile color={category.color} icon={category.icon} size="sm" />
                 {category.name}
                 {category.archived && <span className="text-xs font-semibold opacity-70">(arquivada)</span>}
               </button>

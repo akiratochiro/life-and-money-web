@@ -118,7 +118,7 @@ export function BillForm(props: CreateProps | EditProps) {
               aria-pressed={kind === option.value}
               onClick={() => changeKind(option.value)}
               className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-bold transition active:scale-95 ${
-                kind === option.value ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
+                kind === option.value ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"
               }`}
             >
               <span className={`h-2 w-2 rounded-full ${option.dot}`} />
