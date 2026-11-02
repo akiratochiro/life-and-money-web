@@ -427,3 +427,38 @@ CSS, só `transform` e `opacity`, que somem em 1,6 s, sem biblioteca.
 aparece o erro, e não houve confete. Em troca, o check chega uma fração de segundo depois da
 mudança na tela, o tempo da resposta. Com movimento reduzido, o check já aparece desenhado e o
 confete não sai, mas o aviso de meta atingida continua.
+
+## 21. Cara de app no celular: barra na base, tela cheia para lançar e gestos próprios
+
+**Contexto.** No celular, o app devia parecer nativo: navegação na base, áreas seguras, lançar uma
+transação sem distração, alvos de toque grandes e gestos de puxar e arrastar.
+
+**Decisão.**
+- Abaixo de `md`, uma barra na base com Início, Extrato, o "+" no meio, Orçamento, Metas e "Mais",
+  que abre uma bottom sheet (um `<dialog>` modal) com as outras telas. A partir de `md`, a sidebar.
+  São seis posições iguais, então o "+" fica meio passo à esquerda do centro exato; centralizá-lo
+  apertaria os três itens da direita abaixo de 44 px.
+- `viewport-fit=cover` e `env(safe-area-inset-*)` no topo, na barra, na folha, nos toasts e no botão
+  Salvar.
+- A nova transação é tela cheia no celular, sem a barra, com foco no valor, `inputmode="decimal"` e o
+  Salvar preso acima da área segura. O campo continua em centavos (decisão 3): a vírgula do teclado é
+  ignorada.
+- Puxar para atualizar (Início e Extrato) e swipe lateral para trocar de mês (Extrato, Contas,
+  Orçamento e Análises) são componentes próprios, com a decisão do gesto em funções puras.
+- `navigator.vibrate` curto quando o servidor confirma o salvar, protegido para o iOS, que não tem
+  a API.
+- No CSS: sem realce de toque, sem o pull-to-refresh nativo (`overscroll-behavior`),
+  `touch-action: manipulation`, e campos com 16 px na camada base.
+
+**Consequências.** Os gestos não substituem os controles: o seletor de mês continua sendo o caminho
+para teclado e leitor de tela, e os dados se atualizam sozinhos ao voltar para a aba. Toques que
+começam a 24 px da borda ficam para o "voltar" do iOS.
+
+A auditoria automática (`npm run audit:mobile`, `docs/mobile.md`) já pegou três defeitos que os
+testes de componente não pegariam:
+- a regra de 16 px, fora das camadas do Tailwind, encolhia o valor da nova transação;
+- num mês vazio, o swipe de volta caía fora da área do gesto;
+- havia alvos de 36 e 20 px.
+
+O que a emulação não alcança (teclado virtual, Safari, áreas seguras reais) está numa lista para
+conferir em aparelho.

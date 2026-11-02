@@ -43,6 +43,15 @@ Pig and coin illustrations: [EmojiOne](https://github.com/EmojiTwo/emojitwo) and
 [Twemoji](https://github.com/jdecked/twemoji), licensed under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), unmodified.
 
+## On the phone
+
+Below the `md` breakpoint it behaves like a native app: a bottom navigation with a central "+",
+safe areas for the notch and the gesture bar, a full-screen new transaction with the amount focused
+and a decimal keypad, pull to refresh, swiping sideways to change months, and a short vibration when
+a save is confirmed (Android). `npm run audit:mobile` drives an emulated iPhone through every screen
+and fails on touch targets under 44 px, inputs under 16 px, horizontal overflow or broken gestures;
+[docs/mobile.md](docs/mobile.md) lists what still needs a real device.
+
 ## Stack
 
 React 19 · TypeScript · Vite · React Router · TanStack Query · Tailwind CSS 4 · Motion · openapi-fetch + openapi-typescript

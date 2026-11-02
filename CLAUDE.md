@@ -23,6 +23,7 @@ npm run build       # tsc -b + bundle de produção; é o que a CI roda
 npm run lint        # ESLint
 npm test            # Vitest uma vez (npm run test:watch para modo watch)
 npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
+npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/mobile.md)
 ```
 
 ## Arquitetura
@@ -47,6 +48,12 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   - cor nova no tema precisa passar no `src/theme.test.ts` (contraste AA);
   - cor e ícone de categoria vêm de `features/categories/categoryLook.ts` (dados) e
     `CategoryGlyph.tsx` (desenho); valor novo da API exige entrada nos dois e tokens `cat-*`.
+- **Celular** (decisão 21): abaixo de `md`, barra na base e "Mais" em `BottomSheet`; tela cheia
+  em `FULL_SCREEN_ON_MOBILE` (`AppShell`). Alvo de toque com no mínimo 44×44 px, campo com no mínimo
+  16 px, nada que dependa de hover, e áreas seguras com `env(safe-area-inset-*)` em tudo que é
+  `fixed` ou `sticky` na base. Gesto novo: decisão em função pura (`shared/gestures/gestures.ts`),
+  nunca substituindo um controle. Mexeu em layout, navegação ou formulário: rode o
+  `npm run audit:mobile` e confira a lista de aparelho real em `docs/mobile.md`.
 - **Formas flutuantes** (`shared/brand/FloatingShapes`): só no login e no `EmptyState`, nunca atrás de
   números; só `transform`, `motion-safe`. Ilustrações de terceiros são CC BY 4.0: manter o crédito em
   Minha conta e no README.

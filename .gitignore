@@ -29,3 +29,6 @@ dist-ssr
 
 # Variáveis locais do wrangler dev (ex.: API_ORIGIN apontando para o localhost)
 .dev.vars*
+
+# Saída da auditoria de celular (npm run audit:mobile)
+mobile-audit/
