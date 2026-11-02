@@ -4,6 +4,8 @@ import { GoalCard } from "./GoalCard";
 import { GoalForm } from "./GoalForm";
 import { PlusIcon } from "../../shared/ui/icons";
 import { GoalsSkeleton } from "./GoalsSkeleton";
+import { AnimatePresence, m } from "motion/react";
+import { listItem } from "../../shared/ui/motion";
 
 const ORDER = { OVERDUE: 0, IN_PROGRESS: 1, REACHED: 2 };
 
@@ -58,9 +60,13 @@ export function GoalsPage() {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {list.map((goal) => (
-            <GoalCard key={goal.id} goal={goal} />
-          ))}
+          <AnimatePresence initial={false}>
+            {list.map((goal) => (
+              <m.div key={goal.id} {...listItem}>
+                <GoalCard goal={goal} />
+              </m.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
     </div>

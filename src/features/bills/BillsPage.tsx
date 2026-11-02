@@ -21,6 +21,7 @@ import { currentMonth, formatDate, todayIso } from "../../shared/lib/dates";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { BillsSkeleton } from "./BillsSkeleton";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
+import { AnimatePresence } from "motion/react";
 
 type Editing = { mode: "create" } | { mode: "edit"; billId: number } | null;
 
@@ -105,13 +106,15 @@ export function BillsPage() {
               <EmptyState filtered={selectedDay !== null} onCreate={() => setEditing({ mode: "create" })} />
             ) : (
               <ul className="flex flex-col gap-3">
-                {visible.map((occurrence) => (
-                  <OccurrenceItem
-                    key={`${occurrence.billId}@${occurrence.month}`}
-                    occurrence={occurrence}
-                    onEdit={(billId) => setEditing({ mode: "edit", billId })}
-                  />
-                ))}
+                <AnimatePresence initial={false}>
+                  {visible.map((occurrence) => (
+                    <OccurrenceItem
+                      key={`${occurrence.billId}@${occurrence.month}`}
+                      occurrence={occurrence}
+                      onEdit={(billId) => setEditing({ mode: "edit", billId })}
+                    />
+                  ))}
+                </AnimatePresence>
               </ul>
             )}
           </section>

@@ -1,4 +1,6 @@
-import { NavLink, Outlet } from "react-router";
+import { NavLink, Outlet, useLocation } from "react-router";
+import { AnimatePresence, m } from "motion/react";
+import { pageEnter } from "../shared/ui/motion";
 import { CalendarIcon, ChartIcon, GaugeIcon, HomeIcon, ListIcon, PlusIcon, TagIcon, TargetIcon, UserIcon } from "../shared/ui/icons";
 
 const items = [
@@ -25,6 +27,7 @@ function sideItemClass(state: { isActive: boolean }) {
 }
 
 export function AppShell() {
+  const { pathname } = useLocation();
   return (
     <div className="min-h-dvh bg-ink-900 lg:flex">
       <aside className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:gap-2 lg:border-r lg:border-line lg:px-5 lg:py-8">
@@ -49,9 +52,14 @@ export function AppShell() {
       </aside>
 
       <main className="flex-1 px-5 pb-32 pt-7 lg:px-10 lg:pb-12 lg:pt-10">
-        <div className="mx-auto w-full max-w-3xl">
-          <Outlet />
-        </div>
+        {/* Anima a entrada ao navegar, mas não na primeira abertura (initial={false}): ali a
+            animação só atrasaria o LCP. Sem animação de saída, porque o <Outlet> da página que
+            sai já renderizaria a página nova. */}
+        <AnimatePresence initial={false}>
+          <m.div key={pathname} {...pageEnter} className="mx-auto w-full max-w-3xl">
+            <Outlet />
+          </m.div>
+        </AnimatePresence>
       </main>
 
       <nav

@@ -13,6 +13,8 @@ import { currentMonth, dayLabel, monthLabel } from "../../shared/lib/dates";
 import { toCents } from "../../shared/lib/money";
 import { TransactionListSkeleton } from "./TransactionListSkeleton";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
+import { AnimatePresence, m } from "motion/react";
+import { listItem } from "../../shared/ui/motion";
 
 const TYPE_STYLE: Record<
   CategoryType,
@@ -117,38 +119,41 @@ export function TransactionsPage() {
               <h2 className="px-3 pb-1 text-xs font-bold uppercase tracking-wide text-text-muted">
                 {dayLabel(group.date)}
               </h2>
-              {group.items.map((transaction) => {
-                const category = categoryById.get(transaction.categoryId);
-                const style = TYPE_STYLE[category?.type ?? "EXPENSE"];
-                return (
-                  <button
-                    key={transaction.id}
-                    type="button"
-                    onClick={() => setEditing(transaction)}
-                    className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-surface active:scale-[0.99]"
-                  >
-                    <span
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl font-display text-sm font-semibold ${style.tile}`}
+              <AnimatePresence initial={false}>
+                {group.items.map((transaction) => {
+                  const category = categoryById.get(transaction.categoryId);
+                  const style = TYPE_STYLE[category?.type ?? "EXPENSE"];
+                  return (
+                    <m.button
+                      {...listItem}
+                      key={transaction.id}
+                      type="button"
+                      onClick={() => setEditing(transaction)}
+                      className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-surface active:scale-[0.99]"
                     >
-                      {category?.name.charAt(0) ?? "?"}
-                    </span>
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate font-bold">
-                        {category?.name ?? "Categoria"}
+                      <span
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl font-display text-sm font-semibold ${style.tile}`}
+                      >
+                        {category?.name.charAt(0) ?? "?"}
                       </span>
-                      {transaction.description && (
-                        <span className="truncate text-sm text-text-muted">
-                          {transaction.description}
+                      <span className="flex min-w-0 flex-1 flex-col">
+                        <span className="truncate font-bold">
+                          {category?.name ?? "Categoria"}
                         </span>
-                      )}
-                    </span>
-                    <span className={`shrink-0 font-bold ${style.amount}`}>
-                      {style.sign}
-                      <Money value={transaction.amount} />
-                    </span>
-                  </button>
-                );
-              })}
+                        {transaction.description && (
+                          <span className="truncate text-sm text-text-muted">
+                            {transaction.description}
+                          </span>
+                        )}
+                      </span>
+                      <span className={`shrink-0 font-bold ${style.amount}`}>
+                        {style.sign}
+                        <Money value={transaction.amount} />
+                      </span>
+                    </m.button>
+                  );
+                })}
+              </AnimatePresence>
             </section>
           ))}
         </div>

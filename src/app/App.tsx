@@ -8,6 +8,7 @@ import { serverWake } from "../shared/api/serverWake";
 import { useServerStatus } from "../shared/api/useServerStatus";
 import { ServerWakeOverlay } from "./ServerWakeOverlay";
 import { retryDelay, shouldRetryQuery } from "../shared/api/retryPolicy";
+import { MotionProvider } from "./MotionProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,17 +25,19 @@ export function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <PrivacyProvider>
-          <ToastProvider>
-            {/* Enquanto o aviso cobre a tela, o que está atrás dele não recebe foco nem cliques. */}
-            <div inert={blocked}>
-              <RouterProvider router={router} />
-            </div>
-            {blocked && <ServerWakeOverlay status={serverStatus} onRetry={serverWake.retry} />}
-          </ToastProvider>
-        </PrivacyProvider>
-      </SessionProvider>
+      <MotionProvider>
+        <SessionProvider>
+          <PrivacyProvider>
+            <ToastProvider>
+              {/* Enquanto o aviso cobre a tela, o que está atrás dele não recebe foco nem cliques. */}
+              <div inert={blocked}>
+                <RouterProvider router={router} />
+              </div>
+              {blocked && <ServerWakeOverlay status={serverStatus} onRetry={serverWake.retry} />}
+            </ToastProvider>
+          </PrivacyProvider>
+        </SessionProvider>
+      </MotionProvider>
     </QueryClientProvider>
   );
 }

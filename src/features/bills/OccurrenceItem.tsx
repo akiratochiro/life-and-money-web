@@ -8,6 +8,8 @@ import { AmountInput } from "../../shared/ui/AmountInput";
 import { toCents } from "../../shared/lib/money";
 import { formatDate, todayIso, weekdayAndDay } from "../../shared/lib/dates";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
+import { m } from "motion/react";
+import { listItem } from "../../shared/ui/motion";
 
 const STATUS: Record<BillOccurrence["status"], { label: string; tone: BadgeTone }> = {
   OVERDUE: { label: "Atrasada", tone: "danger" },
@@ -25,7 +27,7 @@ export function OccurrenceItem({ occurrence, onEdit }: Props) {
   const status = STATUS[occurrence.status];
 
   return (
-    <li className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card">
+    <m.li {...listItem} className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card">
       <div className="flex items-start gap-3">
         <span className="mt-1.5 flex h-3 w-3 items-center justify-center" aria-hidden="true">
           <Marker status={occurrence.status} />
@@ -93,7 +95,7 @@ export function OccurrenceItem({ occurrence, onEdit }: Props) {
           {undo.error.message}
         </p>
       )}
-    </li>
+    </m.li>
   );
 }
 
