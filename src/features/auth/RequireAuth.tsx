@@ -13,7 +13,7 @@ export function RequireAuth() {
         aria-busy="true"
         aria-label="Carregando"
       >
-        <div className="h-10 w-10 animate-pulse rounded-full bg-surface" />
+        <div className="h-10 w-10 motion-safe:animate-pulse rounded-full bg-surface" />
       </div>
     );
   }

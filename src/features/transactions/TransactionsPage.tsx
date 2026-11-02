@@ -11,6 +11,7 @@ import { MonthSwitcher } from "../../shared/ui/MonthSwitcher";
 import { Money } from "../../shared/ui/Money";
 import { currentMonth, dayLabel, monthLabel } from "../../shared/lib/dates";
 import { toCents } from "../../shared/lib/money";
+import { TransactionListSkeleton } from "./TransactionListSkeleton";
 
 const TYPE_STYLE: Record<
   CategoryType,
@@ -94,15 +95,7 @@ export function TransactionsPage() {
       </dl>
 
       {transactions.isPending || categories.isPending ? (
-        <div
-          className="flex flex-col gap-3"
-          aria-busy="true"
-          aria-label="Carregando"
-        >
-          <div className="h-16 animate-pulse rounded-2xl bg-surface" />
-          <div className="h-16 animate-pulse rounded-2xl bg-surface" />
-          <div className="h-16 animate-pulse rounded-2xl bg-surface" />
-        </div>
+        <TransactionListSkeleton />
       ) : list.length === 0 ? (
         <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
           <p className="text-sm text-text-soft">

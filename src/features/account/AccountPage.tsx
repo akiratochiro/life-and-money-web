@@ -35,7 +35,7 @@ export function AccountPage() {
             </p>
           </>
         ) : (
-          <div className="h-16 animate-pulse rounded-2xl bg-ink-800" />
+          <div className="h-16 motion-safe:animate-pulse rounded-2xl bg-ink-800" />
         )}
       </Card>
 

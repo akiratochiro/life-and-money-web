@@ -11,6 +11,7 @@ import { currentMonth, greeting, longDate } from "../../shared/lib/dates";
 import { useBudgetDashboard } from "../budget/budgetApi";
 import { Link } from "react-router";
 import { UserIcon } from "../../shared/ui/icons";
+import { HomeSkeleton } from "./HomeSkeleton";
 
 export function HomePage() {
   const month = currentMonth();
@@ -107,19 +108,5 @@ function Feed({ month, totals, lines, goals }: FeedProps) {
       <GoalsSection goals={otherGoals} />
       <BudgetSummary lines={calmLines} hasAnyBudget={lines.length > 0} />
     </>
-  );
-}
-
-function HomeSkeleton() {
-  return (
-    <div
-      className="flex flex-col gap-4"
-      aria-busy="true"
-      aria-label="Carregando"
-    >
-      <div className="h-64 animate-pulse rounded-hero bg-surface" />
-      <div className="h-28 animate-pulse rounded-card bg-surface" />
-      <div className="h-28 animate-pulse rounded-card bg-surface" />
-    </div>
   );
 }

@@ -143,7 +143,7 @@ export function BillForm(props: CreateProps | EditProps) {
       <fieldset className="flex flex-col gap-3">
         <legend className="mb-3 text-sm font-semibold text-text-muted">Categoria</legend>
         {categories.isPending ? (
-          <div className="h-11 w-2/3 animate-pulse rounded-full bg-surface" />
+          <div className="h-11 w-2/3 motion-safe:animate-pulse rounded-full bg-surface" />
         ) : options.length === 0 ? (
           <p className="text-sm text-text-soft">
             Você não tem categorias desse tipo.{" "}

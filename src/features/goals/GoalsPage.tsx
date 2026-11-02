@@ -3,6 +3,7 @@ import { useCreateGoal, useGoals, type Goal } from "./goalsApi";
 import { GoalCard } from "./GoalCard";
 import { GoalForm } from "./GoalForm";
 import { PlusIcon } from "../../shared/ui/icons";
+import { GoalsSkeleton } from "./GoalsSkeleton";
 
 const ORDER = { OVERDUE: 0, IN_PROGRESS: 1, REACHED: 2 };
 
@@ -45,10 +46,7 @@ export function GoalsPage() {
       )}
 
       {goals.isPending ? (
-        <div className="flex flex-col gap-3" aria-busy="true" aria-label="Carregando">
-          <div className="h-40 animate-pulse rounded-card bg-surface" />
-          <div className="h-40 animate-pulse rounded-card bg-surface" />
-        </div>
+        <GoalsSkeleton />
       ) : list.length === 0 && !creating ? (
         <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
           <p className="text-sm leading-snug text-text-soft">

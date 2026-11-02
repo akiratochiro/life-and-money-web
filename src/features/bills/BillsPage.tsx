@@ -18,6 +18,7 @@ import { Money } from "../../shared/ui/Money";
 import { PlusIcon } from "../../shared/ui/icons";
 import { currentMonth, formatDate, todayIso } from "../../shared/lib/dates";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
+import { BillsSkeleton } from "./BillsSkeleton";
 
 type Editing = { mode: "create" } | { mode: "edit"; billId: number } | null;
 
@@ -60,10 +61,7 @@ export function BillsPage() {
       <MonthSwitcher month={month} onChange={changeMonth} />
 
       {occurrences.isPending ? (
-        <div className="flex flex-col gap-3" aria-busy="true" aria-label="Carregando">
-          <div className="h-80 animate-pulse rounded-card bg-surface" />
-          <div className="h-24 animate-pulse rounded-card bg-surface" />
-        </div>
+        <BillsSkeleton />
       ) : occurrences.isError ? (
         <div role="alert" className="flex flex-col items-start gap-3 rounded-card bg-surface p-5">
           <p className="text-sm text-text-soft">Não foi possível carregar suas contas agora.</p>
@@ -190,7 +188,7 @@ function EditBill({ billId, onClose }: { billId: number; onClose: () => void }) 
   const kind = categories.data?.find((category) => category.id === bill?.categoryId)?.type;
 
   if (!bill || !kind) {
-    return <div className="h-64 animate-pulse rounded-2xl bg-ink-800" aria-busy="true" aria-label="Carregando conta" />;
+    return <div className="h-64 motion-safe:animate-pulse rounded-2xl bg-ink-800" aria-busy="true" aria-label="Carregando conta" />;
   }
   return <EditBillForm key={bill.id} bill={bill} kind={kind === "INCOME" ? "INCOME" : "EXPENSE"} onClose={onClose} />;
 }

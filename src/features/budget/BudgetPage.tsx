@@ -7,6 +7,7 @@ import { MonthSwitcher } from "../../shared/ui/MonthSwitcher";
 import { Money } from "../../shared/ui/Money";
 import { currentMonth, monthLabel } from "../../shared/lib/dates";
 import { toCents } from "../../shared/lib/money";
+import { BudgetSkeleton } from "./BudgetSkeleton";
 
 const SEVERITY: Record<BudgetStatus, number> = {
   EXCEEDED: 0,
@@ -63,10 +64,7 @@ export function BudgetPage() {
       )}
 
       {dashboard.isPending ? (
-        <div className="flex flex-col gap-3" aria-busy="true" aria-label="Carregando">
-          <div className="h-36 animate-pulse rounded-hero bg-surface" />
-          <div className="h-32 animate-pulse rounded-card bg-surface" />
-        </div>
+        <BudgetSkeleton />
       ) : (
         <>
           <section className="flex flex-col gap-4 rounded-hero bg-surface p-6 shadow-card">

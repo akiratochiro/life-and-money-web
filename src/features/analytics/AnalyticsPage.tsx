@@ -5,6 +5,7 @@ import { MonthlyBars } from "./MonthlyBars";
 import { MonthSwitcher } from "../../shared/ui/MonthSwitcher";
 import { Money } from "../../shared/ui/Money";
 import { currentMonth } from "../../shared/lib/dates";
+import { BarsSkeleton, DonutSkeleton } from "./AnalyticsSkeletons";
 
 const RANGES = [3, 6, 12];
 
@@ -23,7 +24,7 @@ export function AnalyticsPage() {
         <h2 className="font-display text-base font-semibold">Para onde foi o dinheiro</h2>
         <MonthSwitcher month={month} onChange={setMonth} />
         {expenses.isPending ? (
-          <div className="h-52 animate-pulse rounded-card bg-ink-800" aria-busy="true" aria-label="Carregando" />
+          <DonutSkeleton />
         ) : expenses.isError ? (
           <p role="alert" className="text-sm text-text-soft">Não foi possível carregar os gastos.</p>
         ) : (
@@ -62,7 +63,7 @@ export function AnalyticsPage() {
         </ul>
 
         {totals.isPending ? (
-          <div className="h-64 animate-pulse rounded-card bg-ink-800" aria-busy="true" aria-label="Carregando" />
+          <BarsSkeleton />
         ) : totals.isError ? (
           <p role="alert" className="text-sm text-text-soft">Não foi possível carregar o histórico.</p>
         ) : (

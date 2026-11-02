@@ -7,6 +7,7 @@ import { Badge } from "../../shared/ui/Badge";
 import { Money } from "../../shared/ui/Money";
 import { dayLabel } from "../../shared/lib/dates";
 import { SectionHeader } from "./GoalsSection";
+import { Bone, SkeletonGroup } from "../../shared/ui/Skeleton";
 
 const VISIBLE = 4;
 
@@ -21,7 +22,18 @@ export function UpcomingBillsSection() {
     <section className="flex flex-col gap-3">
       <SectionHeader title="Vence nos próximos 7 dias" to="/bills" />
       {upcoming.isPending ? (
-        <div className="h-24 animate-pulse rounded-card bg-surface" aria-busy="true" aria-label="Carregando contas" />
+        <SkeletonGroup label="Carregando contas" className="flex flex-col rounded-card bg-surface p-2 shadow-card">
+          {[0, 1].map((i) => (
+            <div key={i} className="flex items-center gap-3 px-3 py-3">
+              <Bone className="h-3 w-3 rounded-full" />
+              <div className="flex flex-1 flex-col gap-2">
+                <Bone className="h-4 w-1/3 rounded-full" />
+                <Bone className="h-3 w-1/2 rounded-full" />
+              </div>
+              <Bone className="h-4 w-16 rounded-full" />
+            </div>
+          ))}
+        </SkeletonGroup>
       ) : upcoming.isError ? (
         <div role="alert" className="flex items-center justify-between gap-3 rounded-card bg-surface p-5">
           <p className="text-sm text-text-soft">Não foi possível carregar as contas.</p>

@@ -11,6 +11,7 @@ import { ApiError } from "../../shared/api/problem";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
+import { CategoriesSkeleton } from "./CategoriesSkeleton";
 
 const SECTIONS: { type: CategoryType; title: string; dot: string }[] = [
   { type: "EXPENSE", title: "Despesas", dot: "bg-expense" },
@@ -46,7 +47,7 @@ export function CategoriesPage() {
       <NewCategoryForm />
 
       {categories.isPending ? (
-        <div className="h-40 animate-pulse rounded-card bg-surface" aria-busy="true" aria-label="Carregando" />
+        <CategoriesSkeleton />
       ) : (
         SECTIONS.map((section) => {
           const items = active.filter((category) => category.type === section.type);
