@@ -1,5 +1,6 @@
 import { usePrivacy } from "../../shared/privacy/privacyContext";
 import { Money } from "../../shared/ui/Money";
+import { AnimatedMoney } from "../../shared/ui/AnimatedMoney";
 import { EyeIcon, EyeOffIcon } from "../../shared/ui/icons";
 import { monthName } from "../../shared/lib/dates";
 
@@ -25,7 +26,7 @@ export function BalanceCard({ month, income, expense, saving }: Props) {
         </button>
       </div>
 
-      <Money
+      <AnimatedMoney
         value={balance}
         className={`font-display text-4xl font-bold tracking-tight ${balance < 0 ? "text-danger" : ""}`}
       />
@@ -63,7 +64,7 @@ function Figure({ label, dot, value }: { label: string; dot: string; value: numb
         {label}
       </dt>
       <dd className="m-0 text-[15px] font-bold">
-        <Money value={value} />
+        <AnimatedMoney value={value} />
       </dd>
     </div>
   );
