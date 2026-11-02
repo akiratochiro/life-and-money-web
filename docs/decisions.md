@@ -275,3 +275,85 @@ completa, porque os feriados de um ano não mudam. Quando a BrasilAPI estava for
 A BrasilAPI só cobre feriados nacionais. Um aviso fixo embaixo do calendário diz isso, para quem
 tem feriado estadual ou municipal não achar que ele foi esquecido, nem contar com ele para adiar o
 prazo. Sem a BrasilAPI, o aviso muda e diz que os prazos consideram só os fins de semana.
+
+## 14. O cache é apagado quando a sessão termina
+
+**Contexto.** Um print das Análises mostrou R$ 600 em Moradia em outubro, enquanto a Início e o
+Extrato mostravam zero no mesmo mês. As três telas somam as mesmas transações no servidor, pelo
+mesmo filtro de data, e as datas trafegam como `AAAA-MM-DD`, sem passar por UTC; toda mutação de
+transação já invalidava `["dashboard"]`. Sobrou o cache: só o "Sair" chamava `queryClient.clear()`,
+e as chaves do TanStack Query não dizem de quem são os dados.
+
+**Decisão.** O `SessionProvider` apaga o cache sempre que a sessão termina, por qualquer motivo
+(logout, refresh recusado, 401). O login e o cadastro também apagam, porque entrar com outra conta
+sem ter saído não encerra a sessão anterior. A renovação do token não apaga.
+
+**Consequências.** Uma conta nunca vê, nem por um instante, os dados da conta anterior na mesma
+aba. Antes, com a API acordando, isso podia durar quase um minuto, e explicaria o print: as
+Análises vindas do cache, o Extrato buscado do zero. Não dá para provar que foi isso sem o momento
+do print, mas era um defeito real de qualquer forma. O custo é que voltar a entrar refaz todas as
+buscas, o que já acontece ao recarregar a página.
+
+## 15. Atualização otimista com foto do cache, e o que cada mutação recarrega num mapa só
+
+**Contexto.** Criar, editar e apagar uma transação, aportar numa meta e arquivar uma categoria
+esperavam o servidor para mudar a tela; com a API no plano gratuito, isso às vezes leva segundos.
+As listas de chaves a invalidar estavam espalhadas pelos módulos de API.
+
+**Decisão.** Essas mutações mudam o cache antes da resposta. Antes de mexer, cancelam as buscas em
+andamento (uma resposta antiga chegando depois apagaria a mudança) e guardam uma foto das listas
+afetadas. Se o servidor recusar, a foto volta e um toast diz o motivo que a API deu. A regra de
+ordenação do extrato e o ajuste do valor guardado na meta são funções puras
+(`transactions/optimistic.ts`), testadas sem React. Depois da resposta, o que recarregar sai de um
+mapa único, `shared/api/invalidation.ts`, com um teste por linha.
+
+**Consequências.** A nova transação volta para a tela anterior na hora, e o diálogo de edição
+fecha na hora. O preço é que um erro do servidor aparece depois que o formulário já fechou: o toast
+explica, mas quem digitou precisa digitar de novo. Os erros que o servidor pode dar ali são raros
+(categoria arquivada no meio do caminho, por exemplo), porque o formulário já valida o resto.
+
+O front só calcula o que é simples e não é regra de negócio: a posição na lista e o valor guardado.
+O valor por mês de uma meta e os totais do dashboard esperam o servidor, porque são cálculos dele.
+
+A revisão das invalidações não encontrou nenhuma esquecida, só uma chave morta (`["budgets"]`).
+Concentrá-las não muda o comportamento, mas transforma o contrato implícito da decisão 2 num lugar
+só, verificado por teste.
+
+## 16. Motion com LazyMotion, e animação só no que chega depois
+
+**Contexto.** As transições de página e a entrada de itens deviam ser curtas, respeitar
+`prefers-reduced-motion` e não pesar no bundle.
+
+**Decisão.** Motion com `LazyMotion strict`: o bundle inicial leva só o componente `m`, e as
+animações (`domAnimation`) chegam num pedaço carregado sob demanda. O `MotionConfig` segue o
+`prefers-reduced-motion`, e as durações ficam entre 150 e 250 ms. A página anima ao navegar, não na
+primeira abertura, e as listas usam `AnimatePresence initial={false}`: o primeiro lote aparece
+direto, e o que entra ou sai depois (uma transação otimista, um toast) anima.
+
+**Consequências.** Medido no build, em gzip: o bundle principal foi de 138,3 kB para 154,2 kB
+(+15,9 kB), mais 17,9 kB sob demanda. Sem o LazyMotion, seriam +45,5 kB no bundle principal.
+
+Animar a primeira aparição do conteúdo atrasaria o LCP, porque o Chrome só conta o elemento quando
+ele fica visível. Mesmo assim, o peso extra aparece no Lighthouse: o FCP subiu cerca de 230 ms no
+perfil móvel simulado, em todas as telas, inclusive no login, que não anima nada, porque o app é
+um bundle só. Separar o código por rota recuperaria isso e mais.
+
+A contagem do saldo não usa a Motion: são 30 linhas com `requestAnimationFrame`, para não trazer o
+`animate()` ao bundle principal por um único uso.
+
+## 17. Prefetch dos meses vizinhos e skeletons no formato real
+
+**Contexto.** Trocar de mês no Extrato, nas Análises, nas Contas e no Orçamento mostrava um
+carregamento a cada clique, e os blocos genéricos de carregamento tinham outra altura que o
+conteúdo, então a tela pulava (CLS de 0,109 nas Análises).
+
+**Decisão.** Ao abrir um mês, o anterior e o próximo são buscados em segundo plano
+(`usePrefetchAdjacentMonths`). As queries viraram fábricas com `queryOptions`, usadas pelo hook e
+pelo prefetch, para a chave e a busca serem as mesmas. Cada tela ganhou um skeleton com a mesma
+estrutura do componente real, e o pulso respeita o movimento reduzido. Os botões que enviam algo
+mantêm a largura: o texto fica invisível e o spinner aparece por cima (`PendingLabel`).
+
+**Consequências.** A troca de mês aparece sem carregamento na maior parte das vezes. O
+`prefetchQuery` respeita o `staleTime`, então ir e voltar não multiplica as chamadas, mas cada mês
+novo custa duas requisições a mais, que contam no limite de 100.000 por dia do Workers. O CLS das
+Análises caiu de 0,109 para 0,034, e o da Início de 0,038 para 0,021.

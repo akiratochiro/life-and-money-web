@@ -38,6 +38,20 @@ npm run api:types   # regenera src/shared/api/schema.d.ts a partir da API no ar
   expõe hooks e as mutações invalidam as chaves afetadas (uma transação invalida
   `["transactions"]`, `["dashboard"]`, `["goals"]` e `["bills"]`, porque pode ser o pagamento de
   uma conta; pagar uma conta invalida `["bills"]`, `["transactions"]` e `["dashboard"]`). `useState` só para estado de interface.
+- **O que cada mutação recarrega está em `shared/api/invalidation.ts`** (`AFFECTS`), com um teste
+  por linha. Mutação nova usa `useInvalidate()`/`invalidate()` com o `Change` certo; mudança que
+  afeta outra tela entra no mapa e no teste, nunca numa lista solta no módulo.
+- **Atualização otimista** (decisão 15) em transações, aporte em meta e arquivar categoria: cancelar
+  as buscas, guardar a foto (`getQueriesData`), mudar o cache, e no erro devolver a foto e mostrar
+  `useToast()` com o `message` da API. Regras de lista são funções puras em `optimistic.ts`.
+- **O cache é apagado quando a sessão termina** (`SessionProvider`) e no login/cadastro (decisão 14):
+  as chaves não identificam o usuário.
+- **Carregamento:** skeleton no formato do componente (`shared/ui/Skeleton.tsx` + um por tela), nunca
+  um bloco genérico; botão que envia usa `PendingLabel` (spinner sem mudar a largura). Telas com
+  mês usam `usePrefetchAdjacentMonths` com a fábrica `xxxQuery(month)` do módulo de API.
+- **Animação** (decisão 16): só `m` de `motion/react` (o `LazyMotion` é `strict`), presets em
+  `shared/ui/motion.ts`, 150 a 250 ms, e listas com `AnimatePresence initial={false}`, para não animar
+  o primeiro lote nem atrasar o LCP.
 - **Dinheiro em centavos nos formulários.** `AmountInput` guarda um inteiro em centavos;
   `PercentInput`, centésimos de ponto percentual. A conversão para reais (`cents / 100`)
   acontece só na fronteira com a API, na hora de enviar.

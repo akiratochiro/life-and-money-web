@@ -65,6 +65,13 @@ covers the same choices as questions and answers. In short:
   holiday shows "vence sáb 14 → pague até seg 16". The deadline comes ready from the API, so the
   front never has a second rule for "is it overdue?". State and municipal holidays are not covered,
   and the screen says so
+- **Optimistic updates with rollback**: creating, editing and deleting a transaction, contributing to
+  a goal and archiving a category change the screen before the server answers; if it refuses, the
+  cache snapshot comes back and a toast says why. What each mutation reloads lives in a single map,
+  tested line by line
+- **Fluid, but light**: skeletons shaped like the real components, a spinner inside buttons that
+  keeps their width, prefetch of the previous and next month, and short transitions (150 to
+  250 ms) with [Motion](https://motion.dev) through `LazyMotion`, respecting `prefers-reduced-motion`
 - **A sleeping API does not look like an error**: the free Render instance hibernates, so the app
   checks `/api/health` on start and, if it takes more than about 2 seconds, shows a "waking up the
   server" screen until the API answers. Queries retry only transient failures (network, timeout,
