@@ -10,6 +10,8 @@ import { Button } from "../../shared/ui/Button";
 import { todayIso, yesterdayIso } from "../../shared/lib/dates";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { CategoryTile } from "../categories/CategoryGlyph";
+import { NewCategorySheet } from "../categories/NewCategorySheet";
+import { PlusIcon } from "../../shared/ui/icons";
 
 export type TransactionFormValues = {
   type: CategoryType;
@@ -59,6 +61,9 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
   const [date, setDate] = useState(initial?.date ?? todayIso());
   const [description, setDescription] = useState(initial?.description ?? "");
   const [goalId, setGoalId] = useState<number | null>(initial?.goalId ?? null);
+  const [creatingCategory, setCreatingCategory] = useState(false);
+  // Poupança fica de fora: a categoria dela é quase sempre uma só, e criar meta é outro fluxo.
+  const canCreateCategory = type === "EXPENSE" || type === "INCOME";
 
   const categoryOptions = (categories.data ?? []).filter(
     (category) => category.type === type && (!category.archived || category.id === initial?.categoryId),
@@ -93,126 +98,153 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
   const canSubmit = cents > 0 && categoryId !== null && !pending;
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-7">
-      <div role="group" aria-label="Tipo de transação" className="grid grid-cols-3 gap-1 rounded-full bg-surface p-1">
-        {TYPES.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={type === option.value}
-            onClick={() => changeType(option.value)}
-            className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-bold transition active:scale-95 ${
-              type === option.value ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"
-            }`}
-          >
-            <span className={`h-2 w-2 rounded-full ${option.dot}`} />
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      <AmountInput label="Valor" cents={cents} onChange={setCents} autoFocus={fullScreen} />
-
-      <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 text-sm font-semibold text-text-muted">Categoria</legend>
-        {categories.isPending ? (
-          <div className="h-11 w-2/3 motion-safe:animate-pulse rounded-full bg-surface" />
-        ) : categoryOptions.length === 0 ? (
-          <p className="text-sm text-text-soft">
-            Você não tem categorias desse tipo.{" "}
-            <Link to="/categories" className="font-bold text-link">Criar categoria</Link>
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {categoryOptions.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                aria-pressed={categoryId === category.id}
-                onClick={() => setCategoryId(category.id)}
-                className={`${chipClass(categoryId === category.id)} pl-1.5`}
-              >
-                <CategoryTile color={category.color} icon={category.icon} size="sm" />
-                {category.name}
-                {category.archived && <span className="text-xs font-semibold opacity-70">(arquivada)</span>}
-              </button>
-            ))}
-          </div>
-        )}
-      </fieldset>
-
-      <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 text-sm font-semibold text-text-muted">Data</legend>
-        <div className="flex flex-wrap items-center gap-2">
-          <button type="button" aria-pressed={date === today} onClick={() => setDate(today)} className={chipClass(date === today)}>
-            Hoje
-          </button>
-          <button type="button" aria-pressed={date === yesterday} onClick={() => setDate(yesterday)} className={chipClass(date === yesterday)}>
-            Ontem
-          </button>
-          <label className="flex items-center">
-            <span className="sr-only">Outra data</span>
-            <input
-              type="date"
-              required
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="h-11 rounded-full border border-line bg-sunken px-4 text-base font-bold text-text outline-none focus:border-accent [color-scheme:light]"
-            />
-          </label>
-        </div>
-      </fieldset>
-
-      <TextField
-        label="Descrição (opcional)"
-        maxLength={255}
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Ex.: compras da semana"
-      />
-
-      {type === "SAVING" && goalOptions.length > 0 && (
-        <fieldset className="flex flex-col gap-3">
-          <legend className="mb-3 text-sm font-semibold text-text-muted">Vai para uma meta?</legend>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" aria-pressed={goalId === null} onClick={() => setGoalId(null)} className={chipClass(goalId === null)}>
-              Nenhuma
+    <>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+        <div role="group" aria-label="Tipo de transação" className="grid grid-cols-3 gap-1 rounded-full bg-surface p-1">
+          {TYPES.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={type === option.value}
+              onClick={() => changeType(option.value)}
+              className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-bold transition active:scale-95 ${
+                type === option.value ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"
+              }`}
+            >
+              <span className={`h-2 w-2 rounded-full ${option.dot}`} />
+              {option.label}
             </button>
-            {goalOptions.map((goal) => (
-              <button
-                key={goal.id}
-                type="button"
-                aria-pressed={goalId === goal.id}
-                onClick={() => setGoalId(goal.id)}
-                className={chipClass(goalId === goal.id)}
-              >
-                {goal.name}
-              </button>
-            ))}
+          ))}
+        </div>
+
+        <AmountInput label="Valor" cents={cents} onChange={setCents} autoFocus={fullScreen} />
+
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-3 text-sm font-semibold text-text-muted">Categoria</legend>
+          {categories.isPending ? (
+            <div className="h-11 w-2/3 motion-safe:animate-pulse rounded-full bg-surface" />
+          ) : categoryOptions.length === 0 && !canCreateCategory ? (
+            <p className="text-sm text-text-soft">
+              Você não tem categorias desse tipo.{" "}
+              <Link to="/categories" className="font-bold text-link">Criar categoria</Link>
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {categoryOptions.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  aria-pressed={categoryId === category.id}
+                  onClick={() => setCategoryId(category.id)}
+                  className={`${chipClass(categoryId === category.id)} pl-1.5`}
+                >
+                  <CategoryTile color={category.color} icon={category.icon} size="sm" />
+                  {category.name}
+                  {category.archived && <span className="text-xs font-semibold opacity-70">(arquivada)</span>}
+                </button>
+              ))}
+              {canCreateCategory && (
+                <button
+                  type="button"
+                  aria-label="Nova categoria"
+                  aria-haspopup="dialog"
+                  onClick={() => setCreatingCategory(true)}
+                  className={`${chipClass(false)} pl-1.5`}
+                >
+                  <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-xl border-2 border-dashed border-line text-text-muted">
+                    <PlusIcon width={16} height={16} />
+                  </span>
+                  {categoryOptions.length === 0 ? "Criar a primeira" : "Nova"}
+                </button>
+              )}
+            </div>
+          )}
+        </fieldset>
+
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-3 text-sm font-semibold text-text-muted">Data</legend>
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" aria-pressed={date === today} onClick={() => setDate(today)} className={chipClass(date === today)}>
+              Hoje
+            </button>
+            <button type="button" aria-pressed={date === yesterday} onClick={() => setDate(yesterday)} className={chipClass(date === yesterday)}>
+              Ontem
+            </button>
+            <label className="flex items-center">
+              <span className="sr-only">Outra data</span>
+              <input
+                type="date"
+                required
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="h-11 rounded-full border border-line bg-sunken px-4 text-base font-bold text-text outline-none focus:border-accent [color-scheme:light]"
+              />
+            </label>
           </div>
         </fieldset>
-      )}
 
-      {errorMessage && (
-        <p role="alert" className="text-sm font-semibold text-danger-strong">
-          {errorMessage}
-        </p>
-      )}
+        <TextField
+          label="Descrição (opcional)"
+          maxLength={255}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Ex.: compras da semana"
+        />
 
-      {fullScreen ? (
-        // Preso na base no celular, acima da área segura; no desktop, no fluxo normal.
-        <div className="sticky bottom-0 -mx-gutter bg-canvas/95 px-gutter pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur md:static md:mx-0 md:bg-transparent md:p-0">
-          <Button type="submit" disabled={!canSubmit} className="w-full">
+        {type === "SAVING" && goalOptions.length > 0 && (
+          <fieldset className="flex flex-col gap-3">
+            <legend className="mb-3 text-sm font-semibold text-text-muted">Vai para uma meta?</legend>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" aria-pressed={goalId === null} onClick={() => setGoalId(null)} className={chipClass(goalId === null)}>
+                Nenhuma
+              </button>
+              {goalOptions.map((goal) => (
+                <button
+                  key={goal.id}
+                  type="button"
+                  aria-pressed={goalId === goal.id}
+                  onClick={() => setGoalId(goal.id)}
+                  className={chipClass(goalId === goal.id)}
+                >
+                  {goal.name}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        )}
+
+        {errorMessage && (
+          <p role="alert" className="text-sm font-semibold text-danger-strong">
+            {errorMessage}
+          </p>
+        )}
+
+        {fullScreen ? (
+          // Preso na base no celular, acima da área segura; no desktop, no fluxo normal.
+          <div className="sticky bottom-0 -mx-gutter bg-canvas/95 px-gutter pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur md:static md:mx-0 md:bg-transparent md:p-0">
+            <Button type="submit" disabled={!canSubmit} className="w-full">
+              <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
+            </Button>
+          </div>
+        ) : (
+          <Button type="submit" disabled={!canSubmit}>
             <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
           </Button>
-        </div>
-      ) : (
-        <Button type="submit" disabled={!canSubmit}>
-          <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
-        </Button>
-      )}
+        )}
 
-      {footer}
-    </form>
+        {footer}
+      </form>
+
+      {/* Fora do <form> da transação: um formulário não pode ficar dentro de outro. */}
+      {canCreateCategory && (
+        <NewCategorySheet
+          key={type}
+          type={type}
+          open={creatingCategory}
+          onClose={() => setCreatingCategory(false)}
+          onCreated={(category) => setCategoryId(category.id)}
+        />
+      )}
+    </>
   );
 }

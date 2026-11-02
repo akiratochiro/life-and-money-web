@@ -1,8 +1,9 @@
-import type { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes, Ref } from "react";
 
 type Props = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   error?: string;
+  ref?: Ref<HTMLInputElement>;
 };
 
 export function TextField({ label, error, ...props }: Props) {
