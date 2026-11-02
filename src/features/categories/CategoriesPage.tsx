@@ -208,17 +208,14 @@ function CategoryRow({ category }: { category: Category }) {
             histórico, mas não será possível lançar novas nela, e ela sai do orçamento a partir
             deste mês.
           </p>
-          {archiveCategory.error && (
-            <p role="alert" className="text-sm font-semibold text-danger">{archiveCategory.error.message}</p>
-          )}
           <div className="flex gap-2">
+            {/* Otimista: a categoria vai para as arquivadas na hora; um erro a traz de volta com um aviso. */}
             <button
               type="button"
-              disabled={archiveCategory.isPending}
               onClick={() => archiveCategory.mutate(id)}
-              className="h-11 flex-1 rounded-full bg-warning font-bold text-[#1f1400] transition active:scale-95 disabled:opacity-60"
+              className="h-11 flex-1 rounded-full bg-warning font-bold text-[#1f1400] transition active:scale-95"
             >
-              {archiveCategory.isPending ? "Arquivando..." : "Arquivar"}
+              Arquivar
             </button>
             <button
               type="button"
