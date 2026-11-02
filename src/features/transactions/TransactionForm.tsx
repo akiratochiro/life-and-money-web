@@ -27,7 +27,7 @@ const TYPES: { value: CategoryType; label: string; dot: string }[] = [
 
 function chipClass(selected: boolean) {
   return `flex h-11 items-center gap-2 rounded-full px-4 text-sm font-bold transition active:scale-95 ${
-    selected ? "bg-text text-ink-900" : "bg-surface text-text-soft hover:text-text"
+    selected ? "bg-text text-on-accent" : "bg-surface text-text-soft hover:text-text"
   }`;
 }
 
@@ -99,7 +99,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
             aria-pressed={type === option.value}
             onClick={() => changeType(option.value)}
             className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-bold transition active:scale-95 ${
-              type === option.value ? "bg-signal text-ink-900" : "text-text-muted"
+              type === option.value ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
             }`}
           >
             <span className={`h-2 w-2 rounded-full ${option.dot}`} />
@@ -117,7 +117,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
         ) : categoryOptions.length === 0 ? (
           <p className="text-sm text-text-soft">
             Você não tem categorias desse tipo.{" "}
-            <Link to="/categories" className="font-bold text-signal">Criar categoria</Link>
+            <Link to="/categories" className="font-bold text-link">Criar categoria</Link>
           </p>
         ) : (
           <div className="flex flex-wrap gap-2">
@@ -153,7 +153,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="h-11 rounded-full border border-line bg-ink-800 px-4 text-sm font-bold text-text outline-none focus:border-signal [color-scheme:dark]"
+              className="h-11 rounded-full border border-line bg-sunken px-4 text-sm font-bold text-text outline-none focus:border-accent [color-scheme:light]"
             />
           </label>
         </div>
@@ -190,7 +190,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
       )}
 
       {errorMessage && (
-        <p role="alert" className="text-sm font-semibold text-danger">
+        <p role="alert" className="text-sm font-semibold text-danger-strong">
           {errorMessage}
         </p>
       )}

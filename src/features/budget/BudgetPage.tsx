@@ -58,7 +58,7 @@ export function BudgetPage() {
       />
 
       {!editable && (
-        <p role="status" className="rounded-2xl bg-ink-800 p-4 text-sm leading-snug text-text-soft">
+        <p role="status" className="rounded-2xl bg-sunken p-4 text-sm leading-snug text-text-soft">
           {month < thisMonth
             ? `Você está vendo o orçamento que valia em ${monthLabel(month).toLowerCase()}. Meses passados não podem ser alterados.`
             : `Alterações no orçamento valem a partir do mês atual. Volte para ${monthLabel(thisMonth).toLowerCase()} para editar.`}
@@ -71,12 +71,12 @@ export function BudgetPage() {
         <>
           <section className="flex flex-col gap-4 rounded-hero bg-surface p-6 shadow-card">
             <dl className="grid grid-cols-3 gap-2">
-              <Figure label="Receita do mês" cents={toCents(income)} className="text-income" />
+              <Figure label="Receita do mês" cents={toCents(income)} className="text-income-strong" />
               <Figure label="Planejado" cents={plannedCents} className="text-text" />
-              <Figure label="Gasto" cents={spentCents} className="text-expense" />
+              <Figure label="Gasto" cents={spentCents} className="text-expense-strong" />
             </dl>
             {plannedCents > toCents(income) && income > 0 && (
-              <p className="rounded-2xl bg-ink-800 px-4 py-3 text-sm leading-snug text-text-soft">
+              <p className="rounded-2xl bg-sunken px-4 py-3 text-sm leading-snug text-text-soft">
                 Seus limites de gastos somam mais do que a receita do mês. Vale rever o plano.
               </p>
             )}
@@ -111,7 +111,7 @@ export function BudgetPage() {
                         <button
                           type="button"
                           onClick={() => setDefiningId(category.id)}
-                          className="h-11 px-2 text-sm font-bold text-signal"
+                          className="h-11 px-2 text-sm font-bold text-link"
                         >
                           Definir limite
                         </button>

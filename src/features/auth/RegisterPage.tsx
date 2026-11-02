@@ -46,9 +46,9 @@ export function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-ink-900 px-5 py-10">
+    <main className="flex min-h-dvh items-center justify-center bg-canvas px-5 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-signal">
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
           Life and Money
         </p>
         <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">
@@ -91,7 +91,7 @@ export function RegisterPage() {
           />
 
           {formError && (
-            <p role="alert" className="text-sm font-semibold text-danger">
+            <p role="alert" className="text-sm font-semibold text-danger-strong">
               {formError}
             </p>
           )}
@@ -103,7 +103,7 @@ export function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-text-muted">
           Já tem conta?{" "}
-          <Link to="/login" className="font-bold text-signal">
+          <Link to="/login" className="font-bold text-link">
             Entrar
           </Link>
         </p>

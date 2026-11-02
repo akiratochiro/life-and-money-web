@@ -50,12 +50,12 @@ export function BillCalendar({ month, occurrences, holidays = new Map(), today, 
               style={index === 0 ? { gridColumnStart: grid.leadingBlanks + 1 } : undefined}
               className={`relative flex aspect-square min-h-11 flex-col items-center justify-center gap-1 rounded-2xl text-sm font-bold tabular-nums transition active:scale-95 ${
                 selected
-                  ? "bg-text text-ink-900"
+                  ? "bg-text text-on-accent"
                   : isToday
-                    ? "bg-ink-800 text-signal ring-1 ring-signal"
+                    ? "bg-accent-soft text-accent ring-1 ring-accent"
                     : holiday
-                      ? "bg-saving/15 text-saving-soft hover:bg-saving/25"
-                      : "text-text-soft hover:bg-ink-800"
+                      ? "bg-saving-soft text-saving-strong hover:bg-saving/30"
+                      : "text-text-soft hover:bg-sunken"
               }`}
             >
               {holiday && <HolidayStar className="absolute right-1 top-1" />}
@@ -93,7 +93,7 @@ export function Marker({ status }: { status: BillStatus }) {
     return <span data-status="PENDING" className="h-2 w-2 rounded-full border-[1.5px] border-warning" />;
   }
   return (
-    <svg data-status="PAID" width="9" height="9" viewBox="0 0 10 10" className="text-income">
+    <svg data-status="PAID" width="9" height="9" viewBox="0 0 10 10" className="text-income-strong">
       <path d="M1.5 5.2l2.3 2.3L8.5 2.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
@@ -106,7 +106,7 @@ function Legend() {
       <span className="flex items-center gap-1.5"><Marker status="PENDING" /> Pendente</span>
       <span className="flex items-center gap-1.5"><Marker status="PAID" /> Paga</span>
       <span className="flex items-center gap-1.5">
-        <span className="flex h-4 w-4 items-center justify-center rounded-md bg-saving/15">
+        <span className="flex h-4 w-4 items-center justify-center rounded-md bg-saving-soft">
           <HolidayStar />
         </span>
         Feriado nacional
@@ -121,7 +121,7 @@ function Legend() {
  */
 function HolidayStar({ className = "" }: { className?: string }) {
   return (
-    <svg width="8" height="8" viewBox="0 0 10 10" aria-hidden="true" className={`text-saving-soft ${className}`}>
+    <svg width="8" height="8" viewBox="0 0 10 10" aria-hidden="true" className={`text-saving-strong ${className}`}>
       <path d="M5 0.6l1.3 2.9 3.1.3-2.4 2.1.7 3.1L5 7.4 2.3 9l.7-3.1L.6 3.8l3.1-.3z" fill="currentColor" />
     </svg>
   );

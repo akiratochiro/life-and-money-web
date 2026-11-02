@@ -12,9 +12,9 @@ export function TextField({ label, error, ...props }: Props) {
       <input
         {...props}
         aria-invalid={error ? true : undefined}
-        className="h-14 rounded-2xl border border-line bg-ink-800 px-4 text-base text-text outline-none transition focus:border-signal focus:ring-2 focus:ring-signal/30 aria-invalid:border-danger"
+        className="h-14 rounded-2xl border border-line bg-sunken px-4 text-base text-text outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30 aria-invalid:border-danger"
       />
-      {error && <span className="text-sm font-semibold text-danger">{error}</span>}
+      {error && <span className="text-sm font-semibold text-danger-strong">{error}</span>}
     </label>
   );
 }

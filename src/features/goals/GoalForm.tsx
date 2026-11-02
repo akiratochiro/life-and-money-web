@@ -32,7 +32,7 @@ export function GoalForm({ initial, submitLabel, pending, error, onSubmit, onCan
       : error?.message;
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5 rounded-2xl bg-ink-800 p-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5 rounded-2xl bg-sunken p-4">
       <TextField
         label="Nome da meta"
         required
@@ -50,12 +50,12 @@ export function GoalForm({ initial, submitLabel, pending, error, onSubmit, onCan
           min={minDeadline}
           value={deadline}
           onChange={(e) => setDeadline(e.target.value)}
-          className="h-14 rounded-2xl border border-line bg-ink-900 px-4 text-base text-text outline-none focus:border-signal [color-scheme:dark]"
+          className="h-14 rounded-2xl border border-line bg-canvas px-4 text-base text-text outline-none focus:border-accent [color-scheme:light]"
         />
       </label>
 
       {errorMessage && (
-        <p role="alert" className="text-sm font-semibold text-danger">
+        <p role="alert" className="text-sm font-semibold text-danger-strong">
           {errorMessage}
         </p>
       )}
@@ -64,7 +64,7 @@ export function GoalForm({ initial, submitLabel, pending, error, onSubmit, onCan
         <button
           type="submit"
           disabled={!name.trim() || cents <= 0 || !deadline || pending}
-          className="h-12 flex-1 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95 disabled:opacity-60"
+          className="h-12 flex-1 rounded-full bg-accent font-bold text-on-accent shadow-clay-accent transition active:scale-95 disabled:opacity-60"
         >
           <PendingLabel pending={pending} pendingText="Salvando…">{submitLabel}</PendingLabel>
         </button>

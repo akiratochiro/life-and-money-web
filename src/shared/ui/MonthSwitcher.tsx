@@ -10,7 +10,7 @@ export function MonthSwitcher({ month, onChange }: Props) {
         type="button"
         aria-label="Mês anterior"
         onClick={() => onChange(addMonths(month, -1))}
-        className="flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-ink-800 active:scale-95"
+        className="flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-sunken active:scale-95"
       >
         <ChevronLeftIcon />
       </button>
@@ -21,7 +21,7 @@ export function MonthSwitcher({ month, onChange }: Props) {
         type="button"
         aria-label="Próximo mês"
         onClick={() => onChange(addMonths(month, 1))}
-        className="flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-ink-800 active:scale-95"
+        className="flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-sunken active:scale-95"
       >
         <ChevronRightIcon />
       </button>

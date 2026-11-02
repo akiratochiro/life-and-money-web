@@ -54,7 +54,7 @@ export function GoalsPage() {
           <p className="text-sm leading-snug text-text-soft">
             Uma meta transforma um sonho num valor por mês. Diga quanto quer juntar e até quando, e o app calcula o resto.
           </p>
-          <button type="button" onClick={() => setCreating(true)} className="text-sm font-bold text-signal">
+          <button type="button" onClick={() => setCreating(true)} className="text-sm font-bold text-link">
             Criar minha primeira meta
           </button>
         </div>

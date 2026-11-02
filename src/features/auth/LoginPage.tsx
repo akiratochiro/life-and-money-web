@@ -46,9 +46,9 @@ export function LoginPage() {
         : mutation.error?.message;
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-ink-900 px-5 py-10">
+    <main className="flex min-h-dvh items-center justify-center bg-canvas px-5 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-signal">
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
           Life and Money
         </p>
         <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">
@@ -56,13 +56,13 @@ export function LoginPage() {
         </h1>
 
         {accountDeleted && (
-          <p role="status" className="mt-6 rounded-2xl bg-ink-800 p-4 text-sm text-text-soft">
+          <p role="status" className="mt-6 rounded-2xl bg-sunken p-4 text-sm text-text-soft">
             Sua conta foi excluída, com todos os dados dela.
           </p>
         )}
 
         {expired && (
-          <p role="status" className="mt-6 rounded-2xl bg-ink-800 p-4 text-sm text-text-soft">
+          <p role="status" className="mt-6 rounded-2xl bg-sunken p-4 text-sm text-text-soft">
             Sua sessão expirou. Entre de novo para continuar.
           </p>
         )}
@@ -84,17 +84,17 @@ export function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Link to="/forgot-password" className="-mt-2 self-end text-sm font-bold text-signal">
+          <Link to="/forgot-password" className="-mt-2 self-end text-sm font-bold text-link">
             Esqueci minha senha
           </Link>
 
           {errorMessage && (
-            <p role="alert" className="text-sm font-semibold text-danger">
+            <p role="alert" className="text-sm font-semibold text-danger-strong">
               {errorMessage}
             </p>
           )}
           {wait > 0 && (
-            <p role="alert" className="text-sm font-semibold text-danger">
+            <p role="alert" className="text-sm font-semibold text-danger-strong">
               Muitas tentativas. Tente de novo em {formatWait(wait)}.
             </p>
           )}
@@ -106,7 +106,7 @@ export function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-text-muted">
           Ainda não tem conta?{" "}
-          <Link to="/register" className="font-bold text-signal">
+          <Link to="/register" className="font-bold text-link">
             Criar conta
           </Link>
         </p>

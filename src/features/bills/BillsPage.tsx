@@ -70,7 +70,7 @@ export function BillsPage() {
       ) : occurrences.isError ? (
         <div role="alert" className="flex flex-col items-start gap-3 rounded-card bg-surface p-5">
           <p className="text-sm text-text-soft">Não foi possível carregar suas contas agora.</p>
-          <button type="button" onClick={() => occurrences.refetch()} className="text-sm font-bold text-signal">
+          <button type="button" onClick={() => occurrences.refetch()} className="text-sm font-bold text-link">
             Tentar de novo
           </button>
         </div>
@@ -92,13 +92,13 @@ export function BillsPage() {
                 {selectedDay ? `Vence em ${formatDate(selectedDay)}` : "Vencimentos do mês"}
               </h2>
               {selectedDay && (
-                <button type="button" onClick={() => setSelectedDay(null)} className="py-3 text-sm font-bold text-signal">
+                <button type="button" onClick={() => setSelectedDay(null)} className="py-3 text-sm font-bold text-link">
                   Ver o mês todo
                 </button>
               )}
             </div>
             {selectedDay && holidays.has(selectedDay) && (
-              <p className="rounded-2xl bg-saving/15 px-4 py-3 text-sm font-semibold text-saving-soft">
+              <p className="rounded-2xl bg-saving-soft px-4 py-3 text-sm font-semibold text-saving-strong">
                 Feriado nacional: {holidays.get(selectedDay)}
               </p>
             )}
@@ -149,11 +149,11 @@ function MonthTotals({ occurrences }: { occurrences: BillOccurrence[] }) {
     <div className="grid grid-cols-2 gap-3">
       <div className="flex flex-col gap-1 rounded-card bg-surface p-4">
         <span className="text-xs font-semibold text-text-muted">Falta pagar</span>
-        <Money value={toPay} className="font-display text-lg font-semibold text-expense" />
+        <Money value={toPay} className="font-display text-lg font-semibold text-expense-strong" />
       </div>
       <div className="flex flex-col gap-1 rounded-card bg-surface p-4">
         <span className="text-xs font-semibold text-text-muted">Falta receber</span>
-        <Money value={toReceive} className="font-display text-lg font-semibold text-income" />
+        <Money value={toReceive} className="font-display text-lg font-semibold text-income-strong" />
       </div>
     </div>
   );
@@ -168,7 +168,7 @@ function EmptyState({ filtered, onCreate }: { filtered: boolean; onCreate: () =>
       <p className="text-sm leading-snug text-text-soft">
         Cadastre o aluguel, a luz ou um cliente que paga todo mês, e veja aqui o que vence e o que já foi pago.
       </p>
-      <button type="button" onClick={onCreate} className="text-sm font-bold text-signal">
+      <button type="button" onClick={onCreate} className="text-sm font-bold text-link">
         Cadastrar minha primeira conta
       </button>
     </div>
@@ -195,7 +195,7 @@ function EditBill({ billId, onClose }: { billId: number; onClose: () => void }) 
   const kind = categories.data?.find((category) => category.id === bill?.categoryId)?.type;
 
   if (!bill || !kind) {
-    return <div className="h-64 motion-safe:animate-pulse rounded-2xl bg-ink-800" aria-busy="true" aria-label="Carregando conta" />;
+    return <div className="h-64 motion-safe:animate-pulse rounded-2xl bg-sunken" aria-busy="true" aria-label="Carregando conta" />;
   }
   return <EditBillForm key={bill.id} bill={bill} kind={kind === "INCOME" ? "INCOME" : "EXPENSE"} onClose={onClose} />;
 }
@@ -226,7 +226,7 @@ function EditBillForm({ bill, kind, onClose }: { bill: Bill; kind: "EXPENSE" | "
                   type="button"
                   disabled={remove.isPending}
                   onClick={() => remove.mutate(bill.id, { onSuccess: onClose })}
-                  className="h-11 flex-1 rounded-full bg-danger text-sm font-bold text-[#1a0710] transition active:scale-95 disabled:opacity-60"
+                  className="h-11 flex-1 rounded-full bg-danger-strong text-sm font-bold text-on-accent transition active:scale-95 disabled:opacity-60"
                 >
                   <PendingLabel pending={remove.isPending} pendingText="Excluindo…">Confirmar exclusão</PendingLabel>
                 </button>
@@ -243,7 +243,7 @@ function EditBillForm({ bill, kind, onClose }: { bill: Bill; kind: "EXPENSE" | "
             <button
               type="button"
               onClick={() => setConfirming(true)}
-              className="h-11 self-start rounded-full px-1 text-sm font-bold text-danger"
+              className="h-11 self-start rounded-full px-1 text-sm font-bold text-danger-strong"
             >
               Excluir conta
             </button>

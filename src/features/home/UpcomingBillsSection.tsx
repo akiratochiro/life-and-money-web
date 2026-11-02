@@ -37,14 +37,14 @@ export function UpcomingBillsSection() {
       ) : upcoming.isError ? (
         <div role="alert" className="flex items-center justify-between gap-3 rounded-card bg-surface p-5">
           <p className="text-sm text-text-soft">Não foi possível carregar as contas.</p>
-          <button type="button" onClick={() => upcoming.refetch()} className="text-sm font-bold text-signal">
+          <button type="button" onClick={() => upcoming.refetch()} className="text-sm font-bold text-link">
             Tentar de novo
           </button>
         </div>
       ) : upcoming.data.length === 0 ? (
         <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
           <p className="text-sm text-text-soft">Nada vence nos próximos 7 dias.</p>
-          <Link to="/bills" className="text-sm font-bold text-signal">
+          <Link to="/bills" className="text-sm font-bold text-link">
             Ver o calendário de contas
           </Link>
         </div>
@@ -86,7 +86,7 @@ function UpcomingList({ occurrences }: { occurrences: BillOccurrence[] }) {
         ))}
       </ul>
       {hidden > 0 && (
-        <Link to="/bills" className="flex h-11 items-center justify-center text-sm font-bold text-signal">
+        <Link to="/bills" className="flex h-11 items-center justify-center text-sm font-bold text-link">
           Mais {hidden} {hidden === 1 ? "conta" : "contas"}
         </Link>
       )}

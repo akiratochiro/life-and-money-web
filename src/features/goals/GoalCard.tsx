@@ -68,20 +68,20 @@ export function GoalCard({ goal }: { goal: Goal }) {
       </div>
 
       {status === "IN_PROGRESS" && (
-        <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3">
+        <div className="flex items-center justify-between rounded-2xl bg-sunken px-4 py-3">
           <span className="text-sm text-text-soft">Guarde por mês</span>
-          <Money value={goal.monthlyNeeded ?? 0} className="font-extrabold text-signal" />
+          <Money value={goal.monthlyNeeded ?? 0} className="font-extrabold text-link" />
         </div>
       )}
       {status === "OVERDUE" && (
-        <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3">
+        <div className="flex items-center justify-between rounded-2xl bg-sunken px-4 py-3">
           <span className="text-sm text-text-soft">O prazo passou. Faltam</span>
-          <Money value={goal.remaining} className="font-extrabold text-danger" />
+          <Money value={goal.remaining} className="font-extrabold text-danger-strong" />
         </div>
       )}
 
       {mode === "delete" ? (
-        <div className="flex flex-col gap-3 rounded-2xl bg-ink-800 p-4">
+        <div className="flex flex-col gap-3 rounded-2xl bg-sunken p-4">
           <p className="text-sm leading-snug text-text-soft">
             Apagar a meta <strong className="text-text">{goal.name}</strong>?{" "}
             {saved > 0 ? (
@@ -97,7 +97,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
               type="button"
               disabled={deleteGoal.isPending}
               onClick={() => deleteGoal.mutate(id)}
-              className="h-11 flex-1 rounded-full bg-danger font-bold text-[#1a0710] transition active:scale-95 disabled:opacity-60"
+              className="h-11 flex-1 rounded-full bg-danger-strong font-bold text-on-accent transition active:scale-95 disabled:opacity-60"
             >
               <PendingLabel pending={deleteGoal.isPending} pendingText="Apagando…">Apagar meta</PendingLabel>
             </button>
@@ -115,7 +115,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
           {status !== "REACHED" && (
             <Link
               to={`/transactions/new?type=SAVING&goalId=${id}&returnTo=/goals`}
-              className="flex h-11 items-center rounded-full bg-signal px-5 text-sm font-bold text-ink-900 transition active:scale-95"
+              className="flex h-11 items-center rounded-full bg-accent px-5 text-sm font-bold text-on-accent shadow-clay-accent transition active:scale-95"
             >
               Guardar
             </Link>
@@ -123,7 +123,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
           <button type="button" onClick={() => setMode("edit")} className="h-11 px-3 text-sm font-bold text-text-muted hover:text-text">
             Editar
           </button>
-          <button type="button" onClick={() => setMode("delete")} className="h-11 px-3 text-sm font-bold text-text-muted hover:text-danger">
+          <button type="button" onClick={() => setMode("delete")} className="h-11 px-3 text-sm font-bold text-text-muted hover:text-danger-strong">
             Apagar
           </button>
         </div>

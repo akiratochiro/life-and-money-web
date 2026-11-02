@@ -34,7 +34,7 @@ export function MonthlyBars({ months, averages }: Props) {
               aria-pressed={selected === month.month}
               aria-label={`${monthLabel(month.month)}${month.closed ? "" : ", em andamento"}`}
               onClick={() => setSelected(month.month)}
-              className={`flex h-full flex-1 items-end justify-center gap-0.5 rounded-xl px-1 transition hover:bg-ink-800 aria-pressed:bg-ink-800 ${
+              className={`flex h-full flex-1 items-end justify-center gap-0.5 rounded-xl px-1 transition hover:bg-sunken aria-pressed:bg-sunken ${
                 month.closed ? "" : "opacity-55"
               }`}
             >
@@ -56,15 +56,15 @@ export function MonthlyBars({ months, averages }: Props) {
       </div>
 
       {active && (
-        <div className="rounded-2xl bg-ink-800 p-4">
+        <div className="rounded-2xl bg-sunken p-4">
           <p className="mb-3 text-sm font-bold">
             {monthLabel(active.month)}
             {!active.closed && <span className="font-semibold text-text-muted"> · em andamento</span>}
           </p>
           <dl className="grid grid-cols-3 gap-2">
-            <Value label="Entrou" value={active.income} className="text-income" />
-            <Value label="Saiu" value={active.expense} className="text-expense" />
-            <Value label="Guardou" value={active.saving} className="text-saving-soft" />
+            <Value label="Entrou" value={active.income} className="text-income-strong" />
+            <Value label="Saiu" value={active.expense} className="text-expense-strong" />
+            <Value label="Guardou" value={active.saving} className="text-saving-strong" />
           </dl>
         </div>
       )}

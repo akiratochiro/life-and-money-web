@@ -6,7 +6,7 @@ export function DonutSkeleton() {
     <SkeletonGroup label="Carregando gastos" className="flex flex-col items-center gap-6 sm:flex-row">
       <span
         aria-hidden="true"
-        className="block h-[200px] w-[200px] shrink-0 rounded-full border-[26px] border-ink-800 motion-safe:animate-pulse"
+        className="block h-[200px] w-[200px] shrink-0 rounded-full border-[26px] border-sunken motion-safe:animate-pulse"
       />
       <div className="flex w-full flex-col gap-1">
         {[0, 1, 2, 3].map((i) => (
@@ -34,7 +34,7 @@ export function BarsSkeleton() {
               <span
                 key={j}
                 aria-hidden="true"
-                className="block w-full max-w-3 rounded-t-md bg-ink-800 motion-safe:animate-pulse"
+                className="block w-full max-w-3 rounded-t-md bg-sunken motion-safe:animate-pulse"
                 style={{ height: `${height}%` }}
               />
             ))}

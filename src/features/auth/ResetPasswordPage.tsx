@@ -45,9 +45,9 @@ export function ResetPasswordPage() {
   const linkError = apiError && !passwordError ? apiError.message : undefined;
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-ink-900 px-5 py-10">
+    <main className="flex min-h-dvh items-center justify-center bg-canvas px-5 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-signal">
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
           Life and Money
         </p>
 
@@ -59,7 +59,7 @@ export function ResetPasswordPage() {
             </p>
             <Link
               to="/login"
-              className="mt-8 flex h-14 items-center justify-center rounded-full bg-signal px-6 font-bold text-ink-900"
+              className="mt-8 flex h-14 items-center justify-center rounded-full bg-accent px-6 font-bold text-on-accent shadow-clay-accent"
             >
               Entrar
             </Link>
@@ -72,7 +72,7 @@ export function ResetPasswordPage() {
             </p>
             <Link
               to="/forgot-password"
-              className="mt-8 flex h-14 items-center justify-center rounded-full bg-signal px-6 font-bold text-ink-900"
+              className="mt-8 flex h-14 items-center justify-center rounded-full bg-accent px-6 font-bold text-on-accent shadow-clay-accent"
             >
               Pedir outro link
             </Link>

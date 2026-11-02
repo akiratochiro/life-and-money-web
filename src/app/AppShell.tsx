@@ -19,7 +19,7 @@ const desktopOnlyItems = [
   { to: "/account", label: "Minha conta", icon: UserIcon },
 ];
 function navClass({ isActive }: { isActive: boolean }) {
-  return isActive ? "text-signal" : "text-text-muted hover:text-text";
+  return isActive ? "text-accent" : "text-text-muted hover:text-text";
 }
 
 function sideItemClass(state: { isActive: boolean }) {
@@ -29,9 +29,9 @@ function sideItemClass(state: { isActive: boolean }) {
 export function AppShell() {
   const { pathname } = useLocation();
   return (
-    <div className="min-h-dvh bg-ink-900 lg:flex">
+    <div className="min-h-dvh bg-canvas lg:flex">
       <aside className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:gap-2 lg:border-r lg:border-line lg:px-5 lg:py-8">
-        <p className="mb-6 px-3 font-display text-xs font-semibold uppercase tracking-[0.25em] text-signal">
+        <p className="mb-6 px-3 font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
           Life and Money
         </p>
         <nav aria-label="Navegação principal" className="flex flex-col gap-1">
@@ -44,7 +44,7 @@ export function AppShell() {
         </nav>
         <NavLink
           to="/transactions/new"
-          className="mt-6 flex h-12 items-center justify-center gap-2 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95"
+          className="mt-6 flex h-12 items-center justify-center gap-2 rounded-full bg-accent font-bold text-on-accent shadow-clay-accent transition active:scale-95"
         >
           <PlusIcon width={20} height={20} />
           Nova transação
@@ -64,7 +64,7 @@ export function AppShell() {
 
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 flex h-24 items-center justify-between border-t border-line bg-ink-900/95 px-3 pb-6 pt-2 backdrop-blur lg:hidden"
+        className="fixed inset-x-0 bottom-0 flex h-24 items-center justify-between border-t border-line bg-canvas/95 px-3 pb-6 pt-2 backdrop-blur lg:hidden"
       >
         {items.slice(0, 2).map(({ to, label, icon: Icon }) => (
           <NavLink
@@ -80,7 +80,7 @@ export function AppShell() {
         <NavLink
           to="/transactions/new"
           aria-label="Nova transação"
-          className="-mt-8 flex h-16 w-16 items-center justify-center rounded-[22px] bg-signal text-ink-900 shadow-[0_14px_28px_-10px_rgb(255_122_31_/_0.7)] ring-[6px] ring-ink-900 transition active:scale-95"
+          className="-mt-8 flex h-16 w-16 items-center justify-center rounded-[22px] bg-accent text-on-accent shadow-clay-accent ring-[6px] ring-canvas transition active:scale-95"
         >
           <PlusIcon width={26} height={26} />
         </NavLink>

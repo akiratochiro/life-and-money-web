@@ -22,9 +22,9 @@ export function ForgotPasswordPage() {
   const rateLimited = mutation.error instanceof ApiError && mutation.error.status === 429;
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-ink-900 px-5 py-10">
+    <main className="flex min-h-dvh items-center justify-center bg-canvas px-5 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-signal">
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
           Life and Money
         </p>
         <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">Esqueceu a senha?</h1>
@@ -56,12 +56,12 @@ export function ForgotPasswordPage() {
               />
 
               {mutation.error && !fieldError && !rateLimited && (
-                <p role="alert" className="text-sm font-semibold text-danger">
+                <p role="alert" className="text-sm font-semibold text-danger-strong">
                   {mutation.error.message}
                 </p>
               )}
               {wait > 0 && (
-                <p role="alert" className="text-sm font-semibold text-danger">
+                <p role="alert" className="text-sm font-semibold text-danger-strong">
                   Muitas tentativas. Tente de novo em {formatWait(wait)}.
                 </p>
               )}
@@ -75,7 +75,7 @@ export function ForgotPasswordPage() {
 
         <p className="mt-6 text-center text-sm text-text-muted">
           Lembrou?{" "}
-          <Link to="/login" className="font-bold text-signal">
+          <Link to="/login" className="font-bold text-link">
             Voltar para o login
           </Link>
         </p>

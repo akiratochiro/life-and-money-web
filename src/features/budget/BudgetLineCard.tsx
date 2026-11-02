@@ -49,7 +49,7 @@ export function BudgetLineCard({ line, editable }: Props) {
 
       {editable && mode === "view" && (
         <div className="flex gap-1">
-          <button type="button" onClick={() => setMode("edit")} className="h-11 px-3 text-sm font-bold text-signal">
+          <button type="button" onClick={() => setMode("edit")} className="h-11 px-3 text-sm font-bold text-link">
             Editar
           </button>
           <button type="button" onClick={() => setMode("remove")} className="h-11 px-3 text-sm font-bold text-text-muted hover:text-text">
@@ -68,7 +68,7 @@ export function BudgetLineCard({ line, editable }: Props) {
       )}
 
       {mode === "remove" && (
-        <div className="flex flex-col gap-3 rounded-2xl bg-ink-800 p-4">
+        <div className="flex flex-col gap-3 rounded-2xl bg-sunken p-4">
           <p className="text-sm leading-snug text-text-soft">
             A partir deste mês, <strong className="text-text">{line.categoryName}</strong> sai do orçamento. Os meses
             anteriores continuam como estavam.
@@ -78,7 +78,7 @@ export function BudgetLineCard({ line, editable }: Props) {
               type="button"
               disabled={removeBudget.isPending}
               onClick={() => removeBudget.mutate(categoryId, { onSuccess: () => setMode("view") })}
-              className="h-11 flex-1 rounded-full bg-warning font-bold text-[#1f1400] transition active:scale-95 disabled:opacity-60"
+              className="h-11 flex-1 rounded-full bg-warning font-bold text-text transition active:scale-95 disabled:opacity-60"
             >
               <PendingLabel pending={removeBudget.isPending} pendingText="Removendo…">Remover</PendingLabel>
             </button>

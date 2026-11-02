@@ -21,7 +21,7 @@ export function AttentionSection({ lines, overdueGoals }: Props) {
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-base font-semibold">Precisa da sua atenção</h2>
-        <span className="rounded-full bg-signal px-2.5 py-1 text-xs font-extrabold text-ink-900">{total}</span>
+        <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-extrabold text-on-accent shadow-clay-accent">{total}</span>
       </div>
       {alerts.map((line) => (
         <BudgetAlertCard key={line.categoryId} line={line} />

@@ -29,7 +29,7 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
       ref={dialogRef}
       onClose={onClose}
       aria-labelledby="edit-transaction-title"
-      className="m-auto max-h-[90dvh] w-[min(100%-1.5rem,32rem)] overflow-y-auto rounded-hero bg-ink-900 p-6 text-text shadow-card backdrop:bg-ink-950/80 backdrop:backdrop-blur-sm"
+      className="m-auto max-h-[90dvh] w-[min(100%-1.5rem,32rem)] overflow-y-auto rounded-hero bg-canvas p-6 text-text shadow-card backdrop:bg-backdrop backdrop:backdrop-blur-sm"
     >
       <header className="mb-6 flex items-center justify-between">
         <h2 id="edit-transaction-title" className="font-display text-lg font-semibold">
@@ -74,14 +74,14 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
                     deleteTransaction.mutate(id);
                     close();
                   }}
-                  className="h-11 flex-1 rounded-full bg-danger font-bold text-[#1a0710] transition active:scale-95"
+                  className="h-11 flex-1 rounded-full bg-danger-strong font-bold text-on-accent transition active:scale-95"
                 >
                   Apagar
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmingDelete(false)}
-                  className="h-11 flex-1 rounded-full bg-ink-800 font-bold text-text transition active:scale-95"
+                  className="h-11 flex-1 rounded-full bg-sunken font-bold text-text transition active:scale-95"
                 >
                   Voltar
                 </button>
@@ -91,7 +91,7 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
             <button
               type="button"
               onClick={() => setConfirmingDelete(true)}
-              className="h-11 self-center px-4 text-sm font-bold text-danger"
+              className="h-11 self-center px-4 text-sm font-bold text-danger-strong"
             >
               Apagar transação
             </button>

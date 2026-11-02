@@ -119,7 +119,7 @@ export function ExpensesDonut({ data }: { data: ExpensesByCategory }) {
               type="button"
               aria-pressed={selected === slice.key}
               onClick={() => setSelected((current) => (current === slice.key ? null : slice.key))}
-              className="flex h-11 w-full items-center gap-3 rounded-2xl px-3 text-left transition hover:bg-ink-800 aria-pressed:bg-ink-800"
+              className="flex h-11 w-full items-center gap-3 rounded-2xl px-3 text-left transition hover:bg-sunken aria-pressed:bg-sunken"
             >
               <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: slice.color }} />
               <span className="min-w-0 flex-1 truncate text-sm font-bold">{slice.name}</span>

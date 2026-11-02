@@ -36,7 +36,7 @@ export function HomePage() {
         <Link
           to="/account"
           aria-label="Minha conta"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface font-display text-base font-semibold text-signal transition active:scale-95"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface font-display text-base font-semibold text-link transition active:scale-95"
         >
           {firstName ? firstName.charAt(0).toUpperCase() : <UserIcon width={20} height={20} />}
         </Link>
@@ -59,7 +59,7 @@ export function HomePage() {
               budget.refetch();
               goals.refetch();
             }}
-            className="text-sm font-bold text-signal"
+            className="text-sm font-bold text-link"
           >
             Tentar de novo
           </button>
@@ -99,7 +99,7 @@ function Feed({ month, totals, lines, goals }: FeedProps) {
       />
       <Link
         to="/analytics"
-        className="-mt-3 flex h-11 items-center justify-center rounded-full text-sm font-bold text-signal"
+        className="-mt-3 flex h-11 items-center justify-center rounded-full text-sm font-bold text-link"
       >
         Ver para onde foi o dinheiro
       </Link>

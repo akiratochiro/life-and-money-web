@@ -68,7 +68,7 @@ export function OccurrenceItem({ occurrence, onEdit }: Props) {
               type="button"
               disabled={undo.isPending}
               onClick={() => undo.mutate({ billId: occurrence.billId, month: occurrence.month })}
-              className="h-11 rounded-full bg-ink-800 px-4 text-sm font-bold text-text transition active:scale-95 disabled:opacity-60"
+              className="h-11 rounded-full bg-sunken px-4 text-sm font-bold text-text transition active:scale-95 disabled:opacity-60"
             >
               <PendingLabel pending={undo.isPending} pendingText="Desfazendo…">Desfazer</PendingLabel>
             </button>
@@ -76,7 +76,7 @@ export function OccurrenceItem({ occurrence, onEdit }: Props) {
             <button
               type="button"
               onClick={() => setPaying(true)}
-              className="h-11 rounded-full bg-signal px-4 text-sm font-bold text-ink-900 transition active:scale-95"
+              className="h-11 rounded-full bg-accent px-4 text-sm font-bold text-on-accent shadow-clay-accent transition active:scale-95"
             >
               {receivable ? "Marcar como recebida" : "Marcar como paga"}
             </button>
@@ -91,7 +91,7 @@ export function OccurrenceItem({ occurrence, onEdit }: Props) {
         </div>
       )}
       {undo.error && (
-        <p role="alert" className="text-sm font-semibold text-danger">
+        <p role="alert" className="text-sm font-semibold text-danger-strong">
           {undo.error.message}
         </p>
       )}
@@ -107,7 +107,7 @@ export function Deadline({ occurrence }: { occurrence: BillOccurrence }) {
   if (occurrence.payableUntil === occurrence.dueDate) return null;
   const verb = occurrence.type === "INCOME" ? "receba" : "pague";
   return (
-    <p className="text-xs font-semibold text-saving-soft">
+    <p className="text-xs font-semibold text-saving-strong">
       vence {weekdayAndDay(occurrence.dueDate)} → {verb} até {weekdayAndDay(occurrence.payableUntil)}
     </p>
   );
@@ -129,7 +129,7 @@ function PayPanel({ occurrence, onDone }: { occurrence: BillOccurrence; onDone: 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-2xl bg-ink-800 p-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-2xl bg-sunken p-4">
       <AmountInput label={receivable ? "Valor recebido" : "Valor pago"} cents={cents} onChange={setCents} />
       <label className="flex flex-col gap-2">
         <span className="text-sm font-semibold text-text-muted">{receivable ? "Recebido em" : "Pago em"}</span>
@@ -138,11 +138,11 @@ function PayPanel({ occurrence, onDone }: { occurrence: BillOccurrence; onDone: 
           required
           value={paidOn}
           onChange={(e) => setPaidOn(e.target.value)}
-          className="h-12 rounded-2xl border border-line bg-ink-900 px-4 text-base text-text outline-none focus:border-signal [color-scheme:dark]"
+          className="h-12 rounded-2xl border border-line bg-canvas px-4 text-base text-text outline-none focus:border-accent [color-scheme:light]"
         />
       </label>
       {pay.error && (
-        <p role="alert" className="text-sm font-semibold text-danger">
+        <p role="alert" className="text-sm font-semibold text-danger-strong">
           {pay.error.message}
         </p>
       )}
@@ -150,7 +150,7 @@ function PayPanel({ occurrence, onDone }: { occurrence: BillOccurrence; onDone: 
         <button
           type="submit"
           disabled={cents <= 0 || !paidOn || pay.isPending}
-          className="h-12 flex-1 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95 disabled:opacity-60"
+          className="h-12 flex-1 rounded-full bg-accent font-bold text-on-accent shadow-clay-accent transition active:scale-95 disabled:opacity-60"
         >
           <PendingLabel pending={pay.isPending} pendingText="Salvando…">Confirmar</PendingLabel>
         </button>

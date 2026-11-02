@@ -36,8 +36,8 @@ export function BudgetEditor({ categoryId, initialMode, initialLimit, onDone }: 
     error instanceof ApiError && error.status === 409 ? "Essa categoria foi arquivada." : error?.message;
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5 rounded-2xl bg-ink-800 p-4">
-      <div role="group" aria-label="Tipo de limite" className="grid grid-cols-2 gap-1 rounded-full bg-ink-900 p-1">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5 rounded-2xl bg-sunken p-4">
+      <div role="group" aria-label="Tipo de limite" className="grid grid-cols-2 gap-1 rounded-full bg-canvas p-1">
         {MODES.map((option) => (
           <button
             key={option.value}
@@ -45,7 +45,7 @@ export function BudgetEditor({ categoryId, initialMode, initialLimit, onDone }: 
             aria-pressed={mode === option.value}
             onClick={() => setMode(option.value)}
             className={`h-11 rounded-full text-sm font-bold transition active:scale-95 ${
-              mode === option.value ? "bg-signal text-ink-900" : "text-text-muted"
+              mode === option.value ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
             }`}
           >
             {option.label}
@@ -63,7 +63,7 @@ export function BudgetEditor({ categoryId, initialMode, initialLimit, onDone }: 
       <p className="text-center text-xs text-text-muted">Vale a partir deste mês. Os meses anteriores não mudam.</p>
 
       {errorMessage && (
-        <p role="alert" className="text-sm font-semibold text-danger">
+        <p role="alert" className="text-sm font-semibold text-danger-strong">
           {errorMessage}
         </p>
       )}
@@ -72,7 +72,7 @@ export function BudgetEditor({ categoryId, initialMode, initialLimit, onDone }: 
         <button
           type="submit"
           disabled={value <= 0 || setBudget.isPending}
-          className="h-12 flex-1 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95 disabled:opacity-60"
+          className="h-12 flex-1 rounded-full bg-accent font-bold text-on-accent shadow-clay-accent transition active:scale-95 disabled:opacity-60"
         >
           <PendingLabel pending={setBudget.isPending} pendingText="Salvando…">Salvar</PendingLabel>
         </button>

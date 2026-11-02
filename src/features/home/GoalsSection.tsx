@@ -47,9 +47,9 @@ function GoalCard({ goal }: { goal: Goal }) {
         </div>
       </div>
       {!reached && (
-        <div className="flex items-center justify-between rounded-2xl bg-ink-800 px-4 py-3">
+        <div className="flex items-center justify-between rounded-2xl bg-sunken px-4 py-3">
           <span className="text-sm text-text-soft">Guarde por mês</span>
-          <Money value={goal.monthlyNeeded ?? 0} className="font-extrabold text-signal" />
+          <Money value={goal.monthlyNeeded ?? 0} className="font-extrabold text-link" />
         </div>
       )}
     </Card>
@@ -60,7 +60,7 @@ export function SectionHeader({ title, to }: { title: string; to: string }) {
   return (
     <div className="flex items-center justify-between">
       <h2 className="font-display text-base font-semibold">{title}</h2>
-      <Link to={to} className="py-3 text-sm font-bold text-signal">
+      <Link to={to} className="py-3 text-sm font-bold text-link">
         Ver tudo
       </Link>
     </div>
@@ -71,7 +71,7 @@ export function EmptyCard({ text, action, to }: { text: string; action: string; 
   return (
     <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
       <p className="text-sm text-text-soft">{text}</p>
-      <Link to={to} className="text-sm font-bold text-signal">
+      <Link to={to} className="text-sm font-bold text-link">
         {action}
       </Link>
     </div>

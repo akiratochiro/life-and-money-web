@@ -35,7 +35,7 @@ export function AccountPage() {
             </p>
           </>
         ) : (
-          <div className="h-16 motion-safe:animate-pulse rounded-2xl bg-ink-800" />
+          <div className="h-16 motion-safe:animate-pulse rounded-2xl bg-sunken" />
         )}
       </Card>
 
@@ -48,12 +48,12 @@ export function AccountPage() {
           type="button"
           onClick={() => exportData.mutate()}
           disabled={exportData.isPending}
-          className="self-start text-sm font-bold text-signal disabled:opacity-60"
+          className="self-start text-sm font-bold text-link disabled:opacity-60"
         >
           <PendingLabel pending={exportData.isPending} pendingText="Preparando o arquivo…">Exportar meus dados</PendingLabel>
         </button>
         {exportData.error && (
-          <p role="alert" className="text-sm font-semibold text-danger">
+          <p role="alert" className="text-sm font-semibold text-danger-strong">
             {exportData.error.message}
           </p>
         )}
@@ -107,7 +107,7 @@ function DeleteAccountSection() {
         <p className="text-sm leading-relaxed text-text-soft">
           Apaga a conta e todos os dados dela. Não dá para desfazer.
         </p>
-        <button type="button" onClick={() => setOpen(true)} className="self-start text-sm font-bold text-danger">
+        <button type="button" onClick={() => setOpen(true)} className="self-start text-sm font-bold text-danger-strong">
           Quero excluir minha conta
         </button>
       </Card>
@@ -118,7 +118,7 @@ function DeleteAccountSection() {
     <Card>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <h2 className="font-display text-base font-semibold text-danger">Excluir conta</h2>
+          <h2 className="font-display text-base font-semibold text-danger-strong">Excluir conta</h2>
           <p className="text-sm leading-relaxed text-text-soft">
             Isso apaga para sempre suas categorias, transações, orçamento e metas. Se quiser guardar uma
             cópia, exporte seus dados antes.
@@ -143,12 +143,12 @@ function DeleteAccountSection() {
         />
 
         {wait > 0 && (
-          <p role="alert" className="text-sm font-semibold text-danger">
+          <p role="alert" className="text-sm font-semibold text-danger-strong">
             Muitas tentativas. Tente de novo em {formatWait(wait)}.
           </p>
         )}
         {otherError && (
-          <p role="alert" className="text-sm font-semibold text-danger">
+          <p role="alert" className="text-sm font-semibold text-danger-strong">
             {otherError}
           </p>
         )}
@@ -157,7 +157,7 @@ function DeleteAccountSection() {
           <button
             type="submit"
             disabled={!confirmed || mutation.isPending || wait > 0}
-            className="h-14 rounded-full bg-danger px-6 font-bold text-ink-900 transition active:scale-95 disabled:opacity-40"
+            className="h-14 rounded-full bg-danger px-6 font-bold text-on-accent transition active:scale-95 disabled:opacity-40"
           >
             <PendingLabel pending={mutation.isPending} pendingText="Excluindo…">Excluir minha conta</PendingLabel>
           </button>

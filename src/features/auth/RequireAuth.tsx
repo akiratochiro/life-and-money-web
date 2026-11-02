@@ -9,7 +9,7 @@ export function RequireAuth() {
   if (status === "loading") {
     return (
       <div
-        className="flex min-h-dvh items-center justify-center bg-ink-900"
+        className="flex min-h-dvh items-center justify-center bg-canvas"
         aria-busy="true"
         aria-label="Carregando"
       >

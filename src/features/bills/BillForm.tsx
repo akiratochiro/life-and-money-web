@@ -27,12 +27,12 @@ const DAYS = Array.from({ length: 31 }, (_, index) => index + 1);
 
 function chipClass(selected: boolean) {
   return `flex h-11 items-center gap-2 rounded-full px-4 text-sm font-bold transition active:scale-95 ${
-    selected ? "bg-text text-ink-900" : "bg-surface text-text-soft hover:text-text"
+    selected ? "bg-text text-on-accent" : "bg-surface text-text-soft hover:text-text"
   }`;
 }
 
 const selectClass =
-  "h-14 rounded-2xl border border-line bg-ink-800 px-4 text-base text-text outline-none focus:border-signal [color-scheme:dark]";
+  "h-14 rounded-2xl border border-line bg-sunken px-4 text-base text-text outline-none focus:border-accent [color-scheme:light]";
 
 type CreateProps = {
   mode: "create";
@@ -106,7 +106,7 @@ export function BillForm(props: CreateProps | EditProps) {
   const canSubmit = name.trim() !== "" && categoryId !== null && cents > 0 && (!pickByDate || dueDate !== "") && !props.pending;
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6 rounded-2xl bg-ink-800 p-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6 rounded-2xl bg-sunken p-4">
       <h2 className="font-display text-base font-semibold">{editing ? "Editar conta" : "Nova conta"}</h2>
 
       {!editing && (
@@ -118,7 +118,7 @@ export function BillForm(props: CreateProps | EditProps) {
               aria-pressed={kind === option.value}
               onClick={() => changeKind(option.value)}
               className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-bold transition active:scale-95 ${
-                kind === option.value ? "bg-signal text-ink-900" : "text-text-muted"
+                kind === option.value ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
               }`}
             >
               <span className={`h-2 w-2 rounded-full ${option.dot}`} />
@@ -147,7 +147,7 @@ export function BillForm(props: CreateProps | EditProps) {
         ) : options.length === 0 ? (
           <p className="text-sm text-text-soft">
             Você não tem categorias desse tipo.{" "}
-            <Link to="/categories" className="font-bold text-signal">Criar categoria</Link>
+            <Link to="/categories" className="font-bold text-link">Criar categoria</Link>
           </p>
         ) : (
           <div className="flex flex-wrap gap-2">
@@ -215,7 +215,7 @@ export function BillForm(props: CreateProps | EditProps) {
             {dueDay > 28 && (
               <span className="text-xs text-text-muted">Nos meses sem esse dia, vence no último dia do mês.</span>
             )}
-            {fieldErrors.dueDay && <span className="text-sm font-semibold text-danger">{fieldErrors.dueDay}</span>}
+            {fieldErrors.dueDay && <span className="text-sm font-semibold text-danger-strong">{fieldErrors.dueDay}</span>}
           </label>
           {!editing && (
             <div role="group" aria-label="Primeiro mês" className="flex flex-col gap-2">
@@ -233,7 +233,7 @@ export function BillForm(props: CreateProps | EditProps) {
               type="checkbox"
               checked={hasEnd}
               onChange={(e) => setHasEnd(e.target.checked)}
-              className="h-5 w-5 accent-signal"
+              className="h-5 w-5 accent-accent"
             />
             Tem um último mês
           </label>
@@ -243,7 +243,7 @@ export function BillForm(props: CreateProps | EditProps) {
             </div>
           )}
           {fieldErrors.periodValid && (
-            <span className="text-sm font-semibold text-danger">{fieldErrors.periodValid}</span>
+            <span className="text-sm font-semibold text-danger-strong">{fieldErrors.periodValid}</span>
           )}
         </div>
       )}
@@ -255,7 +255,7 @@ export function BillForm(props: CreateProps | EditProps) {
       )}
 
       {props.error && Object.keys(fieldErrors).length === 0 && (
-        <p role="alert" className="text-sm font-semibold text-danger">
+        <p role="alert" className="text-sm font-semibold text-danger-strong">
           {props.error.message}
         </p>
       )}
@@ -264,7 +264,7 @@ export function BillForm(props: CreateProps | EditProps) {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="h-12 flex-1 rounded-full bg-signal font-bold text-ink-900 transition active:scale-95 disabled:opacity-60"
+          className="h-12 flex-1 rounded-full bg-accent font-bold text-on-accent shadow-clay-accent transition active:scale-95 disabled:opacity-60"
         >
           <PendingLabel pending={props.pending} pendingText="Salvando…">{editing ? "Salvar" : "Criar conta"}</PendingLabel>
         </button>

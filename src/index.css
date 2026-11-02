@@ -1,55 +1,177 @@
 @import "tailwindcss";
 @import "@fontsource-variable/manrope";
-@import "@fontsource-variable/unbounded";
+@import "@fontsource-variable/fredoka";
 
+/*
+ * Direção visual "Cofrinho de argila": claymorphism em tons pastel. Superfícies claras com
+ * volume (sombra externa macia + brilho interno no topo), os rosas do porco como marca, e um
+ * único destaque forte, a framboesa, reservado a ações primárias e pontos de atenção.
+ *
+ * Toda cor de texto foi conferida contra o fundo, o card e o campo (WCAG AA, 4,5:1); o teste
+ * src/theme.test.ts relê este arquivo e falha se um par sair do limite.
+ */
 @theme {
   /* Fundos e superfícies */
-  --color-ink-950: #070b17;
-  --color-ink-900: #0b1020;
-  --color-ink-800: #0f1530;
-  --color-surface: #141b33;
-  --color-surface-raised: #171e3a;
-  --color-line: #1e2748;
-  --color-track: #232c4d;
+  --color-canvas: #fbf0f4;
+  --color-surface: #ffffff;
+  --color-surface-raised: #fff7fa;
+  --color-sunken: #f7e6ec;
+  --color-line: #efd5df;
+  --color-track: #f1dce4;
+  --color-backdrop: rgb(73 59 48 / 0.35);
 
-  /* Texto */
-  --color-text: #f2f4fa;
-  --color-text-soft: #c9d0e6;
-  --color-text-muted: #a7b0cc;
+  /* Texto: o marrom do porco, em três intensidades */
+  --color-text: #493b30;
+  --color-text-soft: #65503f;
+  --color-text-muted: #7a6455;
+  --color-link: #8f4d66;
 
-  /* O sinal: o único acento */
-  --color-signal: #ff7a1f;
+  /* Marca: os rosas do porco. Para logo, ilustração e decoração, nunca para texto pequeno. */
+  --color-pig-100: #ffd7e4;
+  --color-pig-300: #fc97b2;
+  --color-pig-400: #ea83a3;
+  --color-pig-500: #bf7b90;
+  --color-pig-600: #a5627a;
+  --color-pig-ink: #493b30;
 
-  /* Significado dos dados */
-  --color-income: #3bd4e8;
-  --color-expense: #ff7a45;
-  --color-saving: #5b7cff;
-  --color-saving-soft: #8fa6ff;
-  --color-warning: #ffb020;
-  --color-danger: #ff4d6d;
+  /* O destaque: só ações primárias e pontos de atenção */
+  --color-accent: #b8395f;
+  --color-accent-soft: #fbdbe5;
+  --color-on-accent: #ffffff;
 
-  /* Tipografia */
+  /*
+   * Significado dos dados. Cada um em três papéis: o tom de preenchimento (barras, pontos,
+   * gráficos), o fundo suave (selos, ícones) e o tom forte, que é o único seguro para texto.
+   */
+  --color-income: #5cc28d; /* entrou */
+  --color-income-soft: #d9f2e3;
+  --color-income-strong: #24784a;
+  --color-expense: #f08a5d; /* saiu */
+  --color-expense-soft: #fde4d8;
+  --color-expense-strong: #a8421b;
+  --color-saving: #8b93e8; /* guardou */
+  --color-saving-soft: #e5e7fb;
+  --color-saving-strong: #4f58b8;
+  --color-warning: #f2b544; /* alerta */
+  --color-warning-soft: #fdeccb;
+  --color-warning-strong: #8a580c;
+  --color-danger: #e5636f;
+  --color-danger-soft: #fbdfe3;
+  --color-danger-strong: #b42f43;
+
+  /* Cores das categorias (CategoryColor da API): preenchimento, fundo suave e tinta do ícone */
+  --color-cat-rose: #f28aa0;
+  --color-cat-rose-soft: #fde0e7;
+  --color-cat-rose-ink: #a8324f;
+  --color-cat-pink: #fc97b2;
+  --color-cat-pink-soft: #ffe3ec;
+  --color-cat-pink-ink: #9e4064;
+  --color-cat-peach: #f7b38a;
+  --color-cat-peach-soft: #fee7d8;
+  --color-cat-peach-ink: #934a1c;
+  --color-cat-coral: #f28f7a;
+  --color-cat-coral-soft: #fde1da;
+  --color-cat-coral-ink: #a63b26;
+  --color-cat-amber: #f5c35b;
+  --color-cat-amber-soft: #fdefcc;
+  --color-cat-amber-ink: #805300;
+  --color-cat-lime: #b5d96a;
+  --color-cat-lime-soft: #eef7d6;
+  --color-cat-lime-ink: #4a6410;
+  --color-cat-mint: #7fd3a6;
+  --color-cat-mint-soft: #dcf4e7;
+  --color-cat-mint-ink: #1d6a42;
+  --color-cat-teal: #6cc4c0;
+  --color-cat-teal-soft: #d9f1f0;
+  --color-cat-teal-ink: #175c59;
+  --color-cat-sky: #8cc3f0;
+  --color-cat-sky-soft: #e0effc;
+  --color-cat-sky-ink: #22598c;
+  --color-cat-lavender: #b3a6ee;
+  --color-cat-lavender-soft: #ece8fc;
+  --color-cat-lavender-ink: #4f3f9e;
+  --color-cat-plum: #c98bb9;
+  --color-cat-plum-soft: #f3e2ef;
+  --color-cat-plum-ink: #7a3a68;
+  --color-cat-sand: #d8c3a5;
+  --color-cat-sand-soft: #f4ece0;
+  --color-cat-sand-ink: #654e30;
+
+  /* Tipografia: Fredoka (arredondada, combina com a argila) nos títulos, Manrope no texto */
   --font-sans: "Manrope Variable", system-ui, sans-serif;
-  --font-display: "Unbounded Variable", sans-serif;
+  --font-display: "Fredoka Variable", "Manrope Variable", sans-serif;
 
-  /* Forma e profundidade */
+  /* Escala tipográfica com nome: o papel do texto, não o tamanho */
+  --text-display: 2.25rem; /* o saldo */
+  --text-display--line-height: 1.1;
+  --text-title: 1.625rem; /* título da tela */
+  --text-title--line-height: 1.2;
+  --text-heading: 1.0625rem; /* título de seção */
+  --text-heading--line-height: 1.3;
+  --text-label: 0.75rem; /* rótulos e legendas */
+  --text-label--line-height: 1.35;
+
+  /* Espaçamento com nome, em cima da escala de 4 px do Tailwind */
+  --spacing-gutter: 1.25rem; /* margem lateral da tela */
+  --spacing-card: 1.25rem; /* respiro interno de um card */
+  --spacing-section: 1.5rem; /* entre blocos de uma tela */
+
+  /* Forma */
+  --radius-control: 18px;
   --radius-card: 28px;
   --radius-hero: 32px;
-  --shadow-card: 0 18px 36px -22px rgb(0 0 0 / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.04);
+
+  /*
+   * Profundidade de argila: uma sombra larga e macia tingida de rosa, uma de contato mais
+   * curta, um brilho interno no topo e uma sombra interna na base. Pressionado, o volume afunda.
+   */
+  --shadow-card:
+    0 14px 30px -12px rgb(165 98 122 / 0.28), 0 3px 8px -3px rgb(165 98 122 / 0.16),
+    inset 0 2px 0 rgb(255 255 255 / 0.95), inset 0 -4px 10px rgb(165 98 122 / 0.07);
+  --shadow-clay-sm:
+    0 6px 14px -8px rgb(165 98 122 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 -2px 5px rgb(165 98 122 / 0.08);
+  --shadow-clay-accent:
+    0 12px 24px -10px rgb(184 57 95 / 0.6), inset 0 2px 0 rgb(255 255 255 / 0.35),
+    inset 0 -4px 8px rgb(110 20 50 / 0.25);
+  --shadow-clay-pressed: inset 0 3px 8px rgb(165 98 122 / 0.2), inset 0 -1px 0 rgb(255 255 255 / 0.8);
 
   /* Movimento */
   --animate-fade-in: fade-in 300ms ease-out;
+  --animate-float: float 9s ease-in-out infinite;
+  --animate-draw: draw 420ms ease-out 80ms both;
 
   @keyframes fade-in {
     from {
       opacity: 0;
     }
   }
+
+  /* Só transform e opacity: não força layout nem pintura a cada quadro. */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate3d(0, -14px, 0) rotate(6deg);
+    }
+  }
+
+  /* O traço do check se desenhando (o caminho tem pathLength=1). */
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
 }
 
 body {
   margin: 0;
-  background: var(--color-ink-900);
+  background: var(--color-canvas);
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

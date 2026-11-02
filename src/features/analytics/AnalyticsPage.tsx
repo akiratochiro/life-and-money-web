@@ -37,7 +37,7 @@ export function AnalyticsPage() {
       <section className="flex flex-col gap-5 rounded-hero bg-surface p-6 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-base font-semibold">Mês a mês</h2>
-          <div role="group" aria-label="Período" className="flex gap-1 rounded-full bg-ink-800 p-1">
+          <div role="group" aria-label="Período" className="flex gap-1 rounded-full bg-sunken p-1">
             {RANGES.map((option) => (
               <button
                 key={option}
@@ -45,7 +45,7 @@ export function AnalyticsPage() {
                 aria-pressed={range === option}
                 onClick={() => setRange(option)}
                 className={`h-9 rounded-full px-3 text-xs font-bold transition active:scale-95 ${
-                  range === option ? "bg-signal text-ink-900" : "text-text-muted"
+                  range === option ? "bg-accent text-on-accent shadow-clay-accent" : "text-text-muted"
                 }`}
               >
                 {option} meses
@@ -79,13 +79,13 @@ export function AnalyticsPage() {
                 Médias de {averages.basedOnMonths} {averages.basedOnMonths === 1 ? "mês fechado" : "meses fechados"}
               </p>
               <dl className="grid grid-cols-3 gap-2">
-                <Average label="Entrou" value={averages.income} className="text-income" />
-                <Average label="Saiu" value={averages.expense} className="text-expense" />
-                <Average label="Guardou" value={averages.saving} className="text-saving-soft" />
+                <Average label="Entrou" value={averages.income} className="text-income-strong" />
+                <Average label="Saiu" value={averages.expense} className="text-expense-strong" />
+                <Average label="Guardou" value={averages.saving} className="text-saving-strong" />
               </dl>
             </div>
           ) : (
-            <p className="rounded-2xl bg-ink-800 p-4 text-sm leading-snug text-text-soft">
+            <p className="rounded-2xl bg-sunken p-4 text-sm leading-snug text-text-soft">
               Ainda não há meses fechados desde o seu cadastro neste período, então ainda não dá para calcular médias.
             </p>
           )

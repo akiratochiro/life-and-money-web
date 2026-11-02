@@ -20,7 +20,7 @@ export function BalanceCard({ month, income, expense, saving }: Props) {
           type="button"
           onClick={toggle}
           aria-label={hidden ? "Mostrar valores" : "Ocultar valores"}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-ink-800 transition active:scale-95"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-sunken transition active:scale-95"
         >
           {hidden ? <EyeOffIcon /> : <EyeIcon />}
         </button>
@@ -28,7 +28,7 @@ export function BalanceCard({ month, income, expense, saving }: Props) {
 
       <AnimatedMoney
         value={balance}
-        className={`font-display text-4xl font-bold tracking-tight ${balance < 0 ? "text-danger" : ""}`}
+        className={`font-display text-4xl font-bold tracking-tight ${balance < 0 ? "text-danger-strong" : ""}`}
       />
 
       {income > 0 && (
@@ -45,7 +45,7 @@ export function BalanceCard({ month, income, expense, saving }: Props) {
         <Figure label="Guardou" dot="bg-saving" value={saving} />
       </dl>
 
-      <p className="rounded-2xl bg-ink-800 px-4 py-3 text-sm leading-snug text-text-soft">
+      <p className="rounded-2xl bg-sunken px-4 py-3 text-sm leading-snug text-text-soft">
         {income > 0 ? (
           <>Já entraram <Money value={income} /> neste mês. Os limites em porcentagem já consideram esse valor.</>
         ) : (

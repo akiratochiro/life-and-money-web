@@ -43,7 +43,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               {...listItem}
               role={toast.tone === "error" ? "alert" : "status"}
               className={`pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-2xl px-4 py-3 text-sm font-semibold shadow-card ${
-                toast.tone === "error" ? "bg-danger text-[#1a0710]" : "bg-surface-raised text-text"
+                toast.tone === "error" ? "bg-danger-strong text-on-accent" : "bg-surface-raised text-text"
               }`}
             >
               <p className="flex-1 leading-snug">{toast.message}</p>

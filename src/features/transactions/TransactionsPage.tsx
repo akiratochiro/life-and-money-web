@@ -21,18 +21,18 @@ const TYPE_STYLE: Record<
   { tile: string; amount: string; sign: string }
 > = {
   INCOME: {
-    tile: "bg-income/15 text-income",
-    amount: "text-income",
+    tile: "bg-income-soft text-income-strong",
+    amount: "text-income-strong",
     sign: "+ ",
   },
   EXPENSE: {
-    tile: "bg-expense/15 text-expense",
+    tile: "bg-expense-soft text-expense-strong",
     amount: "text-text",
     sign: "− ",
   },
   SAVING: {
-    tile: "bg-saving/15 text-saving-soft",
-    amount: "text-saving-soft",
+    tile: "bg-saving-soft text-saving-strong",
+    amount: "text-saving-strong",
     sign: "",
   },
 };
@@ -81,7 +81,7 @@ export function TransactionsPage() {
         <h1 className="font-display text-2xl font-semibold">Extrato</h1>
         <Link
           to="/categories"
-          className="flex h-11 items-center px-2 text-sm font-bold text-signal"
+          className="flex h-11 items-center px-2 text-sm font-bold text-link"
         >
           Categorias
         </Link>
@@ -89,12 +89,12 @@ export function TransactionsPage() {
       <MonthSwitcher month={month} onChange={setMonth} />
 
       <dl className="grid grid-cols-3 gap-2 rounded-card bg-surface p-5">
-        <Total label="Entrou" cents={totals.INCOME} className="text-income" />
-        <Total label="Saiu" cents={totals.EXPENSE} className="text-expense" />
+        <Total label="Entrou" cents={totals.INCOME} className="text-income-strong" />
+        <Total label="Saiu" cents={totals.EXPENSE} className="text-expense-strong" />
         <Total
           label="Guardou"
           cents={totals.SAVING}
-          className="text-saving-soft"
+          className="text-saving-strong"
         />
       </dl>
 
@@ -107,7 +107,7 @@ export function TransactionsPage() {
           </p>
           <Link
             to="/transactions/new"
-            className="text-sm font-bold text-signal"
+            className="text-sm font-bold text-link"
           >
             Lançar uma transação
           </Link>
