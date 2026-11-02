@@ -155,7 +155,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="h-11 rounded-full border border-line bg-sunken px-4 text-sm font-bold text-text outline-none focus:border-accent [color-scheme:light]"
+              className="h-11 rounded-full border border-line bg-sunken px-4 text-base font-bold text-text outline-none focus:border-accent [color-scheme:light]"
             />
           </label>
         </div>

@@ -1,13 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/pig-face.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover: o app ocupa a tela inteira, inclusive atrás do notch e da barra de
+         gestos; o CSS devolve esse espaço com env(safe-area-inset-*) onde há conteúdo. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#fbf0f4" />
     <!-- Nenhuma requisição leva o endereço da página no Referer: a tela de redefinição de senha
          chega com o token na URL, e ele não pode vazar para quem quer que receba a requisição. -->
     <meta name="referrer" content="no-referrer" />
-    <title>life-and-money-web</title>
+    <title>Life and Money</title>
   </head>
   <body>
     <div id="root"></div>

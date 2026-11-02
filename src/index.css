@@ -182,10 +182,40 @@
   }
 }
 
+html {
+  /* Nada de "quicar" a página inteira nem do pull-to-refresh nativo, que recarregaria o app: o
+     puxar para atualizar é do próprio app, nas telas onde faz sentido. */
+  overscroll-behavior-y: none;
+  /* O realce cinza do toque no iOS e no Android; o retorno visual é o :active de cada botão. */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   background: var(--color-canvas);
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* Sem o atraso de duplo toque em quem é tocável. */
+a,
+button,
+input,
+select,
+textarea,
+label,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+/* O iOS dá zoom ao focar um campo com fonte menor que 16 px; em tela de toque, nenhum fica menor. */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
 }
