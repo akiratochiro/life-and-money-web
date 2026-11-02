@@ -15,6 +15,7 @@ import { TransactionListSkeleton } from "./TransactionListSkeleton";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 import { AnimatePresence, m } from "motion/react";
 import { listItem } from "../../shared/ui/motion";
+import { EmptyState } from "../../shared/ui/EmptyState";
 
 const TYPE_STYLE: Record<
   CategoryType,
@@ -101,17 +102,15 @@ export function TransactionsPage() {
       {transactions.isPending || categories.isPending ? (
         <TransactionListSkeleton />
       ) : list.length === 0 ? (
-        <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
-          <p className="text-sm text-text-soft">
-            Nenhuma transação em {monthLabel(month).toLowerCase()}.
-          </p>
-          <Link
-            to="/transactions/new"
-            className="text-sm font-bold text-link"
-          >
-            Lançar uma transação
-          </Link>
-        </div>
+        <EmptyState
+          action={
+            <Link to="/transactions/new" className="text-sm font-bold text-link">
+              Lançar uma transação
+            </Link>
+          }
+        >
+          Nenhuma transação em {monthLabel(month).toLowerCase()}.
+        </EmptyState>
       ) : (
         <div className="flex flex-col gap-5">
           {groupByDate(list).map((group) => (

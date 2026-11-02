@@ -6,6 +6,7 @@ import { ApiError } from "../../shared/api/problem";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
+import { Logo } from "../../shared/brand/Logo";
 
 export function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -47,9 +48,7 @@ export function ResetPasswordPage() {
   return (
     <main className="flex min-h-dvh items-center justify-center bg-canvas px-5 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
-          Life and Money
-        </p>
+        <Logo />
 
         {mutation.isSuccess ? (
           <>

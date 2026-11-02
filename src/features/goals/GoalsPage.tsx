@@ -6,6 +6,7 @@ import { PlusIcon } from "../../shared/ui/icons";
 import { GoalsSkeleton } from "./GoalsSkeleton";
 import { AnimatePresence, m } from "motion/react";
 import { listItem } from "../../shared/ui/motion";
+import { EmptyState } from "../../shared/ui/EmptyState";
 
 const ORDER = { OVERDUE: 0, IN_PROGRESS: 1, REACHED: 2 };
 
@@ -50,14 +51,15 @@ export function GoalsPage() {
       {goals.isPending ? (
         <GoalsSkeleton />
       ) : list.length === 0 && !creating ? (
-        <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
-          <p className="text-sm leading-snug text-text-soft">
-            Uma meta transforma um sonho num valor por mês. Diga quanto quer juntar e até quando, e o app calcula o resto.
-          </p>
-          <button type="button" onClick={() => setCreating(true)} className="text-sm font-bold text-link">
-            Criar minha primeira meta
-          </button>
-        </div>
+        <EmptyState
+          action={
+            <button type="button" onClick={() => setCreating(true)} className="text-sm font-bold text-link">
+              Criar minha primeira meta
+            </button>
+          }
+        >
+          Uma meta transforma um sonho num valor por mês. Diga quanto quer juntar e até quando, e o app calcula o resto.
+        </EmptyState>
       ) : (
         <div className="flex flex-col gap-3">
           <AnimatePresence initial={false}>

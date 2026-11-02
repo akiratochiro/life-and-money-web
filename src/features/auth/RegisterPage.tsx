@@ -7,6 +7,7 @@ import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdow
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
+import { Logo } from "../../shared/brand/Logo";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -48,9 +49,7 @@ export function RegisterPage() {
   return (
     <main className="flex min-h-dvh items-center justify-center bg-canvas px-5 py-10">
       <div className="w-full max-w-sm">
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
-          Life and Money
-        </p>
+        <Logo />
         <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">
           Vamos colocar seu dinheiro em ordem.
         </h1>

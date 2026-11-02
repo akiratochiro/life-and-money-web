@@ -22,6 +22,7 @@ import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { BillsSkeleton } from "./BillsSkeleton";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
 import { AnimatePresence } from "motion/react";
+import { EmptyState } from "../../shared/ui/EmptyState";
 
 type Editing = { mode: "create" } | { mode: "edit"; billId: number } | null;
 
@@ -103,7 +104,7 @@ export function BillsPage() {
               </p>
             )}
             {visible.length === 0 ? (
-              <EmptyState filtered={selectedDay !== null} onCreate={() => setEditing({ mode: "create" })} />
+              <BillsEmpty filtered={selectedDay !== null} onCreate={() => setEditing({ mode: "create" })} />
             ) : (
               <ul className="flex flex-col gap-3">
                 <AnimatePresence initial={false}>
@@ -159,19 +160,20 @@ function MonthTotals({ occurrences }: { occurrences: BillOccurrence[] }) {
   );
 }
 
-function EmptyState({ filtered, onCreate }: { filtered: boolean; onCreate: () => void }) {
+function BillsEmpty({ filtered, onCreate }: { filtered: boolean; onCreate: () => void }) {
   if (filtered) {
-    return <p className="rounded-card border border-dashed border-line p-5 text-sm text-text-soft">Nada vence neste dia.</p>;
+    return <EmptyState>Nada vence neste dia.</EmptyState>;
   }
   return (
-    <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
-      <p className="text-sm leading-snug text-text-soft">
-        Cadastre o aluguel, a luz ou um cliente que paga todo mês, e veja aqui o que vence e o que já foi pago.
-      </p>
-      <button type="button" onClick={onCreate} className="text-sm font-bold text-link">
-        Cadastrar minha primeira conta
-      </button>
-    </div>
+    <EmptyState
+      action={
+        <button type="button" onClick={onCreate} className="text-sm font-bold text-link">
+          Cadastrar minha primeira conta
+        </button>
+      }
+    >
+      Cadastre o aluguel, a luz ou um cliente que paga todo mês, e veja aqui o que vence e o que já foi pago.
+    </EmptyState>
   );
 }
 

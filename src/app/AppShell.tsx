@@ -2,6 +2,7 @@ import { NavLink, Outlet, useLocation } from "react-router";
 import { AnimatePresence, m } from "motion/react";
 import { pageEnter } from "../shared/ui/motion";
 import { CalendarIcon, ChartIcon, GaugeIcon, HomeIcon, ListIcon, PlusIcon, TagIcon, TargetIcon, UserIcon } from "../shared/ui/icons";
+import { Logo } from "../shared/brand/Logo";
 
 const items = [
   { to: "/", label: "Início", icon: HomeIcon },
@@ -31,9 +32,7 @@ export function AppShell() {
   return (
     <div className="min-h-dvh bg-canvas lg:flex">
       <aside className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:gap-2 lg:border-r lg:border-line lg:px-5 lg:py-8">
-        <p className="mb-6 px-3 font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
-          Life and Money
-        </p>
+        <Logo className="mb-6 px-1" />
         <nav aria-label="Navegação principal" className="flex flex-col gap-1">
           {[...items, ...desktopOnlyItems].map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} end={to === "/"} className={sideItemClass}>

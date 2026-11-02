@@ -66,6 +66,23 @@ export function AccountPage() {
       </Card>
 
       <DeleteAccountSection />
+
+      {/* A licença CC BY 4.0 dessas ilustrações pede o crédito. */}
+      <p className="px-1 text-label text-text-muted">
+        Ilustrações do porco e da moeda:{" "}
+        <a href="https://github.com/EmojiTwo/emojitwo" target="_blank" rel="noreferrer" className="font-semibold text-link underline">
+          EmojiOne
+        </a>{" "}
+        e{" "}
+        <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noreferrer" className="font-semibold text-link underline">
+          Twemoji
+        </a>
+        , sob a licença{" "}
+        <a href="https://creativecommons.org/licenses/by/4.0/deed.pt_BR" target="_blank" rel="noreferrer" className="font-semibold text-link underline">
+          CC BY 4.0
+        </a>
+        .
+      </p>
     </div>
   );
 }

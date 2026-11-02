@@ -4,6 +4,7 @@ import { Card } from "../../shared/ui/Card";
 import { Ring } from "../../shared/ui/Ring";
 import { Badge } from "../../shared/ui/Badge";
 import { Money } from "../../shared/ui/Money";
+import { EmptyState } from "../../shared/ui/EmptyState";
 
 function byPriority(a: Goal, b: Goal): number {
   if (a.status !== b.status) {
@@ -69,11 +70,14 @@ export function SectionHeader({ title, to }: { title: string; to: string }) {
 
 export function EmptyCard({ text, action, to }: { text: string; action: string; to: string }) {
   return (
-    <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-line p-5">
-      <p className="text-sm text-text-soft">{text}</p>
-      <Link to={to} className="text-sm font-bold text-link">
-        {action}
-      </Link>
-    </div>
+    <EmptyState
+      action={
+        <Link to={to} className="text-sm font-bold text-link">
+          {action}
+        </Link>
+      }
+    >
+      {text}
+    </EmptyState>
   );
 }

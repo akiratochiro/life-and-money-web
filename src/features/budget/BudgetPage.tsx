@@ -9,6 +9,7 @@ import { currentMonth, monthLabel } from "../../shared/lib/dates";
 import { toCents } from "../../shared/lib/money";
 import { BudgetSkeleton } from "./BudgetSkeleton";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
+import { EmptyState } from "../../shared/ui/EmptyState";
 
 const SEVERITY: Record<BudgetStatus, number> = {
   EXCEEDED: 0,
@@ -88,9 +89,7 @@ export function BudgetPage() {
           </section>
 
           {lines.length === 0 ? (
-            <p className="rounded-card border border-dashed border-line p-5 text-sm text-text-soft">
-              Nenhuma categoria com orçamento em {monthLabel(month).toLowerCase()}.
-            </p>
+            <EmptyState>Nenhuma categoria com orçamento em {monthLabel(month).toLowerCase()}.</EmptyState>
           ) : (
             <div className="flex flex-col gap-3">
               {lines.map((line) => (
