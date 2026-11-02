@@ -56,6 +56,8 @@ dar uma mudança de celular como pronta, confira num iPhone (Safari) e num Andro
       voltando de tela, sem trocar o mês.
 - [ ] Rolar a tela na vertical nunca troca o mês.
 - [ ] No Android, o gesto de voltar fecha a folha "Mais" antes de sair da tela.
+- [ ] O "Nova" das categorias, na nova transação, abre a folha com o teclado no nome; com o teclado
+  aberto, dá para rolar a folha até o "Criar e usar", e o voltar do Android fecha a folha.
 
 **Toque e retorno**
 - [ ] Nenhum realce cinza ao tocar em botões e links (iOS e Android).

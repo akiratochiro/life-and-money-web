@@ -462,3 +462,22 @@ testes de componente não pegariam:
 
 O que a emulação não alcança (teclado virtual, Safari, áreas seguras reais) está numa lista para
 conferir em aparelho.
+
+## 22. Criar categoria sem sair da nova transação
+
+**Contexto.** Quem está lançando um gasto e não acha a categoria tinha que abandonar o formulário,
+ir a Categorias e voltar, perdendo o valor já digitado.
+
+**Decisão.** Um chip "Nova" (com "+") no fim das categorias, só em Saiu e Entrou, abre uma folha
+com nome, cor e ícone. O tipo vem da transação, e a categoria criada já volta selecionada.
+- Poupança fica de fora: costuma ter uma categoria só, e o caminho natural ali é a meta.
+- Não é otimista, ao contrário das transações (decisão 15): o nome pode ser recusado (409), e a
+  transação precisa do id real para ser salva. Ao responder, a categoria entra no cache na ordem
+  por nome, sem esperar a nova busca, para o chip aparecer selecionado na hora.
+- A folha é a mesma `BottomSheet` do "Mais", que do md para cima vira pop-up centralizado.
+- Ela fica fora do `<form>` da transação: formulário dentro de formulário é HTML inválido e
+  enviaria os dois.
+
+**Consequências.** O mesmo formulário serve à edição de transação, então o "Nova" também aparece no
+diálogo de editar (uma folha sobre o diálogo, os dois no top layer do navegador). Fechar a folha
+descarta o rascunho.
