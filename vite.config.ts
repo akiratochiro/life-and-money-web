@@ -9,11 +9,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   // Mesmo desenho da produção: o navegador só fala com a origem do front, e /api/* é repassado
   // para a API. Sem reescrever o caminho, porque a API também responde sob /api.
-  // API_PROXY_TARGET troca o destino sem editar este arquivo, por exemplo quando a 8080 já está
+  // API_PROXY_TARGET troca o destino sem editar este arquivo, por exemplo quando a 8081 já está
   // ocupada por outra cópia da API. O preview (vite preview) usa o mesmo proxy.
   server: {
     proxy: {
-      '/api': process.env.API_PROXY_TARGET ?? 'http://localhost:8080',
+      '/api': process.env.API_PROXY_TARGET ?? 'http://localhost:8081',
     },
   },
   test: {
