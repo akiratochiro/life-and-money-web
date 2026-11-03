@@ -6,7 +6,7 @@ import { PigFace } from "./illustrations";
  */
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
+    <span className={`inline-flex items-center gap-2.5 ${className}`} onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
       <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-pig-100 shadow-clay-sm">
         <PigFace width={28} height={28} />
       </span>

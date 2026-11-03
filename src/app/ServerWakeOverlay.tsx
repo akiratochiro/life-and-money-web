@@ -16,7 +16,6 @@ export function ServerWakeOverlay({ status, onRetry }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-canvas px-5 motion-safe:animate-fade-in">
       <div role="status" aria-live="polite" className="flex w-full max-w-sm flex-col items-center text-center">
         <WakeMark spinning={waking} />
-
         <p className="mt-8 font-display text-xs font-semibold uppercase tracking-[0.25em] text-link">
           Life and Money
         </p>
