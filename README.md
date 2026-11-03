@@ -101,7 +101,7 @@ covers the same choices as questions and answers. In short:
 ## Running locally
 
 Requirements: Node 22.22+ or 24.15+ (required by jsdom, used in the tests) and the API running at
-`http://localhost:8080`.
+`http://localhost:8081`.
 
 ```bash
 git clone https://github.com/akiratochiro/life-and-money-web.git
@@ -110,7 +110,7 @@ npm install
 npm run dev
 ```
 
-The app runs at `http://localhost:5173`. The Vite proxy forwards `/api/*` to `localhost:8080`, so
+The app runs at `http://localhost:5173`. The Vite proxy forwards `/api/*` to `localhost:8081`, so
 the browser only talks to the front's origin, as in production. There is no environment variable
 to set.
 
@@ -159,7 +159,7 @@ without a trailing slash, and it is read at runtime: pointing the front at anoth
 a new `wrangler deploy`, not a new build.
 
 To try the Worker locally against the local API, create a `.dev.vars` file (ignored by git) with
-`API_ORIGIN=http://localhost:8080` and run `npm run build && npx wrangler dev`.
+`API_ORIGIN=http://localhost:8081` and run `npm run build && npx wrangler dev`.
 
 Routing is handled by [`wrangler.jsonc`](wrangler.jsonc): `not_found_handling: "single-page-application"`
 serves `index.html` for any path that is not a file, so that opening `/goals` directly, or
