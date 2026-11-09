@@ -1,0 +1,19 @@
+# Dependabot (gratuito no GitHub): abre um PR quando uma dependência tem versão nova ou falha de
+# segurança conhecida. Cada PR passa pela CI antes de entrar, como qualquer outro.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Ferramentas de build, teste e lint num PR só; as dependências do app em outro.
+      dev:
+        dependency-type: development
+      prod:
+        dependency-type: production
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
