@@ -8,6 +8,7 @@ import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { Logo } from "../../shared/brand/Logo";
+import { SpamNotice } from "./SpamNotice";
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -32,10 +33,7 @@ export function ForgotPasswordPage() {
           <div role="status" className="mt-8 flex flex-col gap-3 rounded-hero bg-surface p-6 shadow-card">
             {/* A mensagem vem da API e é a mesma exista ou não a conta. */}
             <p className="text-base leading-relaxed">{mutation.data}</p>
-            <p className="text-sm leading-relaxed text-text-soft">
-              Não chegou? Confira a caixa de spam: o e-mail sai de um remetente que seu provedor
-              pode não conhecer.
-            </p>
+            <SpamNotice />
           </div>
         ) : (
           <>

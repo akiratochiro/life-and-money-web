@@ -40,6 +40,7 @@ describe("RegisterPage", () => {
     expect(await screen.findByRole("heading", { name: "Confira seu e-mail." })).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Abra-o em até 24 horas");
     expect(screen.getByRole("status")).toHaveTextContent("ana@exemplo.dev");
+    expect(screen.getByText("Procure também na caixa de spam.")).toBeInTheDocument();
   });
 
   it("uma senha de vazamento conhecido aparece no campo da senha", async () => {

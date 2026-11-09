@@ -8,6 +8,7 @@ import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { Logo } from "../../shared/brand/Logo";
+import { SpamNotice } from "./SpamNotice";
 
 export function RegisterPage() {
   const [name, setName] = useState("");
@@ -44,9 +45,11 @@ export function RegisterPage() {
           <p role="status" className="mt-3 text-sm leading-relaxed text-text-soft">
             {mutation.data} O e-mail vai para <strong className="text-text">{email}</strong>.
           </p>
-          <p className="mt-3 text-sm leading-relaxed text-text-muted">
-            Não chegou em alguns minutos? Veja a caixa de spam. Se o endereço estava errado, é só fazer o
-            cadastro de novo.
+          <div className="mt-5">
+            <SpamNotice />
+          </div>
+          <p className="mt-4 text-sm leading-relaxed text-text-muted">
+            Se o endereço estava errado, é só fazer o cadastro de novo.
           </p>
           <Link
             to="/login"

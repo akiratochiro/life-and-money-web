@@ -25,6 +25,7 @@ describe("ForgotPasswordPage", () => {
 
     expect(mocks.requestPasswordReset).toHaveBeenCalledWith("ana@exemplo.dev");
     expect(await screen.findByRole("status")).toHaveTextContent(message);
+    expect(screen.getByRole("status")).toHaveTextContent("Procure também na caixa de spam.");
     expect(screen.queryByLabelText("E-mail")).not.toBeInTheDocument();
   });
 });
