@@ -17,15 +17,19 @@ import {
 import { Logo } from "../shared/brand/Logo";
 import { BottomSheet } from "../shared/ui/BottomSheet";
 
+/** Duas de cada lado do "+": com cinco posições iguais, ele fica no centro exato da barra. */
 const primary = [
   { to: "/", label: "Início", icon: HomeIcon },
   { to: "/transactions", label: "Extrato", icon: ListIcon },
   { to: "/budget", label: "Orçamento", icon: GaugeIcon },
-  { to: "/goals", label: "Metas", icon: TargetIcon },
 ];
 
-/** No celular, ficam no "Mais"; no desktop, na sidebar junto com as principais. */
+/**
+ * No celular, ficam no "Mais"; no desktop, na sidebar junto com as principais. Metas vem primeiro:
+ * a sidebar mantém a ordem de antes, e no "Mais" ela é a primeira opção.
+ */
 const secondary = [
+  { to: "/goals", label: "Metas", icon: TargetIcon },
   { to: "/bills", label: "Contas", icon: CalendarIcon },
   { to: "/analytics", label: "Análises", icon: ChartIcon },
   { to: "/categories", label: "Categorias", icon: TagIcon },
@@ -93,7 +97,7 @@ export function AppShell() {
       {!fullScreen && (
         <nav
           aria-label="Navegação principal"
-          className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 items-end border-t border-line bg-canvas/95 px-1 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-1.5 backdrop-blur md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 items-end border-t border-line bg-canvas/95 px-1 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-1.5 backdrop-blur md:hidden"
         >
           {primary.slice(0, 2).map((item) => (
             <TabLink key={item.to} {...item} />

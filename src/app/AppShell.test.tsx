@@ -31,12 +31,12 @@ function bottomNav() {
 }
 
 describe("AppShell no celular", () => {
-  it("a barra de baixo tem Início, Extrato, Orçamento, Metas, Mais e o + no meio", () => {
+  it("a barra de baixo tem Início e Extrato, o + no meio, e Orçamento e Mais", () => {
     open("/");
     const nav = bottomNav();
 
     const targets = [...nav.children].map((child) => child.getAttribute("aria-label") ?? child.textContent);
-    expect(targets).toEqual(["Início", "Extrato", "Nova transação", "Orçamento", "Metas", "Mais"]);
+    expect(targets).toEqual(["Início", "Extrato", "Nova transação", "Orçamento", "Mais"]);
   });
 
   it("o Mais abre uma folha com as outras telas, e escolher uma fecha a folha", async () => {
@@ -46,7 +46,7 @@ describe("AppShell no celular", () => {
     const sheet = screen.getByRole("dialog", { name: "Mais" });
     expect(sheet).toHaveAttribute("open");
     const links = within(sheet).getAllByRole("link").map((link) => link.textContent);
-    expect(links).toEqual(["Contas", "Análises", "Categorias", "Minha conta"]);
+    expect(links).toEqual(["Metas", "Contas", "Análises", "Categorias", "Minha conta"]);
 
     await userEvent.click(within(sheet).getByRole("link", { name: "Contas" }));
     expect(sheet).not.toHaveAttribute("open");
@@ -56,6 +56,22 @@ describe("AppShell no celular", () => {
     open("/bills");
 
     expect(within(bottomNav()).getByRole("button", { name: "Mais" })).toHaveClass("text-accent");
+  });
+
+  it("em Metas, que agora mora no Mais, é o Mais que fica marcado", () => {
+    open("/goals");
+
+    expect(within(bottomNav()).getByRole("button", { name: "Mais" })).toHaveClass("text-accent");
+  });
+
+  it("no desktop, a sidebar mantém a ordem de sempre, com Metas depois de Orçamento", () => {
+    open("/");
+    const sidebar = screen
+      .getAllByRole("navigation", { name: "Navegação principal" })
+      .find((nav) => !within(nav).queryByRole("button", { name: "Mais" }))!;
+
+    const links = within(sidebar).getAllByRole("link").map((link) => link.textContent);
+    expect(links).toEqual(["Início", "Extrato", "Orçamento", "Metas", "Contas", "Análises", "Categorias", "Minha conta"]);
   });
 
   it("a nova transação é tela cheia: sem a barra de baixo", () => {

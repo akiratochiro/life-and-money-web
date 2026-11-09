@@ -434,10 +434,13 @@ confete não sai, mas o aviso de meta atingida continua.
 transação sem distração, alvos de toque grandes e gestos de puxar e arrastar.
 
 **Decisão.**
-- Abaixo de `md`, uma barra na base com Início, Extrato, o "+" no meio, Orçamento, Metas e "Mais",
-  que abre uma bottom sheet (um `<dialog>` modal) com as outras telas. A partir de `md`, a sidebar.
-  São seis posições iguais, então o "+" fica meio passo à esquerda do centro exato; centralizá-lo
-  apertaria os três itens da direita abaixo de 44 px.
+- Abaixo de `md`, uma barra na base com Início, Extrato, o "+" no meio, Orçamento e "Mais", que
+  abre uma bottom sheet (um `<dialog>` modal) com as outras telas. A partir de `md`, a sidebar.
+  São cinco posições iguais, duas de cada lado, e o "+" fica no centro exato. A primeira versão
+  tinha seis, com Metas na barra, e o "+" ficava meio passo à esquerda do centro: centralizá-lo
+  com seis apertaria os itens da direita abaixo de 44 px. Metas foi para o "Mais" por ser a menos
+  usada das quatro: os aportes saem pelo "+" (uma transação ligada à meta), e o progresso já
+  aparece na Início. Com cinco colunas, cada item ganha ~78 px num celular de 390 px.
 - `viewport-fit=cover` e `env(safe-area-inset-*)` no topo, na barra, na folha, nos toasts e no botão
   Salvar.
 - A nova transação é tela cheia no celular, sem a barra, com foco no valor, `inputmode="decimal"` e o
