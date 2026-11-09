@@ -10,7 +10,7 @@ is designed mobile-first: the phone is where an expense gets recorded, right whe
 
 ## Live demo
 
-**https://life-and-money-web.akira-tochiro23.workers.dev**
+**https://life-and-money.akira-tochiro23.workers.dev**
 
 > The API runs on a free instance that sleeps after 15 minutes of inactivity.
 > The first request after that can take up to a minute while it wakes up.

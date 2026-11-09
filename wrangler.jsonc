@@ -1,5 +1,5 @@
 {
-  "name": "life-and-money-web",
+  "name": "life-and-money",
   "compatibility_date": "2026-10-23",
   // Só o proxy de /api/*. O resto do site são arquivos estáticos.
   "main": "worker/index.ts",
