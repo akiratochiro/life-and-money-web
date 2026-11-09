@@ -2,20 +2,53 @@
 
 [![CI](https://github.com/akiratochiro/life-and-money-web/actions/workflows/ci.yml/badge.svg)](https://github.com/akiratochiro/life-and-money-web/actions/workflows/ci.yml)
 
+![Life and Money on the phone: the month's balance, upcoming bills and expenses by category](public/og-image.png)
+
 Front-end for Life and Money, a personal finance app: day-to-day transactions, budgets per
-category, savings goals and month-by-month analytics.
+category, savings goals, monthly bills and month-by-month analytics.
 
 It consumes the [Life and Money API](https://github.com/akiratochiro/life-and-money-api), and it
 is designed mobile-first: the phone is where an expense gets recorded, right when it happens.
 
-## Live demo
+## Try it
 
-**https://life-and-money.akira-tochiro23.workers.dev**
+**[life-and-money.akira-tochiro23.workers.dev](https://life-and-money.akira-tochiro23.workers.dev)**,
+best opened on a phone. Create an account to try it: new users start with a default set of
+categories. It is a portfolio project, so feel free to use made-up numbers
+([privacy](https://life-and-money.akira-tochiro23.workers.dev/privacy)).
 
-> The API runs on a free instance that sleeps after 15 minutes of inactivity.
-> The first request after that can take up to a minute while it wakes up.
+> The API runs on a free instance that sleeps after 15 minutes of inactivity. The first request
+> after that can take up to a minute: the app shows a "waking up the server" screen meanwhile.
 
-Create an account to try it: new users start with a default set of categories.
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/home.png" width="240" alt="Home: the month's balance, what is due in the next 7 days, goals and budget"><br><sub>Home</sub></td>
+    <td align="center"><img src="docs/screenshots/statement.png" width="240" alt="Statement: transactions grouped by day"><br><sub>Statement</sub></td>
+    <td align="center"><img src="docs/screenshots/budget.png" width="240" alt="Budget: a limit per category, fixed or as a percentage of income"><br><sub>Budget</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/goals.png" width="240" alt="Goals: progress, deadline and how much to save each month"><br><sub>Goals</sub></td>
+    <td align="center"><img src="docs/screenshots/bills.png" width="240" alt="Bills: a monthly calendar with paid, pending and overdue bills and national holidays"><br><sub>Bills</sub></td>
+    <td align="center"><img src="docs/screenshots/analytics.png" width="240" alt="Analytics: expenses by category in a donut"><br><sub>Analytics</sub></td>
+  </tr>
+</table>
+
+<img src="docs/screenshots/desktop-home.png" alt="The same home screen on a desktop, with the sidebar" width="100%">
+
+## Highlights
+
+- **Feels like a native app on the phone**: bottom navigation with the "+" in the center,
+  full-screen new transaction with a decimal keypad, pull to refresh, swipe to change months, safe
+  areas for the notch, and an automated audit that fails on any touch target under 44 px
+- **Fast on a free stack**: optimistic updates with rollback, skeletons shaped like the real
+  components, prefetch of adjacent months, and a friendly screen while the free API wakes up
+- **Security taken seriously**: access token only in memory, refresh token in an `HttpOnly`
+  `SameSite=Strict` cookie on the same origin, a strict Content Security Policy, no third-party
+  scripts, and rate limits shown as a countdown instead of a generic error
+- **Type-safe end to end**: the API client is generated from the back-end's OpenAPI spec, so a
+  breaking API change is a compile error here
+- **Every decision written down**: [docs/decisions.md](docs/decisions.md) explains the why and the
+  trade-offs of each choice, and 200+ tests run on every push
 
 ## Screens
 
