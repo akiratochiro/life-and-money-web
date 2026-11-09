@@ -28,7 +28,10 @@ export function PrivacyPage() {
 
         <Section title="O que fica guardado">
           <ul className="list-disc space-y-1.5 pl-5">
-            <li>Seu nome e seu e-mail.</li>
+            <li>
+              Seu nome e seu e-mail. Até você confirmar o e-mail, o cadastro fica guardado por no máximo 24
+              horas e depois é apagado; a conta só existe depois da confirmação.
+            </li>
             <li>Sua senha, só como hash BCrypt: nem quem administra o banco consegue ler a senha.</li>
             <li>O que você cadastra: categorias, transações, orçamentos, metas e contas.</li>
             <li>
@@ -73,7 +76,7 @@ export function PrivacyPage() {
             <li>O site é servido pela Cloudflare.</li>
             <li>A API roda no Render, e o banco de dados fica no Neon, ambos nos Estados Unidos.</li>
             <li>
-              Os e-mails do app (como o de redefinição de senha) saem pelo Brevo, que recebe seu nome e seu e-mail
+              Os e-mails do app (confirmação do cadastro e redefinição de senha) saem pelo Brevo, que recebe seu nome e seu e-mail
               para fazer a entrega.
             </li>
             <li>

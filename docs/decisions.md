@@ -484,3 +484,25 @@ com nome, cor e ícone. O tipo vem da transação, e a categoria criada já volt
 **Consequências.** O mesmo formulário serve à edição de transação, então o "Nova" também aparece no
 diálogo de editar (uma folha sobre o diálogo, os dois no top layer do navegador). Fechar a folha
 descarta o rascunho.
+
+## 23. Cadastro termina no e-mail, e a confirmação pede um clique
+
+**Contexto.** A API passou a confirmar o e-mail antes de criar a conta (decisão 16 da API): o
+`POST /auth/register` responde sempre `202` e a conta só nasce em `POST /auth/confirm-email`. O
+front cadastrava e já entrava em seguida, o que deixa de ser possível.
+
+**Decisão.**
+- Depois de enviar o cadastro, a tela vira "Confira seu e-mail", com a mensagem da API e o endereço
+  digitado, para quem errou o e-mail perceber. Não há mais o erro "e-mail já cadastrado": a API não
+  diz mais isso a ninguém.
+- O link do e-mail abre `/confirm-email`, que lê o token para a memória e o tira da URL, como a
+  redefinição de senha. A confirmação **espera um clique** em "Confirmar meu e-mail". Depois, a
+  pessoa entra com a senha, como em qualquer login.
+- O `TextField` ganhou `hint`, uma orientação neutra ("Mínimo de 8 caracteres") que antes ia no
+  lugar do erro e deixava o campo vermelho e inválido antes de qualquer digitação. A mensagem saiu
+  de dentro do `<label>` e chega ao leitor de tela pelo `aria-describedby`.
+
+**Consequências.** O clique existe por segurança: antivírus e leitores de e-mail abrem os links para
+conferir, e uma confirmação ao carregar deixaria quem cadastrou o e-mail de outra pessoa (com a
+própria senha) ganhar a conta sem a dona do e-mail fazer nada. O custo é um passo a mais para quem
+está chegando, além de esperar o e-mail.

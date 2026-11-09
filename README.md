@@ -13,8 +13,8 @@ is designed mobile-first: the phone is where an expense gets recorded, right whe
 ## Try it
 
 **[life-and-money.akira-tochiro23.workers.dev](https://life-and-money.akira-tochiro23.workers.dev)**,
-best opened on a phone. Create an account to try it: new users start with a default set of
-categories. It is a portfolio project, so feel free to use made-up numbers
+best opened on a phone. Create an account to try it: confirm the email from the link you
+receive, and you start with a default set of categories. It is a portfolio project, so feel free to use made-up numbers
 ([privacy](https://life-and-money.akira-tochiro23.workers.dev/privacy)).
 
 > The API runs on a free instance that sleeps after 15 minutes of inactivity. The first request

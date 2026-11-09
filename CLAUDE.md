@@ -90,6 +90,12 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   transitórios (rede, timeout, 502/503/504) e leituras (GET) têm timeout de 20 s. **Escrita nunca
   ganha timeout nem retry** (duplicaria lançamentos), e o refresh só repete 502/503, porque
   reenviar um token já rotacionado revoga todas as sessões do usuário.
+- **Cadastro com confirmação de e-mail** (decisão 23): o cadastro termina em "Confira seu e-mail",
+  sem sessão. `/confirm-email` tira o token da URL e só confirma com o clique no botão, nunca ao
+  carregar (antivírus de e-mail abrem links). Orientação de campo vai em `hint` no `TextField`,
+  nunca em `error`.
+- **Privacidade** (`features/legal/PrivacyPage`, pública): descreve o que o código faz. Mudou um
+  cookie, um serviço externo ou um dado guardado, muda o texto e a data dela.
 - **Token de redefinição de senha:** a `ResetPasswordPage` lê o token da URL uma vez, para o
   estado, e o tira da URL com `navigate(..., { replace: true })`. O `index.html` tem
   `referrer no-referrer` para o app inteiro. Não carregue recursos de terceiros nessa tela.
