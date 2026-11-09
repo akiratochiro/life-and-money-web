@@ -86,7 +86,8 @@ export function RegisterPage() {
             maxLength={72}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            error={fieldErrors.password ?? "Mínimo de 8 caracteres."}
+            error={fieldErrors.password}
+            hint="Mínimo de 8 caracteres."
           />
 
           {formError && (
