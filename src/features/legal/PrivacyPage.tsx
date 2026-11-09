@@ -76,6 +76,11 @@ export function PrivacyPage() {
               Os e-mails do app (como o de redefinição de senha) saem pelo Brevo, que recebe seu nome e seu e-mail
               para fazer a entrega.
             </li>
+            <li>
+              Ao criar ou trocar a senha, o app confere se ela já apareceu em vazamentos de dados, no serviço
+              Pwned Passwords. A senha não sai do servidor: vão só os 5 primeiros caracteres de um resumo
+              (hash) dela, que não permitem descobri-la.
+            </li>
             <li>Os feriados do calendário de contas vêm da BrasilAPI, que recebe só o ano consultado.</li>
           </ul>
           <p className="mt-2">
