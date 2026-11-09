@@ -106,6 +106,9 @@ export function RegisterPage() {
             Entrar
           </Link>
         </p>
+        <Link to="/privacy" className="mx-auto mt-2 flex min-h-11 w-fit items-center text-sm font-semibold text-text-muted underline">
+          Como seus dados são tratados
+        </Link>
       </div>
     </main>
   );

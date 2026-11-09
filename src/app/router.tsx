@@ -14,12 +14,15 @@ import { GoalsPage } from "../features/goals/GoalsPage";
 import { AnalyticsPage } from "../features/analytics/AnalyticsPage";
 import { AccountPage } from "../features/account/AccountPage";
 import { BillsPage } from "../features/bills/BillsPage";
+import { PrivacyPage } from "../features/legal/PrivacyPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
+  // Pública: quem ainda vai criar a conta precisa poder ler antes.
+  { path: "/privacy", element: <PrivacyPage /> },
   {
     element: <RequireAuth />,
     children: [

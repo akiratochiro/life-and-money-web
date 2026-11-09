@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DELETE_CONFIRMATION, deleteAccount, downloadAccountExport } from "./accountApi";
 import { useMe } from "../home/homeApi";
@@ -57,6 +57,9 @@ export function AccountPage() {
             {exportData.error.message}
           </p>
         )}
+        <Link to="/privacy" className="-my-2 flex min-h-11 items-center self-start text-sm font-bold text-link">
+          Como seus dados são tratados
+        </Link>
       </Card>
 
       <Card>

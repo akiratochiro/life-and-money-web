@@ -111,6 +111,9 @@ export function LoginPage() {
             Criar conta
           </Link>
         </p>
+        <Link to="/privacy" className="mx-auto mt-2 flex min-h-11 w-fit items-center text-sm font-semibold text-text-muted underline">
+          Privacidade
+        </Link>
       </div>
     </main>
   );
