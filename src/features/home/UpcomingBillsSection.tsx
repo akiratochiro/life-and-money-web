@@ -45,7 +45,7 @@ export function UpcomingBillsSection() {
       ) : upcoming.data.length === 0 ? (
         <EmptyState
           action={
-            <Link to="/bills" className="text-sm font-bold text-link">
+            <Link to="/bills" className="-my-2 flex min-h-11 items-center text-sm font-bold text-link">
               Ver o calendário de contas
             </Link>
           }

@@ -107,7 +107,7 @@ export function TransactionsPage() {
             ) : list.length === 0 ? (
               <EmptyState
                 action={
-                  <Link to="/transactions/new" className="text-sm font-bold text-link">
+                  <Link to="/transactions/new" className="-my-2 flex min-h-11 items-center text-sm font-bold text-link">
                     Lançar uma transação
                   </Link>
                 }

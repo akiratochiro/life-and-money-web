@@ -53,7 +53,7 @@ export function GoalsPage() {
       ) : list.length === 0 && !creating ? (
         <EmptyState
           action={
-            <button type="button" onClick={() => setCreating(true)} className="text-sm font-bold text-link">
+            <button type="button" onClick={() => setCreating(true)} className="-my-2 flex min-h-11 items-center text-sm font-bold text-link">
               Criar minha primeira meta
             </button>
           }

@@ -172,7 +172,7 @@ function BillsEmpty({ filtered, onCreate }: { filtered: boolean; onCreate: () =>
   return (
     <EmptyState
       action={
-        <button type="button" onClick={onCreate} className="text-sm font-bold text-link">
+        <button type="button" onClick={onCreate} className="-my-2 flex min-h-11 items-center text-sm font-bold text-link">
           Cadastrar minha primeira conta
         </button>
       }

@@ -72,7 +72,7 @@ export function EmptyCard({ text, action, to }: { text: string; action: string; 
   return (
     <EmptyState
       action={
-        <Link to={to} className="text-sm font-bold text-link">
+        <Link to={to} className="-my-2 flex min-h-11 items-center text-sm font-bold text-link">
           {action}
         </Link>
       }
