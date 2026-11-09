@@ -106,6 +106,12 @@ async function touch(from, to, steps = 8) {
 const monthLabel = () => page.$eval('[aria-live="polite"]', (el) => el.textContent);
 
 // Login com um usuário de teste do banco local.
+// Telas públicas, antes de entrar.
+for (const [name, path] of [["cadastro", "/register"], ["privacidade", "/privacy"]]) {
+  await page.goto(`${BASE}${path}`, { waitUntil: "load" });
+  await audit(name);
+}
+
 await page.goto(`${BASE}/login`, { waitUntil: "load" });
 await audit("login");
 await page.type("input[type=email]", AUDIT_EMAIL);
