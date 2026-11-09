@@ -11,9 +11,18 @@ export async function login(credentials: Credentials): Promise<void> {
 
 export type Registration = Credentials & { name: string };
 
-export async function register(registration: Registration): Promise<void> {
-  await unwrap(api.POST("/auth/register", { body: registration }));
-  await login({ email: registration.email, password: registration.password });
+/**
+ * Pede o cadastro. Não abre sessão: a conta só existe depois que o link do e-mail é usado
+ * ({@link confirmEmail}). A API responde a mesma mensagem tenha ou não o e-mail uma conta.
+ */
+export async function register(registration: Registration): Promise<string> {
+  const response = await unwrap(api.POST("/auth/register", { body: registration }));
+  return response.message;
+}
+
+/** Usa o token do link do e-mail e cria a conta. Depois, é preciso entrar com a senha. */
+export async function confirmEmail(token: string): Promise<void> {
+  await unwrap(api.POST("/auth/confirm-email", { body: { token } }));
 }
 
 /** A API responde a mesma mensagem exista ou não uma conta com o e-mail. */

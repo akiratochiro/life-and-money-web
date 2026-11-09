@@ -4,6 +4,7 @@ import { LoginPage } from "../features/auth/LoginPage";
 import { RegisterPage } from "../features/auth/RegisterPage";
 import { ForgotPasswordPage } from "../features/auth/ForgotPasswordPage";
 import { ResetPasswordPage } from "../features/auth/ResetPasswordPage";
+import { ConfirmEmailPage } from "../features/auth/ConfirmEmailPage";
 import { RequireAuth } from "../features/auth/RequireAuth";
 import { HomePage } from "../features/home/HomePage";
 import { NewTransactionPage } from "../features/transactions/NewTransactionPage";
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
   { path: "/register", element: <RegisterPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
+  { path: "/confirm-email", element: <ConfirmEmailPage /> },
   // Pública: quem ainda vai criar a conta precisa poder ler antes.
   { path: "/privacy", element: <PrivacyPage /> },
   {

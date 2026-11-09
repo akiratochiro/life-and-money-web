@@ -187,7 +187,7 @@ export interface paths {
         put?: never;
         /**
          * Cria uma senha nova com o token do e-mail
-         * @description O token vale uma vez só. A senha segue as regras do cadastro, e todas as sessões do usuário são encerradas: depois disso é preciso entrar de novo.
+         * @description O token vale uma vez só. A senha segue as regras do cadastro, e todas as sessões do usuário são encerradas: depois disso é preciso entrar de novo. São 10 tentativas a cada 15 minutos por IP.
          */
         post: operations["resetPassword"];
         delete?: never;
@@ -206,8 +206,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Cadastra um usuário
-         * @description Não abre sessão: depois do cadastro, chame POST /auth/login.
+         * Pede um cadastro
+         * @description Responde sempre 202 com a mesma mensagem, exista ou não uma conta com o e-mail: a resposta não pode servir para descobrir quem tem cadastro. Um e-mail novo recebe um link de confirmação, que vale por 24 horas; a conta só é criada em POST /auth/confirm-email. Quem já tem conta recebe um aviso por e-mail, e a senha dele não muda. Senhas de vazamentos conhecidos são recusadas com 400.
          */
         post: operations["register"];
         delete?: never;
@@ -267,7 +267,7 @@ export interface paths {
         put?: never;
         /**
          * Abre uma sessão
-         * @description Devolve o access token no corpo e o refresh token num cookie HttpOnly.
+         * @description Devolve o access token no corpo e o refresh token num cookie HttpOnly. Também grava o cookie loginDevice: o navegador que já entrou na conta tem um limite de tentativas próprio, que senhas erradas vindas de outros lugares não esgotam.
          */
         post: operations["login"];
         delete?: never;
@@ -290,6 +290,26 @@ export interface paths {
          * @description Responde sempre 202 com a mesma mensagem, exista ou não uma conta com o e-mail: a resposta não pode servir para descobrir quem tem cadastro. Quando a conta existe, o link sai por e-mail e vale por 30 minutos.
          */
         post: operations["forgotPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/confirm-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirma o e-mail e cria a conta
+         * @description Usa o token do link enviado no cadastro. Vale uma vez só. Não abre sessão: depois, chame POST /auth/login.
+         */
+        post: operations["confirmEmail"];
         delete?: never;
         options?: never;
         head?: never;
@@ -725,13 +745,8 @@ export interface components {
             email: string;
             password: string;
         };
-        UserResponse: {
-            /** Format: int64 */
-            id: number;
-            name: string;
-            email: string;
-            /** Format: date-time */
-            createdAt: string;
+        RegistrationResponse: {
+            message: string;
         };
         TokenResponse: {
             accessToken: string;
@@ -753,6 +768,17 @@ export interface components {
         };
         ForgotPasswordResponse: {
             message: string;
+        };
+        ConfirmEmailRequest: {
+            token: string;
+        };
+        UserResponse: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            email: string;
+            /** Format: date-time */
+            createdAt: string;
         };
         UpdateCategoryRequest: {
             /** @description Opcional; ausente para manter o nome */
@@ -1387,13 +1413,13 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Created */
-            201: {
+            /** @description Accepted */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["UserResponse"];
+                    "*/*": components["schemas"]["RegistrationResponse"];
                 };
             };
         };
@@ -1447,7 +1473,9 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
-            cookie?: never;
+            cookie?: {
+                loginDevice?: string;
+            };
         };
         requestBody: {
             content: {
@@ -1486,6 +1514,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ForgotPasswordResponse"];
+                };
+            };
+        };
+    };
+    confirmEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserResponse"];
                 };
             };
         };

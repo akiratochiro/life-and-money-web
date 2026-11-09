@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import { register } from "./authApi";
 import { ApiError } from "../../shared/api/problem";
 import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdown";
@@ -10,21 +10,12 @@ import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { Logo } from "../../shared/brand/Logo";
 
 export function RegisterPage() {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const mutation = useMutation({
-    mutationFn: register,
-    // Entrar com outra conta sem ter saído não encerra a sessão anterior, então o cache dela
-    // também precisa ir embora aqui.
-    onSuccess: () => {
-      queryClient.clear();
-      navigate("/", { replace: true });
-    },
-  });
+  // O cadastro não abre sessão: a conta só existe depois do link do e-mail (ConfirmEmailPage).
+  const mutation = useMutation({ mutationFn: register });
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -40,10 +31,32 @@ export function RegisterPage() {
   let formError: string | undefined;
   if (apiError?.status === 429) {
     formError = wait > 0 ? `Muitas tentativas. Tente de novo em ${formatWait(wait)}.` : undefined;
-  } else if (apiError?.status === 409) {
-    formError = "Este e-mail já está cadastrado.";
   } else if (!hasFieldErrors) {
     formError = mutation.error?.message;
+  }
+
+  if (mutation.isSuccess) {
+    return (
+      <main className="flex min-h-dvh items-center justify-center bg-canvas px-5 py-10">
+        <div className="w-full max-w-sm">
+          <Logo />
+          <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">Confira seu e-mail.</h1>
+          <p role="status" className="mt-3 text-sm leading-relaxed text-text-soft">
+            {mutation.data} O e-mail vai para <strong className="text-text">{email}</strong>.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-text-muted">
+            Não chegou em alguns minutos? Veja a caixa de spam. Se o endereço estava errado, é só fazer o
+            cadastro de novo.
+          </p>
+          <Link
+            to="/login"
+            className="mt-8 flex h-14 items-center justify-center rounded-full bg-surface px-6 font-bold text-text shadow-clay-sm"
+          >
+            Ir para o login
+          </Link>
+        </div>
+      </main>
+    );
   }
 
   return (
