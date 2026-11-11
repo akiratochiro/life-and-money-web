@@ -55,7 +55,7 @@ beforeEach(() => {
 describe("cards do mês", () => {
   it("mostra receita, despesas, impostos, retiradas e o resultado com o sinal", async () => {
     serve(OCTOBER);
-    open(<MonthCards companyId={7} showWithdrawals />);
+    open(<MonthCards companyId={7} />);
 
     const result = await screen.findByRole("region", { name: "Resultado" });
     expect(within(result).getByText("Resultado")).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe("cards do mês", () => {
 
   it("no mês aberto, avisa a previsão, o negativo e o imposto sem valor", async () => {
     serve(NOVEMBER);
-    open(<MonthCards companyId={7} showWithdrawals={false} />);
+    open(<MonthCards companyId={7} />);
 
     const result = await screen.findByRole("region", { name: "Resultado" });
     expect(within(result).getByText("Resultado previsto")).toBeInTheDocument();
@@ -75,12 +75,11 @@ describe("cards do mês", () => {
     expect(screen.getByText("1 sem valor previsto")).toBeInTheDocument();
     expect(screen.getByText(/^R\$\s120,00 a pagar$/)).toBeInTheDocument();
     expect(screen.getByText(/O mês ainda não acabou/)).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Retiradas/ })).not.toBeInTheDocument();
   });
 
   it("trocar de mês busca o mês escolhido", async () => {
     serve(OCTOBER);
-    open(<MonthCards companyId={7} showWithdrawals />);
+    open(<MonthCards companyId={7} />);
     await screen.findByRole("region", { name: "Resultado" });
 
     await userEvent.click(screen.getByRole("button", { name: "Mês anterior" }));

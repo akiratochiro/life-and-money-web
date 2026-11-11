@@ -20,9 +20,10 @@ function MonthCard({ to, label, value, detail }: { to: string; label: string; va
 
 /**
  * Os cards do mês (decisão 28): receita, despesas, impostos da competência e retiradas, e o resultado
- * na largura toda. Cada card leva à aba dele. No mês corrente, tudo é previsão.
+ * na largura toda. Cada card leva à aba dele. No mês corrente, tudo é previsão. Retiradas aparece
+ * também no MEI (distribuição de lucros, Fase 6).
  */
-export function MonthCards({ companyId, showWithdrawals }: { companyId: number; showWithdrawals: boolean }) {
+export function MonthCards({ companyId }: { companyId: number }) {
   const [month, setMonth] = useState(currentMonth());
   const overview = useCompanyOverview(companyId, month);
   usePrefetchAdjacentMonths(month, (neighbor) => overviewQuery(companyId, neighbor));
@@ -48,10 +49,8 @@ export function MonthCards({ companyId, showWithdrawals }: { companyId: number; 
           <MonthCard to="expenses" label="Despesas" value={data!.expenses.total}
             detail={data!.expenses.pending > 0 ? `${money(data!.expenses.pending)} a pagar` : undefined} />
           <MonthCard to="taxes" label="Impostos" value={data!.taxes.total} detail={taxDetail || undefined} />
-          {showWithdrawals && (
-            <MonthCard to="withdrawals" label="Retiradas" value={data!.withdrawals.total}
-              detail={data!.withdrawals.count > 0 ? "Não entram no resultado" : undefined} />
-          )}
+          <MonthCard to="withdrawals" label="Retiradas" value={data!.withdrawals.total}
+            detail={data!.withdrawals.count > 0 ? "Não entram no resultado" : undefined} />
         </div>
         <section aria-label="Resultado"
           className={`flex flex-col gap-1 rounded-card p-5 shadow-card ${positive ? "bg-income-soft" : "bg-danger-soft"}`}>

@@ -12,8 +12,9 @@ const money = (value: number) => formatCents(toCents(value));
 const monthYear = (month: string) => `${month.slice(5, 7)}/${month.slice(0, 4)}`;
 
 /**
- * A aba Retiradas: o pró-labore planejado de cada sócio (entra na previsão do DARF e do Fator R) e
- * os pró-labores pagos no ano. A distribuição de lucros chega na Fase 6, nesta mesma aba.
+ * A aba Retiradas: o pró-labore planejado de cada sócio (entra na previsão do DARF e do Fator R) e as
+ * retiradas pagas no ano, pró-labore e distribuição de lucros, que podem ser lançadas nas finanças
+ * pessoais (Fase 6). No MEI, que não tem pró-labore, só a distribuição.
  */
 export function WithdrawalsPage() {
   const company = useCompanyContext();
@@ -26,10 +27,11 @@ export function WithdrawalsPage() {
   const partnerList = partners.data ?? [];
   const nameOf = (partnerId: number) => partnerList.find((p) => p.id === partnerId)?.name ?? "Sócio";
   const items = withdrawals.data ?? [];
+  const allowProLabore = company.currentRegime?.taxRegime !== "SIMEI";
 
   return (
     <div className="flex flex-col gap-6">
-      <section aria-labelledby="planned" className="flex flex-col gap-3">
+      {allowProLabore && <section aria-labelledby="planned" className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
           <h2 id="planned" className="font-display text-lg font-semibold">Pró-labore planejado</h2>
           <p className="text-sm text-text-muted">Entra na previsão do DARF e do Fator R enquanto o mês não é registrado como pago.</p>
@@ -40,7 +42,7 @@ export function WithdrawalsPage() {
               plan={plans.data?.find((plan) => plan.partnerId === partner.id)} readOnly={company.archived} />
           ))}
         </ul>
-      </section>
+      </section>}
 
       <section aria-labelledby="paid" className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
@@ -56,26 +58,28 @@ export function WithdrawalsPage() {
         {!company.archived && (
           <button type="button" onClick={() => setOpen("new")}
             className="h-12 self-start rounded-full bg-accent px-6 font-bold text-on-accent shadow-clay-accent transition active:scale-95">
-            Registrar pró-labore
+            Registrar retirada
           </button>
         )}
         {withdrawals.isPending ? (
           <div className="h-24 motion-safe:animate-pulse rounded-card bg-sunken" />
         ) : items.length === 0 ? (
-          <EmptyState>Nenhum pró-labore pago em {year}.</EmptyState>
+          <EmptyState>Nenhuma retirada paga em {year}.</EmptyState>
         ) : (
-          <ul aria-label={`Pró-labores de ${year}`} className="flex flex-col overflow-hidden rounded-card bg-surface shadow-card">
+          <ul aria-label={`Retiradas de ${year}`} className="flex flex-col overflow-hidden rounded-card bg-surface shadow-card">
             {items.map((item) => (
               <li key={item.id} className="border-b border-line last:border-b-0">
                 <button type="button" onClick={() => setOpen(item)}
                   className="flex min-h-14 w-full items-center gap-3 px-4 py-2 text-left transition active:bg-sunken">
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate font-semibold">
-                      Pró-labore {item.competenceMonth ? monthYear(item.competenceMonth) : ""}
+                      {item.kind === "PRO_LABORE" ? `Pró-labore ${item.competenceMonth ? monthYear(item.competenceMonth) : ""}` : "Lucros"}
                       {partnerList.length > 1 && ` · ${nameOf(item.partnerId)}`}
                     </span>
                     <span className="text-xs text-text-muted">
-                      INSS {money(item.inssAmount)} · IRRF {money(item.irrfAmount)} · líquido {money(item.netAmount)}
+                      {item.kind === "PRO_LABORE" && `INSS ${money(item.inssAmount)} · `}
+                      IRRF {money(item.irrfAmount)} · líquido {money(item.netAmount)}
+                      {item.personalTransactionId !== undefined && " · lançada nas suas finanças"}
                     </span>
                   </span>
                   <span className="font-semibold tabular-nums">{money(item.grossAmount)}</span>
@@ -88,7 +92,8 @@ export function WithdrawalsPage() {
 
       {open && (
         <WithdrawalSheet key={open === "new" ? "new" : open.id} companyId={company.id} partners={partnerList}
-          withdrawal={open === "new" ? undefined : open} readOnly={company.archived} onClose={() => setOpen(undefined)} />
+          withdrawal={open === "new" ? undefined : open} allowProLabore={allowProLabore} readOnly={company.archived}
+          onClose={() => setOpen(undefined)} />
       )}
     </div>
   );

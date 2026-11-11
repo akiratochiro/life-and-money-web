@@ -33,7 +33,9 @@ export type Change =
  *   da empresa, e a primeira nota trava a data de abertura) e o uso da cota de arquivos.
  * - imposto (pagar, desfazer, obrigações): as empresas. O pagamento cria ou apaga uma despesa de
  *   Impostos, e as despesas também moram debaixo da chave da empresa.
- * - retirada (pró-labore pago ou planejado): as empresas, porque muda o DARF e o Fator R dos impostos.
+ * - retirada (pró-labore, distribuição, planejado, lançar): as empresas (muda o DARF e o Fator R) e, desde
+ *   a Fase 6, as finanças pessoais: lançar cria uma receita (e talvez a categoria "Pró-labore"), e editar
+ *   ou excluir a retirada lançada muda ou apaga essa receita.
  */
 export const AFFECTS: Record<Change, readonly string[]> = {
   transaction: ["transactions", "dashboard", "goals", "bills"],
@@ -46,7 +48,7 @@ export const AFFECTS: Record<Change, readonly string[]> = {
   invoice: ["companies", "attachments"],
   companyExpense: ["companies", "attachments"],
   tax: ["companies"],
-  withdrawal: ["companies"],
+  withdrawal: ["companies", "transactions", "dashboard", "categories"],
 };
 
 export function invalidate(queryClient: QueryClient, change: Change): Promise<void> {

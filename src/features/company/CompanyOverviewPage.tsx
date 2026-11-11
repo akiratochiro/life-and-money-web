@@ -32,7 +32,7 @@ export function CompanyOverviewPage() {
         </p>
       )}
 
-      <MonthCards companyId={company.id} showWithdrawals={company.currentRegime.taxRegime !== "SIMEI"} />
+      <MonthCards companyId={company.id} />
       <UpcomingCard companyId={company.id} />
       <RevenueCard companyId={company.id} />
 

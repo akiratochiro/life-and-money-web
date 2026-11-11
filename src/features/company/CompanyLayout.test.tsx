@@ -146,14 +146,14 @@ describe("página da empresa", () => {
     ]);
   });
 
-  it("no MEI não há a aba Retiradas", async () => {
+  it("no MEI a aba Retiradas também aparece (distribuição de lucros)", async () => {
     const mei = { ...MEI, validTo: undefined };
     serve({ company: company({ currentRegime: mei }), regimes: [mei] });
     open();
 
     const nav = await screen.findByRole("navigation", { name: "Seções da empresa" });
     expect(within(nav).getByRole("link", { name: "Impostos" })).toBeInTheDocument();
-    expect(within(nav).queryByRole("link", { name: "Retiradas" })).not.toBeInTheDocument();
+    expect(within(nav).getByRole("link", { name: "Retiradas" })).toBeInTheDocument();
   });
 
   it("editar abre a folha com os dados atuais", async () => {

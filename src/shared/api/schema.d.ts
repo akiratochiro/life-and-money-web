@@ -47,6 +47,7 @@ export interface paths {
         /** Muda a data e o bruto; o sócio e o mês da folha não mudam */
         put: operations["updateWithdrawal"];
         post?: never;
+        /** Exclui a retirada; com deletePersonal, também o lançamento nas finanças pessoais (sem ele, o lançamento fica) */
         delete: operations["deleteWithdrawal"];
         options?: never;
         head?: never;
@@ -271,6 +272,23 @@ export interface paths {
         put?: never;
         /** Registra um pró-labore pago, com o INSS e o IRRF calculados */
         post: operations["createWithdrawal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/withdrawals/{withdrawalId}/personal-transaction": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lança o líquido da retirada do "sou eu" como receita nas finanças pessoais */
+        post: operations["launchWithdrawal"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1205,6 +1223,18 @@ export interface components {
             transactionDate: string;
             description?: string;
         };
+        TransactionOrigin: {
+            /** @enum {string} */
+            kind: "WITHDRAWAL";
+            /** @example Pró-labore 10/2026 · Estúdio Ana */
+            label: string;
+            /** Format: int64 */
+            companyId: number;
+            /** Format: int64 */
+            withdrawalId: number;
+            /** @description Falso com a empresa arquivada: a origem não pode mais ser editada nem excluída */
+            editable: boolean;
+        };
         TransactionResponse: {
             /** Format: int64 */
             id: number;
@@ -1220,6 +1250,8 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            /** @description Quando a transação veio de outra feature (uma retirada da empresa) */
+            origin?: components["schemas"]["TransactionOrigin"];
         };
         SavingsGoalRequest: {
             name: string;
@@ -1257,16 +1289,16 @@ export interface components {
             /** @enum {string} */
             kind: "PRO_LABORE" | "DISTRIBUICAO_LUCROS";
             /**
-             * @description O mês da folha do pró-labore
+             * @description O mês da folha; só no pró-labore (a distribuição de lucros não tem)
              * @example 2026-11
              */
-            competenceMonth: string;
+            competenceMonth?: string;
             /** Format: date */
             paymentDate: string;
             grossAmount: number;
-            /** @description Só nos meses que o app não calcula (antes de 2026): o INSS retido, como no holerite */
+            /** @description Só no pró-labore dos meses que o app não calcula (antes de 2026): o INSS retido, como no holerite */
             inssAmount?: number;
-            /** @description Só nos meses que o app não calcula: o IRRF retido, como no holerite */
+            /** @description No pró-labore dos meses que o app não calcula, o IRRF do holerite; na distribuição de lucros, o IRRF retido, se houve (opcional) */
             irrfAmount?: number;
         };
         WithdrawalResponse: {
@@ -1287,6 +1319,11 @@ export interface components {
             /** @description Falso quando o INSS e o IRRF foram informados (mês que o app não calcula) */
             calculated: boolean;
             warnings: string[];
+            /**
+             * Format: int64
+             * @description A transação de receita nas finanças pessoais, quando lançada
+             */
+            personalTransactionId?: number;
         };
         RecurringExpenseRequest: {
             name: string;
@@ -1538,6 +1575,13 @@ export interface components {
              * @enum {string}
              */
             meiActivity?: "SERVICOS" | "COMERCIO_INDUSTRIA" | "AMBOS";
+        };
+        LaunchRequest: {
+            /**
+             * Format: int64
+             * @description Uma categoria de receita; sem ela, "Pró-labore" ou "Lucros distribuídos" (criada se não existir)
+             */
+            categoryId?: number;
         };
         PayTaxRequest: {
             /** @description O valor pago; ausente nas declarações, que só são marcadas como entregues */
@@ -2091,7 +2135,7 @@ export interface components {
         };
         Parameter: {
             /** @enum {string} */
-            key: "MINIMUM_WAGE" | "INSS_CEILING" | "INSS_PRO_LABORE_RATE" | "IRRF_SIMPLIFIED_DISCOUNT" | "IRRF_DEPENDENT_DEDUCTION" | "IRRF_REDUCTION_FULL_LIMIT" | "IRRF_REDUCTION_FULL_MAX" | "IRRF_REDUCTION_PARTIAL_LIMIT" | "IRRF_REDUCTION_A" | "IRRF_REDUCTION_B" | "FATOR_R_THRESHOLD" | "DAS_MEI_INSS_RATE" | "DAS_MEI_ICMS" | "DAS_MEI_ISS" | "MEI_ANNUAL_LIMIT" | "MEI_MONTHLY_LIMIT" | "MEI_TOLERANCE" | "SIMPLES_EPP_THRESHOLD" | "SIMPLES_SUBLIMIT" | "SIMPLES_CEILING" | "SIMPLES_TOLERANCE" | "SIMPLES_ISS_CAP" | "DIVIDENDS_MONTHLY_EXEMPTION" | "DIVIDENDS_IRRF_RATE";
+            key: "MINIMUM_WAGE" | "INSS_CEILING" | "INSS_PRO_LABORE_RATE" | "IRRF_SIMPLIFIED_DISCOUNT" | "IRRF_DEPENDENT_DEDUCTION" | "IRRF_REDUCTION_FULL_LIMIT" | "IRRF_REDUCTION_FULL_MAX" | "IRRF_REDUCTION_PARTIAL_LIMIT" | "IRRF_REDUCTION_A" | "IRRF_REDUCTION_B" | "FATOR_R_THRESHOLD" | "DAS_MEI_INSS_RATE" | "DAS_MEI_ICMS" | "DAS_MEI_ISS" | "MEI_ANNUAL_LIMIT" | "MEI_MONTHLY_LIMIT" | "MEI_TOLERANCE" | "SIMPLES_EPP_THRESHOLD" | "SIMPLES_SUBLIMIT" | "SIMPLES_CEILING" | "SIMPLES_TOLERANCE" | "SIMPLES_ISS_CAP" | "DIVIDENDS_MONTHLY_EXEMPTION" | "DIVIDENDS_IRRF_RATE" | "PRESUMED_PROFIT_SERVICES" | "PRESUMED_PROFIT_TRADE";
             value: number;
             /** Format: date */
             validFrom: string;
@@ -2508,7 +2552,9 @@ export interface operations {
     };
     deleteWithdrawal: {
         parameters: {
-            query?: never;
+            query?: {
+                deletePersonal?: boolean;
+            };
             header?: never;
             path: {
                 companyId: number;
@@ -3101,6 +3147,33 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["WithdrawalRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WithdrawalResponse"];
+                };
+            };
+        };
+    };
+    launchWithdrawal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                withdrawalId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["LaunchRequest"];
             };
         };
         responses: {

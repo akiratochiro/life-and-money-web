@@ -39,10 +39,25 @@ export function useUpdateWithdrawal(companyId: number) {
   );
 }
 
+/** Com deletePersonal, o lançamento nas finanças pessoais vai junto; sem, ele fica, só perde a ligação. */
 export function useDeleteWithdrawal(companyId: number) {
-  return useWithdrawalMutation((withdrawalId: number) =>
+  return useWithdrawalMutation(({ withdrawalId, deletePersonal }: { withdrawalId: number; deletePersonal: boolean }) =>
     expectNoContent(
-      api.DELETE("/companies/{companyId}/withdrawals/{withdrawalId}", { params: { path: { companyId, withdrawalId } } }),
+      api.DELETE("/companies/{companyId}/withdrawals/{withdrawalId}", {
+        params: { path: { companyId, withdrawalId }, query: { deletePersonal } },
+      }),
+    ),
+  );
+}
+
+/** Lança o líquido como receita nas finanças pessoais; sem categoria, a padrão ("Pró-labore" ou "Lucros distribuídos"). */
+export function useLaunchWithdrawal(companyId: number) {
+  return useWithdrawalMutation(({ withdrawalId, categoryId }: { withdrawalId: number; categoryId?: number }) =>
+    unwrap(
+      api.POST("/companies/{companyId}/withdrawals/{withdrawalId}/personal-transaction", {
+        params: { path: { companyId, withdrawalId } },
+        body: categoryId === undefined ? undefined : { categoryId },
+      }),
     ),
   );
 }

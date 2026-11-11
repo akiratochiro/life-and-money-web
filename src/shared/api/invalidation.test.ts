@@ -79,8 +79,10 @@ describe("o que cada mudança recarrega", () => {
     expect(await staleAfter("tax")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
   });
 
-  it("uma retirada: as empresas (o DARF e o Fator R mudam junto)", async () => {
-    expect(await staleAfter("withdrawal")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
+  it("uma retirada: as empresas (DARF e Fator R) e as finanças pessoais (o lançamento e a categoria dele)", async () => {
+    expect(await staleAfter("withdrawal")).toEqual([
+      "transactions", "expensesByCategory", "monthlyTotals", "budget", "categories", "companies", "company", "companyRegimes", "invoices",
+    ]);
   });
 
   it("nenhuma mudança das finanças pessoais recarrega as empresas", async () => {
