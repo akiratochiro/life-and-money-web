@@ -14,7 +14,10 @@ import { ApiError } from "../../shared/api/problem";
  * As abas aparecem quando a fase de cada uma fica pronta (decisão 24): aba que não faz nada é
  * ruído. Com uma aba só, a barra nem aparece.
  */
-const TABS = [{ to: "", label: "Visão geral" }];
+const TABS = [
+  { to: "", label: "Visão geral" },
+  { to: "invoices", label: "Notas fiscais" },
+];
 
 export function CompanyLayout() {
   const companyId = Number(useParams().companyId);
@@ -62,7 +65,7 @@ export function CompanyLayout() {
             <NavLink
               key={tab.to}
               to={tab.to}
-              end
+              end={tab.to === ""}
               className={({ isActive }) =>
                 `flex h-11 shrink-0 items-center rounded-full px-4 text-sm font-bold ${
                   isActive ? "bg-surface text-text shadow-clay-sm" : "text-text-muted"

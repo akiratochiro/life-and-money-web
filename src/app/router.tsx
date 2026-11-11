@@ -18,6 +18,7 @@ import { BillsPage } from "../features/bills/BillsPage";
 import { PrivacyPage } from "../features/legal/PrivacyPage";
 import { CompanyLayout } from "../features/company/CompanyLayout";
 import { CompanyOverviewPage } from "../features/company/CompanyOverviewPage";
+import { InvoicesPage } from "../features/invoices/InvoicesPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -45,7 +46,10 @@ export const router = createBrowserRouter([
           {
             path: "/companies/:companyId",
             element: <CompanyLayout />,
-            children: [{ index: true, element: <CompanyOverviewPage /> }],
+            children: [
+              { index: true, element: <CompanyOverviewPage /> },
+              { path: "invoices", element: <InvoicesPage /> },
+            ],
           },
         ],
       },
