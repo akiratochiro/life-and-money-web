@@ -62,6 +62,8 @@ describe("notas por mês", () => {
   });
 
   it("o uso da cota fica legível", () => {
+    expect(formatBytes(0)).toBe("0 KB");
+    expect(formatBytes(60)).toBe("menos de 1 KB");
     expect(formatBytes(850 * 1024)).toBe("850 KB");
     expect(formatBytes(12.4 * 1024 * 1024)).toBe("12,4 MB");
   });

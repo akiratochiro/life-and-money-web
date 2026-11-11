@@ -110,6 +110,9 @@ export function groupByMonth(invoices: Invoice[]): InvoiceMonth[] {
 
 /** "12,4 MB" ou "830 KB": o uso da cota, legível. */
 export function formatBytes(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.max(0, Math.round(bytes / 1024))} KB`;
+  if (bytes <= 0) return "0 KB";
+  // Um XML pequeno arredondaria para "0 KB", que parece que nada foi guardado.
+  if (bytes < 1024) return "menos de 1 KB";
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / (1024 * 1024)).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} MB`;
 }
