@@ -16,6 +16,8 @@ import { AnalyticsPage } from "../features/analytics/AnalyticsPage";
 import { AccountPage } from "../features/account/AccountPage";
 import { BillsPage } from "../features/bills/BillsPage";
 import { PrivacyPage } from "../features/legal/PrivacyPage";
+import { CompanyLayout } from "../features/company/CompanyLayout";
+import { CompanyOverviewPage } from "../features/company/CompanyOverviewPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -40,6 +42,11 @@ export const router = createBrowserRouter([
           { path: "/bills", element: <BillsPage /> },
           { path: "/analytics", element: <AnalyticsPage /> },
           { path: "/account", element: <AccountPage /> },
+          {
+            path: "/companies/:companyId",
+            element: <CompanyLayout />,
+            children: [{ index: true, element: <CompanyOverviewPage /> }],
+          },
         ],
       },
     ],
