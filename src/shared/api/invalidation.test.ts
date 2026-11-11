@@ -16,6 +16,8 @@ const QUERIES = {
   companies: ["companies", "list", { includeArchived: false }],
   company: ["companies", 7],
   companyRegimes: ["companies", 7, "regimes"],
+  invoices: ["companies", 7, "invoices", 2026],
+  attachmentUsage: ["attachments", "usage"],
   me: ["me"],
 } as const;
 
@@ -62,17 +64,22 @@ describe("o que cada mudança recarrega", () => {
   });
 
   it("uma empresa: só as empresas (a lista do menu, a empresa e o histórico)", async () => {
-    expect(await staleAfter("company")).toEqual(["companies", "company", "companyRegimes"]);
+    expect(await staleAfter("company")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
+  });
+
+  it("uma nota: as empresas (notas e data de abertura) e o uso da cota", async () => {
+    expect(await staleAfter("invoice")).toEqual(["companies", "company", "companyRegimes", "invoices", "attachmentUsage"]);
   });
 
   it("nenhuma mudança das finanças pessoais recarrega as empresas", async () => {
     for (const change of ["transaction", "goal", "category", "budget", "bill", "billPayment"] as const) {
       expect(await staleAfter(change)).not.toContain("companies");
+      expect(await staleAfter(change)).not.toContain("invoices");
     }
   });
 
   it("feriados e perfil nunca são recarregados por uma mutação", async () => {
-    for (const change of ["transaction", "goal", "category", "budget", "bill", "billPayment", "company"] as const) {
+    for (const change of ["transaction", "goal", "category", "budget", "bill", "billPayment", "company", "invoice"] as const) {
       const stale = await staleAfter(change);
       expect(stale).not.toContain("holidays");
       expect(stale).not.toContain("me");

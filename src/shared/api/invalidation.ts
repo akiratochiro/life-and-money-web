@@ -8,7 +8,8 @@ export type Change =
   | "budget"
   | "bill"
   | "billPayment"
-  | "company";
+  | "company"
+  | "invoice";
 
 /**
  * Quais famílias de queries cada mudança deixa desatualizadas. É o contrato que o compilador não
@@ -25,6 +26,8 @@ export type Change =
  *   As metas ficam de fora porque contas não aceitam categoria de poupança.
  * - empresa (dados, enquadramento, sócios, arquivar): só as empresas. Nada das finanças pessoais
  *   depende dela por enquanto; a ponte com as transações chega com as retiradas.
+ * - nota fiscal (salvar, corrigir, cancelar, excluir): as empresas (as notas moram debaixo da chave
+ *   da empresa, e a primeira nota trava a data de abertura) e o uso da cota de arquivos.
  */
 export const AFFECTS: Record<Change, readonly string[]> = {
   transaction: ["transactions", "dashboard", "goals", "bills"],
@@ -34,6 +37,7 @@ export const AFFECTS: Record<Change, readonly string[]> = {
   bill: ["bills"],
   billPayment: ["bills", "transactions", "dashboard"],
   company: ["companies"],
+  invoice: ["companies", "attachments"],
 };
 
 export function invalidate(queryClient: QueryClient, change: Change): Promise<void> {

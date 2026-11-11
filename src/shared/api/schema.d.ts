@@ -36,6 +36,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/invoices/{invoiceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getInvoice"];
+        /** Corrige os campos de uma nota do PDF ou manual */
+        put: operations["correctInvoice"];
+        post?: never;
+        /** Apaga a nota e o arquivo dela */
+        delete: operations["deleteInvoice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/budgets/{categoryId}": {
         parameters: {
             query?: never;
@@ -183,6 +201,74 @@ export interface paths {
         put?: never;
         /** Adiciona um sócio (o MEI não tem sócios) */
         post: operations["addPartner"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** As notas do ano, pela competência, da mais recente para a mais antiga */
+        get: operations["listInvoices"];
+        put?: never;
+        /** Salva uma nota: do XML, com os valores do arquivo; do PDF ou manual, com os campos confirmados em data */
+        post: operations["createInvoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/invoices/{invoiceId}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reactivateInvoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/invoices/{invoiceId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marca a nota como cancelada: ela deixa de contar como receita */
+        post: operations["cancelInvoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/invoices/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lê até 10 arquivos (XML ou PDF) e diz o que encontrou em cada um; não grava nada */
+        post: operations["previewInvoices"];
         delete?: never;
         options?: never;
         head?: never;
@@ -579,6 +665,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/invoices/{invoiceId}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Baixa o XML ou PDF original da nota */
+        get: operations["downloadInvoiceFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/invoices/years": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Os anos que têm nota, do mais recente ao mais antigo */
+        get: operations["listInvoiceYears"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cnpj/{cnpj}": {
         parameters: {
             query?: never;
@@ -644,6 +764,23 @@ export interface paths {
          * @description Calculadas a partir das contas, com o status de cada uma
          */
         get: operations["billOccurrences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/attachments/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Quanto da cota de 50 MB de arquivos o usuário já usou */
+        get: operations["attachmentUsage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -731,6 +868,60 @@ export interface components {
             monthlyNeeded?: number;
             /** @enum {string} */
             status: "IN_PROGRESS" | "REACHED" | "OVERDUE";
+        };
+        InvoiceData: {
+            number: string;
+            /** @description Os 50 dígitos da chave de acesso, sem espaços */
+            accessKey?: string;
+            /** Format: date */
+            issueDate: string;
+            /**
+             * Format: date
+             * @description É por ela que a receita conta
+             */
+            competenceDate: string;
+            serviceAmount: number;
+            /** @description Desconto incondicional: não é receita */
+            unconditionalDiscountAmount?: number;
+            netAmount: number;
+            issWithheldAmount?: number;
+            irrfWithheldAmount?: number;
+            pisWithheldAmount?: number;
+            cofinsWithheldAmount?: number;
+            csllWithheldAmount?: number;
+            inssWithheldAmount?: number;
+            takerName?: string;
+            /** @description CNPJ, CPF ou NIF (estrangeiro) */
+            takerDocument?: string;
+        };
+        InvoiceResponse: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            source: "XML" | "PDF" | "MANUAL";
+            /** @enum {string} */
+            status: "ATIVA" | "CANCELADA";
+            number: string;
+            /** @description Ausente em nota sem chave (PDF ou manual) */
+            accessKey?: string;
+            /** Format: date */
+            issueDate: string;
+            /** Format: date */
+            competenceDate: string;
+            serviceAmount: number;
+            unconditionalDiscountAmount: number;
+            netAmount: number;
+            issWithheldAmount: number;
+            irrfWithheldAmount: number;
+            pisWithheldAmount: number;
+            cofinsWithheldAmount: number;
+            csllWithheldAmount: number;
+            inssWithheldAmount: number;
+            /** @description O tomador pode não ter sido informado na nota */
+            takerName?: string;
+            takerDocument?: string;
+            /** @description Chave da nota que esta substituiu */
+            replacedAccessKey?: string;
         };
         BudgetRequest: {
             /** @enum {string} */
@@ -909,6 +1100,22 @@ export interface components {
             name: string;
             /** @description O sócio que é o próprio usuário */
             me: boolean;
+        };
+        InvoicePreview: {
+            filename: string;
+            /**
+             * @description Ausente quando o arquivo nem é XML nem PDF
+             * @enum {string}
+             */
+            fileType?: "XML" | "PDF" | "JPEG" | "PNG";
+            /** @enum {string} */
+            status: "READY" | "NEEDS_INPUT" | "DUPLICATE" | "REJECTED";
+            /** @description O que fazer com este arquivo, quando há algo a dizer */
+            message?: string;
+            /** @description Avisos que não impedem salvar */
+            warnings: string[];
+            /** @description O que foi reconhecido; pode vir incompleto num PDF */
+            fields?: components["schemas"]["InvoiceData"];
         };
         CreateCategoryRequest: {
             name: string;
@@ -1103,6 +1310,8 @@ export interface components {
             bills: components["schemas"]["BillExport"][];
             /** @description Empresas, arquivadas inclusive, com o histórico de enquadramento e os sócios */
             companies: components["schemas"]["CompanyExport"][];
+            /** @description Os dados das notas fiscais; os arquivos originais são baixados na tela */
+            invoices: components["schemas"]["InvoiceExport"][];
         };
         BillExport: {
             /** Format: int64 */
@@ -1133,6 +1342,11 @@ export interface components {
             archived: boolean;
             regimes: components["schemas"]["CompanyRegimeResponse"][];
             partners: components["schemas"]["PartnerResponse"][];
+        };
+        InvoiceExport: {
+            /** Format: int64 */
+            companyId: number;
+            invoice: components["schemas"]["InvoiceResponse"];
         };
         Payment: {
             /** @example 2026-11 */
@@ -1254,6 +1468,12 @@ export interface components {
              */
             legalNature?: "MEI" | "EI" | "SLU" | "LTDA" | "SOCIEDADE_SIMPLES";
         };
+        AttachmentUsage: {
+            /** Format: int64 */
+            usedBytes: number;
+            /** Format: int64 */
+            limitBytes: number;
+        };
         DeleteAccountRequest: {
             password: string;
         };
@@ -1363,6 +1583,77 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["GoalDeletionResponse"];
                 };
+            };
+        };
+    };
+    getInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InvoiceResponse"];
+                };
+            };
+        };
+    };
+    correctInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvoiceData"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InvoiceResponse"];
+                };
+            };
+        };
+    };
+    deleteInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1730,6 +2021,134 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PartnerResponse"];
+                };
+            };
+        };
+    };
+    listInvoices: {
+        parameters: {
+            query: {
+                year: number;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InvoiceResponse"][];
+                };
+            };
+        };
+    };
+    createInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    data?: components["schemas"]["InvoiceData"];
+                };
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InvoiceResponse"];
+                };
+            };
+        };
+    };
+    reactivateInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InvoiceResponse"];
+                };
+            };
+        };
+    };
+    cancelInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InvoiceResponse"];
+                };
+            };
+        };
+    };
+    previewInvoices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    files: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InvoicePreview"][];
                 };
             };
         };
@@ -2352,6 +2771,51 @@ export interface operations {
             };
         };
     };
+    downloadInvoiceFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    listInvoiceYears: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": number[];
+                };
+            };
+        };
+    };
     lookupCnpj: {
         parameters: {
             query?: never;
@@ -2434,6 +2898,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["BillOccurrenceResponse"][];
+                };
+            };
+        };
+    };
+    attachmentUsage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AttachmentUsage"];
                 };
             };
         };
