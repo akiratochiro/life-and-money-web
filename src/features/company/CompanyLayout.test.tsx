@@ -52,6 +52,7 @@ function serve(data: { company?: unknown; regimes?: unknown[]; companyStatus?: n
     }
     if (path === "/companies/{id}/regimes") return ok(data.regimes ?? [MEI, SIMPLES]);
     if (path === "/companies/{companyId}/partners") return ok([{ id: 3, name: "Ana Souza", me: true }]);
+    if (path === "/companies/{companyId}/revenue") return ok({ granularity: "MONTH", from: "", to: "", total: 0, points: [] });
     throw new Error(`GET inesperado: ${path}`);
   });
 }

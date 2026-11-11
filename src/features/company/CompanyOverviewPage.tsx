@@ -2,6 +2,7 @@ import { useState } from "react";
 import { usePartners, useRegimes, useUndoRegimeChange } from "./companyApi";
 import { ArchivedNotice } from "./CompanyLayout";
 import { useCompanyContext } from "./companyContext";
+import { RevenueCard } from "../invoices/RevenueCard";
 import { RegimeChangeSheet } from "./RegimeChangeSheet";
 import { MANUAL_TAXES_NOTICE, hasAutomaticTaxes, regimeLabel } from "./regimeOptions";
 import { regimePeriod } from "./regimePeriod";
@@ -12,8 +13,8 @@ import { formatDate, monthLabel } from "../../shared/lib/dates";
 import { formatCents, toCents } from "../../shared/lib/money";
 
 /**
- * Nesta fase, a visão geral mostra os dados e o histórico de enquadramento. Os cards de receita,
- * despesas e impostos entram quando as fases deles ficarem prontas.
+ * A visão geral: a receita por competência, os dados e o histórico de enquadramento. Os cards do
+ * mês (despesas, impostos, resultado) entram na Fase 5.
  */
 export function CompanyOverviewPage() {
   const company = useCompanyContext();
@@ -28,6 +29,8 @@ export function CompanyOverviewPage() {
           {MANUAL_TAXES_NOTICE}
         </p>
       )}
+
+      <RevenueCard companyId={company.id} />
 
       <Card className="flex flex-col gap-3">
         <h2 className="font-display text-base font-semibold">Dados da empresa</h2>
