@@ -36,6 +36,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/recurring-expenses/{recurringId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Novos termos a partir deste mês; os meses passados não mudam */
+        put: operations["updateRecurringExpense"];
+        post?: never;
+        /** Apaga se nunca foi paga; senão, encerra no mês anterior */
+        delete: operations["deleteRecurringExpense"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/invoices/{invoiceId}": {
         parameters: {
             query?: never;
@@ -49,6 +67,41 @@ export interface paths {
         post?: never;
         /** Apaga a nota e o arquivo dela */
         delete: operations["deleteInvoice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/expenses/{expenseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Edita a despesa; no pagamento de uma fixa, só o valor e a data */
+        put: operations["updateCompanyExpense"];
+        post?: never;
+        /** Apaga a despesa e o comprovante; o mês de uma fixa volta a pendente */
+        delete: operations["deleteCompanyExpense"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/expenses/{expenseId}/receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["downloadExpenseReceipt"];
+        /** Anexa ou troca o comprovante (PDF, JPEG ou PNG, até 2 MB) */
+        put: operations["attachExpenseReceipt"];
+        post?: never;
+        delete: operations["removeExpenseReceipt"];
         options?: never;
         head?: never;
         patch?: never;
@@ -189,6 +242,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/recurring-expenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Despesas fixas com os termos atuais */
+        get: operations["listRecurringExpenses"];
+        put?: never;
+        post: operations["createRecurringExpense"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/recurring-expenses/{recurringId}/occurrences/{month}/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Paga o mês; sem valor, o previsto; sem data, o vencimento */
+        post: operations["payRecurringExpense"];
+        /** Desfaz o pagamento: o mês volta a pendente */
+        delete: operations["unpayRecurringExpense"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/partners": {
         parameters: {
             query?: never;
@@ -269,6 +357,58 @@ export interface paths {
         put?: never;
         /** Lê até 10 arquivos (XML ou PDF) e diz o que encontrou em cada um; não grava nada */
         post: operations["previewInvoices"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/expenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** O mês inteiro: avulsas, fixas pagas e pendentes, com os totais */
+        get: operations["companyExpenseMonth"];
+        put?: never;
+        /** Despesa avulsa, já paga */
+        post: operations["createCompanyExpense"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/expense-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Categorias de despesa da empresa, em ordem alfabética */
+        get: operations["listExpenseCategories"];
+        put?: never;
+        post: operations["createExpenseCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/expense-categories/{categoryId}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Arquiva a categoria e encerra as despesas fixas dela */
+        post: operations["archiveExpenseCategory"];
         delete?: never;
         options?: never;
         head?: never;
@@ -523,6 +663,23 @@ export interface paths {
         patch: operations["renamePartner"];
         trace?: never;
     };
+    "/companies/{companyId}/expense-categories/{categoryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edita nome, cor, ícone ou se conta como folha */
+        patch: operations["updateExpenseCategory"];
+        trace?: never;
+    };
     "/categories/{id}": {
         parameters: {
             query?: never;
@@ -657,6 +814,23 @@ export interface paths {
             cookie?: never;
         };
         get: operations["budgetDashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/revenue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Receita por competência (notas ativas), por dia, semana ISO ou mês, com zero nos períodos vazios */
+        get: operations["companyRevenue"];
         put?: never;
         post?: never;
         delete?: never;
@@ -869,6 +1043,50 @@ export interface components {
             /** @enum {string} */
             status: "IN_PROGRESS" | "REACHED" | "OVERDUE";
         };
+        RecurringExpenseRequest: {
+            name: string;
+            amount: number;
+            /** Format: int64 */
+            categoryId: number;
+            /** Format: int32 */
+            dueDay: number;
+            /**
+             * @description Primeiro mês; só na criação
+             * @example 2026-11
+             */
+            startMonth?: string;
+            /**
+             * @description Último mês, opcional
+             * @example 2027-10
+             */
+            endMonth?: string;
+        };
+        RecurringExpenseResponse: {
+            /** Format: int64 */
+            id: number;
+            /** @example 2026-11 */
+            startMonth: string;
+            /** @example 2027-10 */
+            endMonth?: string;
+            name: string;
+            amount: number;
+            /** Format: int64 */
+            categoryId: number;
+            /** Format: int32 */
+            dueDay: number;
+            /** @description Todo o histórico de termos; só no export */
+            history?: components["schemas"]["Terms"][];
+        };
+        Terms: {
+            name: string;
+            amount: number;
+            /** Format: int64 */
+            categoryId: number;
+            /** Format: int32 */
+            dueDay: number;
+            validFrom: string;
+            validTo?: string;
+        };
         InvoiceData: {
             number: string;
             /** @description Os 50 dígitos da chave de acesso, sem espaços */
@@ -922,6 +1140,35 @@ export interface components {
             takerDocument?: string;
             /** @description Chave da nota que esta substituiu */
             replacedAccessKey?: string;
+        };
+        OneOffExpenseRequest: {
+            name: string;
+            amount: number;
+            /** Format: int64 */
+            categoryId: number;
+            /**
+             * Format: date
+             * @description O dia em que foi paga; não pode estar no futuro
+             */
+            date: string;
+        };
+        ExpenseResponse: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            amount: number;
+            /** Format: int64 */
+            categoryId: number;
+            /** Format: date */
+            date: string;
+            hasReceipt: boolean;
+            /**
+             * Format: int64
+             * @description Presente quando é o pagamento de uma despesa fixa
+             */
+            recurringExpenseId?: number;
+            /** @example 2026-10 */
+            occurrenceMonth?: string;
         };
         BudgetRequest: {
             /** @enum {string} */
@@ -1091,6 +1338,15 @@ export interface components {
              */
             meiActivity?: "SERVICOS" | "COMERCIO_INDUSTRIA" | "AMBOS";
         };
+        PayRecurringExpenseRequest: {
+            /** @description O valor pago; sem ele, o previsto */
+            amount?: number;
+            /**
+             * Format: date
+             * @description O dia do pagamento; não pode estar no futuro
+             */
+            date?: string;
+        };
         PartnerRequest: {
             name: string;
         };
@@ -1116,6 +1372,35 @@ export interface components {
             warnings: string[];
             /** @description O que foi reconhecido; pode vir incompleto num PDF */
             fields?: components["schemas"]["InvoiceData"];
+        };
+        ExpenseCategoryRequest: {
+            name: string;
+            /**
+             * @description Sem ela, CORAL
+             * @enum {string}
+             */
+            color?: "ROSE" | "PINK" | "PEACH" | "CORAL" | "AMBER" | "LIME" | "MINT" | "TEAL" | "SKY" | "LAVENDER" | "PLUM" | "SAND";
+            /**
+             * @description Sem ele, OTHER
+             * @enum {string}
+             */
+            icon?: "HOME" | "CART" | "FOOD" | "TRANSPORT" | "CAR" | "HEALTH" | "EDUCATION" | "LEISURE" | "TRAVEL" | "PET" | "CLOTHES" | "BILLS" | "PHONE" | "GIFT" | "SALARY" | "INVESTMENT" | "PIGGY_BANK" | "COIN" | "HEART" | "OTHER";
+            /** @description Entra na folha de salários do Fator R; sem ele, não */
+            countsAsPayroll?: boolean;
+        };
+        ExpenseCategoryResponse: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            /** @enum {string} */
+            color: "ROSE" | "PINK" | "PEACH" | "CORAL" | "AMBER" | "LIME" | "MINT" | "TEAL" | "SKY" | "LAVENDER" | "PLUM" | "SAND";
+            /** @enum {string} */
+            icon: "HOME" | "CART" | "FOOD" | "TRANSPORT" | "CAR" | "HEALTH" | "EDUCATION" | "LEISURE" | "TRAVEL" | "PET" | "CLOTHES" | "BILLS" | "PHONE" | "GIFT" | "SALARY" | "INVESTMENT" | "PIGGY_BANK" | "COIN" | "HEART" | "OTHER";
+            /** @description Entra na folha de salários do Fator R */
+            countsAsPayroll: boolean;
+            /** @description Do sistema (Impostos): não pode ser escolhida nem alterada */
+            system: boolean;
+            archived: boolean;
         };
         CreateCategoryRequest: {
             name: string;
@@ -1282,6 +1567,14 @@ export interface components {
             /** Format: date */
             openingBalanceDate?: string;
         };
+        UpdateExpenseCategoryRequest: {
+            name?: string;
+            /** @enum {string} */
+            color?: "ROSE" | "PINK" | "PEACH" | "CORAL" | "AMBER" | "LIME" | "MINT" | "TEAL" | "SKY" | "LAVENDER" | "PLUM" | "SAND";
+            /** @enum {string} */
+            icon?: "HOME" | "CART" | "FOOD" | "TRANSPORT" | "CAR" | "HEALTH" | "EDUCATION" | "LEISURE" | "TRAVEL" | "PET" | "CLOTHES" | "BILLS" | "PHONE" | "GIFT" | "SALARY" | "INVESTMENT" | "PIGGY_BANK" | "COIN" | "HEART" | "OTHER";
+            countsAsPayroll?: boolean;
+        };
         UpdateCategoryRequest: {
             /** @description Opcional; ausente para manter o nome */
             name?: string;
@@ -1312,6 +1605,12 @@ export interface components {
             companies: components["schemas"]["CompanyExport"][];
             /** @description Os dados das notas fiscais; os arquivos originais são baixados na tela */
             invoices: components["schemas"]["InvoiceExport"][];
+            /** @description Categorias de despesa das empresas, arquivadas inclusive */
+            expenseCategories: components["schemas"]["ExpenseCategoryExportRow"][];
+            /** @description Despesas fixas das empresas, com o histórico dos termos */
+            recurringExpenses: components["schemas"]["RecurringExpenseResponse"][];
+            /** @description Despesas pagas das empresas (avulsas e pagamentos de fixas) */
+            companyExpenses: components["schemas"]["ExpenseResponse"][];
         };
         BillExport: {
             /** Format: int64 */
@@ -1343,6 +1642,11 @@ export interface components {
             regimes: components["schemas"]["CompanyRegimeResponse"][];
             partners: components["schemas"]["PartnerResponse"][];
         };
+        ExpenseCategoryExportRow: {
+            /** Format: int64 */
+            companyId: number;
+            category: components["schemas"]["ExpenseCategoryResponse"];
+        };
         InvoiceExport: {
             /** Format: int64 */
             companyId: number;
@@ -1353,18 +1657,6 @@ export interface components {
             month: string;
             /** Format: int64 */
             transactionId: number;
-        };
-        Terms: {
-            name: string;
-            /** Format: int64 */
-            categoryId: number;
-            amount: number;
-            /** Format: int32 */
-            dueDay: number;
-            /** @example 2026-11 */
-            validFrom: string;
-            /** @example 2027-10 */
-            validTo?: string;
         };
         Holiday: {
             /** Format: date */
@@ -1450,6 +1742,74 @@ export interface components {
             usedPercentage?: number;
             /** @enum {string} */
             status: "OK" | "WARNING" | "EXCEEDED" | "IN_PROGRESS" | "REACHED";
+        };
+        Point: {
+            /** Format: date */
+            start: string;
+            /** Format: date */
+            end: string;
+            amount: number;
+            /** Format: int32 */
+            invoices: number;
+        };
+        RevenueResponse: {
+            /** @enum {string} */
+            granularity: "DAY" | "WEEK" | "MONTH";
+            /**
+             * Format: date
+             * @description Início do intervalo, alargado até a segunda (semana) ou o dia 1 (mês)
+             */
+            from: string;
+            /**
+             * Format: date
+             * @description Fim do intervalo, alargado até o domingo (semana) ou o último dia (mês)
+             */
+            to: string;
+            /** @description Serviço menos desconto incondicional das notas ativas */
+            total: number;
+            points: components["schemas"]["Point"][];
+        };
+        ExpenseMonthResponse: {
+            /** @example 2026-11 */
+            month: string;
+            paidTotal: number;
+            /** @description Previsto das fixas ainda não pagas */
+            pendingTotal: number;
+            items: components["schemas"]["Item"][];
+        };
+        Item: {
+            /** @enum {string} */
+            kind: "ONE_OFF" | "RECURRING";
+            /**
+             * Format: int64
+             * @description A despesa paga; ausente numa fixa pendente
+             */
+            expenseId?: number;
+            /**
+             * Format: int64
+             * @description A fixa; ausente numa avulsa
+             */
+            recurringExpenseId?: number;
+            name: string;
+            /** Format: int64 */
+            categoryId: number;
+            /** @description O valor pago, ou o previsto se ainda não foi pago */
+            amount: number;
+            /** @description O previsto da fixa no mês */
+            expectedAmount?: number;
+            /**
+             * Format: date
+             * @description A data do pagamento, ou o vencimento se ainda não foi pago
+             */
+            date: string;
+            /**
+             * Format: date
+             * @description O vencimento da fixa no mês
+             */
+            dueDate?: string;
+            /** @enum {string} */
+            status: "PAID" | "PENDING" | "OVERDUE";
+            hasReceipt: boolean;
         };
         CnpjLookupResponse: {
             /** @description Falso quando a consulta não respondeu; o cadastro segue à mão */
@@ -1586,6 +1946,54 @@ export interface operations {
             };
         };
     };
+    updateRecurringExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                recurringId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecurringExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RecurringExpenseResponse"];
+                };
+            };
+        };
+    };
+    deleteRecurringExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                recurringId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getInvoice: {
         parameters: {
             query?: never;
@@ -1643,6 +2051,128 @@ export interface operations {
             path: {
                 companyId: number;
                 invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateCompanyExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                expenseId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OneOffExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseResponse"];
+                };
+            };
+        };
+    };
+    deleteCompanyExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                expenseId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    downloadExpenseReceipt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                expenseId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    attachExpenseReceipt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                expenseId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseResponse"];
+                };
+            };
+        };
+    };
+    removeExpenseReceipt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                expenseId: number;
             };
             cookie?: never;
         };
@@ -1977,6 +2507,104 @@ export interface operations {
             };
         };
     };
+    listRecurringExpenses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RecurringExpenseResponse"][];
+                };
+            };
+        };
+    };
+    createRecurringExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecurringExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RecurringExpenseResponse"];
+                };
+            };
+        };
+    };
+    payRecurringExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                recurringId: number;
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PayRecurringExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseResponse"];
+                };
+            };
+        };
+    };
+    unpayRecurringExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                recurringId: number;
+                month: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     listPartners: {
         parameters: {
             query?: never;
@@ -2149,6 +2777,129 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["InvoicePreview"][];
+                };
+            };
+        };
+    };
+    companyExpenseMonth: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseMonthResponse"];
+                };
+            };
+        };
+    };
+    createCompanyExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OneOffExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseResponse"];
+                };
+            };
+        };
+    };
+    listExpenseCategories: {
+        parameters: {
+            query?: {
+                includeArchived?: boolean;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseCategoryResponse"][];
+                };
+            };
+        };
+    };
+    createExpenseCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpenseCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseCategoryResponse"];
+                };
+            };
+        };
+    };
+    archiveExpenseCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                categoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseCategoryResponse"];
                 };
             };
         };
@@ -2575,6 +3326,33 @@ export interface operations {
             };
         };
     };
+    updateExpenseCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                categoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateExpenseCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpenseCategoryResponse"];
+                };
+            };
+        };
+    };
     updateCategory: {
         parameters: {
             query?: never;
@@ -2767,6 +3545,32 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["BudgetDashboardResponse"];
+                };
+            };
+        };
+    };
+    companyRevenue: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                granularity: "DAY" | "WEEK" | "MONTH";
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RevenueResponse"];
                 };
             };
         };

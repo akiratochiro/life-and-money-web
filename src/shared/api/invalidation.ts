@@ -9,7 +9,8 @@ export type Change =
   | "bill"
   | "billPayment"
   | "company"
-  | "invoice";
+  | "invoice"
+  | "companyExpense";
 
 /**
  * Quais famílias de queries cada mudança deixa desatualizadas. É o contrato que o compilador não
@@ -38,6 +39,7 @@ export const AFFECTS: Record<Change, readonly string[]> = {
   billPayment: ["bills", "transactions", "dashboard"],
   company: ["companies"],
   invoice: ["companies", "attachments"],
+  companyExpense: ["companies", "attachments"],
 };
 
 export function invalidate(queryClient: QueryClient, change: Change): Promise<void> {

@@ -67,6 +67,10 @@ describe("o que cada mudança recarrega", () => {
     expect(await staleAfter("company")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
   });
 
+  it("uma despesa da empresa: as empresas (despesas e receita debaixo delas) e o uso da cota", async () => {
+    expect(await staleAfter("companyExpense")).toEqual(["companies", "company", "companyRegimes", "invoices", "attachmentUsage"]);
+  });
+
   it("uma nota: as empresas (notas e data de abertura) e o uso da cota", async () => {
     expect(await staleAfter("invoice")).toEqual(["companies", "company", "companyRegimes", "invoices", "attachmentUsage"]);
   });
@@ -79,7 +83,7 @@ describe("o que cada mudança recarrega", () => {
   });
 
   it("feriados e perfil nunca são recarregados por uma mutação", async () => {
-    for (const change of ["transaction", "goal", "category", "budget", "bill", "billPayment", "company", "invoice"] as const) {
+    for (const change of ["transaction", "goal", "category", "budget", "bill", "billPayment", "company", "invoice", "companyExpense"] as const) {
       const stale = await staleAfter(change);
       expect(stale).not.toContain("holidays");
       expect(stale).not.toContain("me");
