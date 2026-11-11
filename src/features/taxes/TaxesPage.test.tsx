@@ -42,8 +42,16 @@ const DEFIS = {
   status: "PENDING", declaration: true, note: "Declaração anual, sem valor a pagar.",
 };
 
+const OBLIGATIONS = [
+  { id: 1, kind: "DAS", name: "DAS do Simples Nacional", recurrence: "MONTHLY", dueDay: 20, dueRule: "POSTPONE", system: true, active: true },
+  { id: 2, kind: "DAS_MEI", name: "DAS-MEI", recurrence: "MONTHLY", dueDay: 20, dueRule: "POSTPONE", system: true, active: true },
+  { id: 9, kind: "CUSTOM", name: "Taxa de licença", recurrence: "YEARLY", dueDay: 15, dueMonth: 11, dueRule: "POSTPONE",
+    fixedAmount: 250, system: false, active: true, startMonth: "2026-01" },
+];
+
 function serve(items: unknown[] = [DARF, DAS]) {
   mocks.GET.mockImplementation((path: string) => {
+    if (path === "/companies/{companyId}/obligations") return ok(OBLIGATIONS);
     if (path === "/companies/{companyId}/taxes") {
       return ok({ month: "2026-10", expectedPending: 330, paidTotal: 401.5, items, notice: "Estimativa calculada pelo app: não substitui o seu contador." });
     }
@@ -53,7 +61,7 @@ function serve(items: unknown[] = [DARF, DAS]) {
 
 function open(archived = false) {
   const router = createMemoryRouter(
-    [{ path: "/c", element: <Outlet context={{ id: 7, archived }} />, children: [{ index: true, element: <TaxesPage /> }] }],
+    [{ path: "/c", element: <Outlet context={{ id: 7, archived, currentRegime: { taxRegime: "SIMPLES_NACIONAL" } }} />, children: [{ index: true, element: <TaxesPage /> }] }],
     { initialEntries: ["/c"] },
   );
   render(
@@ -142,5 +150,60 @@ describe("aba Impostos", () => {
     await userEvent.click(await screen.findByRole("button", { name: /DARF/ }));
 
     expect(screen.queryByRole("button", { name: "Marcar como pago" })).not.toBeInTheDocument();
+  });
+
+  describe("obrigações", () => {
+    async function openSheet() {
+      open();
+      await userEvent.click(await screen.findByRole("button", { name: "Obrigações" }));
+      return screen.getByRole("dialog", { name: "Obrigações" });
+    }
+
+    it("as do sistema têm cadeado, sem editar, e dizem quando não se aplicam ao regime", async () => {
+      const sheet = await openSheet();
+
+      expect(await within(sheet).findAllByLabelText("Obrigação do sistema")).toHaveLength(2);
+      expect(within(sheet).queryByRole("button", { name: "Editar DAS do Simples Nacional" })).not.toBeInTheDocument();
+      expect(within(sheet).getByText(/não se aplica ao regime atual/)).toBeInTheDocument();
+      expect(within(sheet).getByText("15 de novembro, todo ano")).toBeInTheDocument();
+    });
+
+    it("desativar manda só o active", async () => {
+      mocks.PATCH.mockReturnValue(ok({ ...OBLIGATIONS[0], active: false }));
+      const sheet = await openSheet();
+
+      await userEvent.click(await within(sheet).findByLabelText("DAS do Simples Nacional ativa"));
+
+      expect(mocks.PATCH).toHaveBeenCalledWith("/companies/{companyId}/obligations/{obligationId}", {
+        params: { path: { companyId: 7, obligationId: 1 } },
+        body: { active: false, changes: undefined },
+      });
+    });
+
+    it("cria uma anual com o mês, sem valor fixo", async () => {
+      mocks.POST.mockReturnValue(ok({ id: 10 }, 201));
+      const sheet = await openSheet();
+      await userEvent.click(await within(sheet).findByRole("button", { name: "Nova obrigação" }));
+
+      await userEvent.type(within(sheet).getByLabelText("Nome da obrigação"), "Alvará");
+      await userEvent.selectOptions(within(sheet).getByLabelText("Recorrência"), "YEARLY");
+      await userEvent.selectOptions(within(sheet).getByLabelText("Mês"), "3");
+      await userEvent.click(within(sheet).getByRole("button", { name: "Criar obrigação" }));
+
+      expect(mocks.POST.mock.calls[0][1].body).toMatchObject({
+        name: "Alvará", recurrence: "YEARLY", dueDay: 10, dueMonth: 3, dueRule: "POSTPONE", fixedAmount: undefined,
+      });
+    });
+
+    it("excluir uma personalizada com pagamento mostra a recusa da API", async () => {
+      mocks.DELETE.mockReturnValue(problem(409, "Esta obrigação tem pagamentos registrados: desative em vez de excluir."));
+      const sheet = await openSheet();
+      await userEvent.click(await within(sheet).findByRole("button", { name: "Editar Taxa de licença" }));
+
+      await userEvent.click(within(sheet).getByRole("button", { name: "Excluir obrigação" }));
+      await userEvent.click(within(sheet).getByRole("button", { name: "Excluir" }));
+
+      expect(await within(sheet).findByRole("alert")).toHaveTextContent("desative em vez de excluir");
+    });
   });
 });

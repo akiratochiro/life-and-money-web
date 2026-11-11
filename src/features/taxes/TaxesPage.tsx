@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTaxMonth, type TaxOccurrence } from "./taxesApi";
 import { TaxDetailSheet } from "./TaxDetailSheet";
+import { ObligationsSheet } from "./ObligationsSheet";
 import { competenceLabel } from "./taxFormat";
 import { useCompanyContext } from "../company/companyContext";
 import { Badge } from "../../shared/ui/Badge";
@@ -28,6 +29,7 @@ export function TaxesPage() {
   const [month, setMonth] = useState(currentMonth());
   const taxes = useTaxMonth(company.id, month);
   const [open, setOpen] = useState<{ obligationId: number; competence: string }>();
+  const [managing, setManaging] = useState(false);
   const items = taxes.data?.items ?? [];
   const keyOf = (item: { obligationId: number; competence: string }) => `${item.obligationId}-${item.competence}`;
   const opened = open && items.find((item) => keyOf(item) === keyOf(open));
@@ -51,6 +53,12 @@ export function TaxesPage() {
           <p className="text-sm text-text-muted">{taxes.data.notice}</p>
         </>
       )}
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="button" onClick={() => setManaging(true)} className="flex min-h-11 items-center text-sm font-bold text-link">
+          Obrigações
+        </button>
+      </div>
 
       {taxes.isPending ? (
         <div className="h-24 motion-safe:animate-pulse rounded-card bg-sunken" />
@@ -83,6 +91,10 @@ export function TaxesPage() {
         </ul>
       )}
 
+      {managing && (
+        <ObligationsSheet companyId={company.id} taxRegime={company.currentRegime?.taxRegime} readOnly={company.archived}
+          onClose={() => setManaging(false)} />
+      )}
       {opened && (
         <TaxDetailSheet key={keyOf(opened)} companyId={company.id} occurrence={opened} readOnly={company.archived}
           onClose={() => setOpen(undefined)} />
