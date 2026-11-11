@@ -1,61 +1,27 @@
 import { useState } from "react";
-import {
-  downloadInvoiceFile,
-  useCorrectInvoice,
-  useDeleteInvoice,
-  useSetInvoiceStatus,
-  type Invoice,
-} from "./invoicesApi";
-import { draftFrom, isDraftComplete, toData, WITHHOLDINGS } from "./invoiceDraft";
-import { InvoiceFieldsForm } from "./InvoiceFieldsForm";
+import { downloadInvoiceFile, useDeleteInvoice, useSetInvoiceStatus, type Invoice } from "./invoicesApi";
+import { WITHHOLDINGS } from "./invoiceList";
 import { formatCnpj } from "../company/cnpj";
-import { ApiError } from "../../shared/api/problem";
 import { BottomSheet } from "../../shared/ui/BottomSheet";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { formatDate } from "../../shared/lib/dates";
 import { formatCents, toCents } from "../../shared/lib/money";
 
-const SOURCE = { XML: "Lida do XML", PDF: "Lida do PDF e conferida", MANUAL: "Preenchida à mão" } as const;
 
 type Props = { companyId: number; invoice: Invoice; readOnly: boolean; onClose: () => void };
 
-/** O detalhe de uma nota: os valores, baixar o original, mudar o status, corrigir (PDF e manual) e excluir. */
+/** O detalhe de uma nota: os valores (do XML, travados), baixar o original, mudar o status e excluir. */
 export function InvoiceDetailSheet({ companyId, invoice, readOnly, onClose }: Props) {
   const status = useSetInvoiceStatus(companyId);
   const remove = useDeleteInvoice(companyId);
-  const correct = useCorrectInvoice(companyId);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(() => draftFrom(invoice));
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [downloadError, setDownloadError] = useState<string>();
 
   const cancelled = invoice.status === "CANCELADA";
-  const withheld = WITHHOLDINGS.map(({ key, label }) => ({ label, cents: draftFrom(invoice)[key] })).filter((w) => w.cents > 0);
-  const fieldErrors = correct.error instanceof ApiError ? correct.error.fieldErrors : {};
+  const withheld = WITHHOLDINGS.map(({ key, label }) => ({ label, cents: toCents(invoice[key]) })).filter((w) => w.cents > 0);
 
   return (
     <BottomSheet title={`Nota nº ${invoice.number}`} open onClose={onClose}>
-      {editing ? (
-        <div className="flex flex-col gap-4 pt-2">
-          <InvoiceFieldsForm draft={draft} onChange={setDraft} errors={fieldErrors} />
-          {correct.error && Object.keys(fieldErrors).length === 0 && (
-            <p role="alert" className="text-sm font-semibold text-danger-strong">{correct.error.message}</p>
-          )}
-          <div className="flex gap-2">
-            <button
-              type="button"
-              disabled={!isDraftComplete(draft) || correct.isPending}
-              onClick={() => correct.mutate({ invoiceId: invoice.id, data: toData(draft) }, { onSuccess: () => setEditing(false) })}
-              className="h-12 flex-1 rounded-full bg-accent font-bold text-on-accent shadow-clay-accent disabled:opacity-60"
-            >
-              <PendingLabel pending={correct.isPending} pendingText="Salvando…">Salvar correção</PendingLabel>
-            </button>
-            <button type="button" onClick={() => setEditing(false)} className="h-12 flex-1 rounded-full bg-sunken font-bold">
-              Cancelar
-            </button>
-          </div>
-        </div>
-      ) : (
         <div className="flex flex-col gap-4 pt-2">
           {cancelled && (
             <p role="note" className="rounded-2xl bg-warning-soft p-3 text-sm font-semibold text-warning-strong">
@@ -94,8 +60,6 @@ export function InvoiceDetailSheet({ companyId, invoice, readOnly, onClose }: Pr
                 <dd className="break-all font-mono text-xs">{invoice.accessKey}</dd>
               </>
             )}
-            <dt className="text-text-muted">Origem</dt>
-            <dd className="font-semibold">{SOURCE[invoice.source]}</dd>
           </dl>
 
           <div className="flex flex-col gap-1">
@@ -109,11 +73,6 @@ export function InvoiceDetailSheet({ companyId, invoice, readOnly, onClose }: Pr
             {downloadError && <p role="alert" className="text-sm font-semibold text-danger-strong">{downloadError}</p>}
             {!readOnly && (
               <>
-                {invoice.source !== "XML" && (
-                  <button type="button" onClick={() => setEditing(true)} className="flex min-h-11 items-center self-start text-sm font-bold text-link">
-                    Corrigir os campos
-                  </button>
-                )}
                 <button
                   type="button"
                   disabled={status.isPending}
@@ -153,7 +112,6 @@ export function InvoiceDetailSheet({ companyId, invoice, readOnly, onClose }: Pr
             )}
           </div>
         </div>
-      )}
     </BottomSheet>
   );
 }

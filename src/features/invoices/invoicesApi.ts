@@ -54,14 +54,13 @@ export function usePreviewInvoices(companyId: number) {
   });
 }
 
-/** Do XML, a API ignora os campos e relê o arquivo; do PDF ou à mão, valem os campos confirmados. */
+/** Só o XML: a API relê o arquivo e usa os valores dele. */
 export function useSaveInvoice(companyId: number) {
   const invalidate = useInvalidate();
   return useMutation({
-    mutationFn: ({ file, data }: { file: File; data?: InvoiceData }) => {
+    mutationFn: (file: File) => {
       const form = new FormData();
       form.append("file", file);
-      if (data) form.append("data", new Blob([JSON.stringify(data)], { type: "application/json" }));
       return unwrap(
         api.POST("/companies/{companyId}/invoices", {
           params: { path: { companyId } },
@@ -70,20 +69,6 @@ export function useSaveInvoice(companyId: number) {
         }),
       );
     },
-    onSuccess: () => invalidate("invoice"),
-  });
-}
-
-export function useCorrectInvoice(companyId: number) {
-  const invalidate = useInvalidate();
-  return useMutation({
-    mutationFn: ({ invoiceId, data }: { invoiceId: number; data: InvoiceData }) =>
-      unwrap(
-        api.PUT("/companies/{companyId}/invoices/{invoiceId}", {
-          params: { path: { companyId, invoiceId } },
-          body: data,
-        }),
-      ),
     onSuccess: () => invalidate("invoice"),
   });
 }
@@ -114,7 +99,7 @@ export function useDeleteInvoice(companyId: number) {
   });
 }
 
-/** Baixa o XML ou PDF original, com o nome que a API mandou. */
+/** Baixa o XML original, com o nome que a API mandou. */
 export async function downloadInvoiceFile(companyId: number, invoiceId: number): Promise<void> {
   const result = await api.GET("/companies/{companyId}/invoices/{invoiceId}/file", {
     params: { path: { companyId, invoiceId } },

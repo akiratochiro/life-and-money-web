@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { draftFrom, formatBytes, groupByMonth, isDraftComplete, revenueCents, toData } from "./invoiceDraft";
+import { formatBytes, groupByMonth, revenueCents } from "./invoiceList";
 import type { Invoice } from "./invoicesApi";
 
 function invoice(id: number, competenceDate: string, service: number, status: Invoice["status"] = "ATIVA", discount = 0): Invoice {
@@ -9,40 +9,6 @@ function invoice(id: number, competenceDate: string, service: number, status: In
     pisWithheldAmount: 0, cofinsWithheldAmount: 0, csllWithheldAmount: 0, inssWithheldAmount: 0,
   } as Invoice;
 }
-
-describe("rascunho de nota", () => {
-  it("o que o PDF não reconheceu começa vazio, e o que reconheceu vem preenchido", () => {
-    const draft = draftFrom({ accessKey: "3".repeat(50) });
-
-    expect(draft.accessKey).toBe("3".repeat(50));
-    expect(draft.number).toBe("");
-    expect(draft.serviceCents).toBe(0);
-    expect(isDraftComplete(draft)).toBe(false);
-  });
-
-  it("para a API, centavos viram reais, a chave perde os espaços e texto vazio some", () => {
-    const draft = {
-      ...draftFrom(),
-      number: " 77 ",
-      accessKey: "3550 3082",
-      issueDate: "2026-11-05",
-      competenceDate: "2026-11-01",
-      serviceCents: 300_000,
-      netCents: 270_050,
-      irrfCents: 4_500,
-    };
-
-    expect(isDraftComplete(draft)).toBe(true);
-    expect(toData(draft)).toMatchObject({
-      number: "77",
-      accessKey: "35503082",
-      serviceAmount: 3000,
-      netAmount: 2700.5,
-      irrfWithheldAmount: 45,
-      takerName: undefined,
-    });
-  });
-});
 
 describe("notas por mês", () => {
   it("do mês mais recente ao mais antigo, com o total só das ativas e sem o desconto", () => {

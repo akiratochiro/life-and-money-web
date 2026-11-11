@@ -566,6 +566,11 @@ uma vez, no fim do mês, e às vezes pelo celular.
 arquivo e por que algum foi recusado. O custo é um passo a mais e o arquivo viajar duas vezes (até
 2 MB cada), em troca de nenhum arquivo órfão de uma pré-visualização abandonada.
 
+*Atualização (11/11/2026):* as notas entram **só pelo XML**, por enquanto (atualização da decisão 20
+da API). O seletor aceita `.xml`, mas o `accept` é só uma dica: um PDF arrastado chega do mesmo jeito,
+e a pré-visualização o mostra recusado, com a orientação de baixar o XML. Saíram o formulário de
+campos, o `MoneyField` nesse uso e o "corrigir" do detalhe; os valores são sempre os do XML.
+
 ## 26. Receita na visão geral com barras só de desenho, e despesas da empresa numa aba
 
 **Contexto.** A Fase 3 trouxe a receita por competência (decisão 22 da API) e as despesas da empresa

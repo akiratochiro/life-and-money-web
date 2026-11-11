@@ -19,7 +19,6 @@ beforeAll(() => {
 });
 
 const ok = (data: unknown, status = 200) => Promise.resolve({ data, response: new Response(null, { status }) });
-const KEY = "3".repeat(50);
 const YEAR = new Date().getFullYear();
 
 function invoice(overrides: Record<string, unknown>) {
@@ -56,68 +55,58 @@ function open(company = COMPANY) {
 
 const xmlFile = () => new File(["<NFSe/>"], "nota.xml", { type: "application/xml" });
 const pdfFile = () => new File(["%PDF-"], "nota.pdf", { type: "application/pdf" });
-const badFile = () => new File(["MZ"], "virus.pdf", { type: "application/pdf" });
 
 beforeEach(() => {
   Object.values(mocks).forEach((mock) => mock.mockReset());
 });
 
 describe("envio de notas", () => {
-  it("mostra a pré-visualização de cada arquivo: XML travado, PDF para conferir e recusado com o motivo", async () => {
+  it("mostra a pré-visualização de cada arquivo: XML pronto e travado, PDF recusado com a orientação", async () => {
     serve();
     mocks.POST.mockReturnValue(ok([
       { filename: "nota.xml", fileType: "XML", status: "READY", warnings: [], fields: invoice({}) },
-      { filename: "nota.pdf", fileType: "PDF", status: "NEEDS_INPUT", message: "Confira os campos lidos do PDF.", warnings: [], fields: { accessKey: KEY } },
-      { filename: "virus.pdf", status: "REJECTED", message: "O arquivo \"virus.pdf\" não é um XML ou PDF.", warnings: [] },
+      { filename: "nota.pdf", fileType: "PDF", status: "REJECTED", warnings: [],
+        message: "Por enquanto, as notas entram só pelo XML. Baixe o XML da nota no portal da NFS-e." },
     ]));
     open();
 
-    await userEvent.upload(await screen.findByLabelText("Arquivos das notas"), [xmlFile(), pdfFile(), badFile()]);
+    // O accept do seletor é só uma dica: um PDF arrastado chega do mesmo jeito, e a API o recusa.
+    await userEvent.setup({ applyAccept: false })
+      .upload(await screen.findByLabelText("Arquivos XML das notas"), [xmlFile(), pdfFile()]);
 
     const xml = await screen.findByRole("article", { name: "nota.xml" });
     expect(within(xml).getByText("Pronta")).toBeInTheDocument();
-    expect(within(xml).getByText(/Lido do XML/)).toBeInTheDocument();
-    expect(within(xml).queryByLabelText("Valor do serviço")).not.toBeInTheDocument();
+    expect(within(xml).getByText("Os valores vêm do XML assinado e não podem ser alterados.")).toBeInTheDocument();
 
     const pdf = screen.getByRole("article", { name: "nota.pdf" });
-    expect(within(pdf).getByLabelText("Chave de acesso")).toHaveValue(KEY);
-    expect(within(pdf).getByRole("button", { name: "Salvar nota" })).toBeDisabled();
-
-    const bad = screen.getByRole("article", { name: "virus.pdf" });
-    expect(within(bad).getByText("O arquivo \"virus.pdf\" não é um XML ou PDF.")).toBeInTheDocument();
-    expect(within(bad).queryByRole("button", { name: "Salvar nota" })).not.toBeInTheDocument();
+    expect(within(pdf).getByText(/as notas entram só pelo XML/)).toBeInTheDocument();
+    expect(within(pdf).queryByRole("button", { name: "Salvar nota" })).not.toBeInTheDocument();
   });
 
-  it("salvar uma nota do XML manda só o arquivo; a do PDF manda também os campos conferidos", async () => {
+  it("o seletor de arquivos aceita só XML", async () => {
+    serve();
+    open();
+
+    expect(await screen.findByLabelText("Arquivos XML das notas")).toHaveAttribute("accept", ".xml,application/xml,text/xml");
+  });
+
+  it("salvar manda só o arquivo, e o card mostra o número da nota salva", async () => {
     serve();
     mocks.POST.mockImplementation((path: string) =>
       path === "/companies/{companyId}/invoices/parse"
-        ? ok([
-            { filename: "nota.xml", fileType: "XML", status: "READY", warnings: [], fields: invoice({}) },
-            { filename: "nota.pdf", fileType: "PDF", status: "NEEDS_INPUT", warnings: [], fields: { accessKey: KEY } },
-          ])
+        ? ok([{ filename: "nota.xml", fileType: "XML", status: "READY", warnings: [], fields: invoice({}) }])
         : ok(invoice({ number: "99" }), 201),
     );
     open();
-    await userEvent.upload(await screen.findByLabelText("Arquivos das notas"), [xmlFile(), pdfFile()]);
+    await userEvent.upload(await screen.findByLabelText("Arquivos XML das notas"), [xmlFile()]);
 
     const xml = await screen.findByRole("article", { name: "nota.xml" });
     await userEvent.click(within(xml).getByRole("button", { name: "Salvar nota" }));
-    const xmlForm = mocks.POST.mock.calls[1][1].bodySerializer() as FormData;
-    expect((xmlForm.get("file") as File).name).toBe("nota.xml");
-    expect(xmlForm.get("data")).toBeNull();
+
+    const form = mocks.POST.mock.calls[1][1].bodySerializer() as FormData;
+    expect((form.get("file") as File).name).toBe("nota.xml");
+    expect([...form.keys()]).toEqual(["file"]);
     expect(await within(xml).findByText("Nota nº 99 salva.")).toBeInTheDocument();
-
-    const pdf = screen.getByRole("article", { name: "nota.pdf" });
-    await userEvent.type(within(pdf).getByLabelText("Número da nota"), "77");
-    await userEvent.type(within(pdf).getByLabelText("Data de emissão"), `${YEAR}-01-05`);
-    await userEvent.type(within(pdf).getByLabelText("Competência"), `${YEAR}-01-01`);
-    await userEvent.type(within(pdf).getByLabelText("Valor do serviço"), "300000");
-    await userEvent.click(within(pdf).getByRole("button", { name: "Salvar nota" }));
-
-    const pdfForm = mocks.POST.mock.calls[2][1].bodySerializer() as FormData;
-    const data = JSON.parse(await (pdfForm.get("data") as Blob).text());
-    expect(data).toMatchObject({ number: "77", accessKey: KEY, serviceAmount: 3000, competenceDate: `${YEAR}-01-01` });
   });
 
   it("uma empresa arquivada não mostra o envio", async () => {
@@ -147,16 +136,15 @@ describe("lista de notas", () => {
     expect(screen.getByText("12,4 MB de 50 MB usados com arquivos.")).toBeInTheDocument();
   });
 
-  it("o detalhe de uma nota do XML não oferece corrigir, mas deixa cancelar", async () => {
+  it("o detalhe mostra as retenções e deixa cancelar", async () => {
     serve([invoice({})]);
     mocks.POST.mockReturnValue(ok(invoice({ status: "CANCELADA" })));
     open();
 
     await userEvent.click(await screen.findByRole("button", { name: /Nº 42/ }));
     const sheet = screen.getByRole("dialog", { name: "Nota nº 42" });
-    expect(within(sheet).getByText("Lida do XML")).toBeInTheDocument();
     expect(within(sheet).getByText("INSS retido")).toBeInTheDocument();
-    expect(within(sheet).queryByRole("button", { name: "Corrigir os campos" })).not.toBeInTheDocument();
+    expect(within(sheet).queryByText("PIS retido")).not.toBeInTheDocument();
 
     await userEvent.click(within(sheet).getByRole("button", { name: "Marcar como cancelada" }));
     expect(mocks.POST).toHaveBeenCalledWith("/companies/{companyId}/invoices/{invoiceId}/cancel", {
@@ -165,13 +153,12 @@ describe("lista de notas", () => {
   });
 
   it("excluir pede confirmação", async () => {
-    serve([invoice({ source: "MANUAL" })]);
+    serve([invoice({})]);
     mocks.DELETE.mockResolvedValue({ response: new Response(null, { status: 204 }) });
     open();
 
     await userEvent.click(await screen.findByRole("button", { name: /Nº 42/ }));
     const sheet = screen.getByRole("dialog", { name: "Nota nº 42" });
-    expect(within(sheet).getByRole("button", { name: "Corrigir os campos" })).toBeInTheDocument();
     await userEvent.click(within(sheet).getByRole("button", { name: "Excluir a nota" }));
     expect(mocks.DELETE).not.toHaveBeenCalled();
 

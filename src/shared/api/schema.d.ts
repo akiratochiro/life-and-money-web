@@ -54,24 +54,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/companies/{companyId}/invoices/{invoiceId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getInvoice"];
-        /** Corrige os campos de uma nota do PDF ou manual */
-        put: operations["correctInvoice"];
-        post?: never;
-        /** Apaga a nota e o arquivo dela */
-        delete: operations["deleteInvoice"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/companies/{companyId}/expenses/{expenseId}": {
         parameters: {
             query?: never;
@@ -305,7 +287,7 @@ export interface paths {
         /** As notas do ano, pela competência, da mais recente para a mais antiga */
         get: operations["listInvoices"];
         put?: never;
-        /** Salva uma nota: do XML, com os valores do arquivo; do PDF ou manual, com os campos confirmados em data */
+        /** Salva uma nota a partir do XML, com os valores do arquivo */
         post: operations["createInvoice"];
         delete?: never;
         options?: never;
@@ -355,7 +337,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Lê até 10 arquivos (XML ou PDF) e diz o que encontrou em cada um; não grava nada */
+        /** Lê até 10 arquivos XML e diz o que encontrou em cada um; não grava nada */
         post: operations["previewInvoices"];
         delete?: never;
         options?: never;
@@ -839,6 +821,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/invoices/{invoiceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getInvoice"];
+        put?: never;
+        post?: never;
+        /** Apaga a nota e o arquivo dela */
+        delete: operations["deleteInvoice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/invoices/{invoiceId}/file": {
         parameters: {
             query?: never;
@@ -846,7 +845,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Baixa o XML ou PDF original da nota */
+        /** Baixa o XML original da nota */
         get: operations["downloadInvoiceFile"];
         put?: never;
         post?: never;
@@ -1087,60 +1086,6 @@ export interface components {
             validFrom: string;
             validTo?: string;
         };
-        InvoiceData: {
-            number: string;
-            /** @description Os 50 dígitos da chave de acesso, sem espaços */
-            accessKey?: string;
-            /** Format: date */
-            issueDate: string;
-            /**
-             * Format: date
-             * @description É por ela que a receita conta
-             */
-            competenceDate: string;
-            serviceAmount: number;
-            /** @description Desconto incondicional: não é receita */
-            unconditionalDiscountAmount?: number;
-            netAmount: number;
-            issWithheldAmount?: number;
-            irrfWithheldAmount?: number;
-            pisWithheldAmount?: number;
-            cofinsWithheldAmount?: number;
-            csllWithheldAmount?: number;
-            inssWithheldAmount?: number;
-            takerName?: string;
-            /** @description CNPJ, CPF ou NIF (estrangeiro) */
-            takerDocument?: string;
-        };
-        InvoiceResponse: {
-            /** Format: int64 */
-            id: number;
-            /** @enum {string} */
-            source: "XML" | "PDF" | "MANUAL";
-            /** @enum {string} */
-            status: "ATIVA" | "CANCELADA";
-            number: string;
-            /** @description Ausente em nota sem chave (PDF ou manual) */
-            accessKey?: string;
-            /** Format: date */
-            issueDate: string;
-            /** Format: date */
-            competenceDate: string;
-            serviceAmount: number;
-            unconditionalDiscountAmount: number;
-            netAmount: number;
-            issWithheldAmount: number;
-            irrfWithheldAmount: number;
-            pisWithheldAmount: number;
-            cofinsWithheldAmount: number;
-            csllWithheldAmount: number;
-            inssWithheldAmount: number;
-            /** @description O tomador pode não ter sido informado na nota */
-            takerName?: string;
-            takerDocument?: string;
-            /** @description Chave da nota que esta substituiu */
-            replacedAccessKey?: string;
-        };
         OneOffExpenseRequest: {
             name: string;
             amount: number;
@@ -1357,20 +1302,75 @@ export interface components {
             /** @description O sócio que é o próprio usuário */
             me: boolean;
         };
+        InvoiceResponse: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            source: "XML" | "PDF" | "MANUAL";
+            /** @enum {string} */
+            status: "ATIVA" | "CANCELADA";
+            number: string;
+            /** @description Ausente em nota sem chave (PDF ou manual) */
+            accessKey?: string;
+            /** Format: date */
+            issueDate: string;
+            /** Format: date */
+            competenceDate: string;
+            serviceAmount: number;
+            unconditionalDiscountAmount: number;
+            netAmount: number;
+            issWithheldAmount: number;
+            irrfWithheldAmount: number;
+            pisWithheldAmount: number;
+            cofinsWithheldAmount: number;
+            csllWithheldAmount: number;
+            inssWithheldAmount: number;
+            /** @description O tomador pode não ter sido informado na nota */
+            takerName?: string;
+            takerDocument?: string;
+            /** @description Chave da nota que esta substituiu */
+            replacedAccessKey?: string;
+        };
+        InvoiceData: {
+            number: string;
+            /** @description Os 50 dígitos da chave de acesso */
+            accessKey: string;
+            /** Format: date */
+            issueDate: string;
+            /**
+             * Format: date
+             * @description É por ela que a receita conta
+             */
+            competenceDate: string;
+            serviceAmount: number;
+            /** @description Desconto incondicional: não é receita */
+            unconditionalDiscountAmount: number;
+            netAmount: number;
+            issWithheldAmount: number;
+            irrfWithheldAmount: number;
+            pisWithheldAmount: number;
+            cofinsWithheldAmount: number;
+            csllWithheldAmount: number;
+            inssWithheldAmount: number;
+            /** @description O tomador é opcional na NFS-e */
+            takerName?: string;
+            /** @description CNPJ, CPF ou NIF (estrangeiro) */
+            takerDocument?: string;
+        };
         InvoicePreview: {
             filename: string;
             /**
-             * @description Ausente quando o arquivo nem é XML nem PDF
+             * @description Ausente quando o arquivo não foi reconhecido
              * @enum {string}
              */
             fileType?: "XML" | "PDF" | "JPEG" | "PNG";
             /** @enum {string} */
-            status: "READY" | "NEEDS_INPUT" | "DUPLICATE" | "REJECTED";
+            status: "READY" | "DUPLICATE" | "REJECTED";
             /** @description O que fazer com este arquivo, quando há algo a dizer */
             message?: string;
             /** @description Avisos que não impedem salvar */
             warnings: string[];
-            /** @description O que foi reconhecido; pode vir incompleto num PDF */
+            /** @description O que foi lido do XML */
             fields?: components["schemas"]["InvoiceData"];
         };
         ExpenseCategoryRequest: {
@@ -1980,77 +1980,6 @@ export interface operations {
             path: {
                 companyId: number;
                 recurringId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getInvoice: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                companyId: number;
-                invoiceId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["InvoiceResponse"];
-                };
-            };
-        };
-    };
-    correctInvoice: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                companyId: number;
-                invoiceId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["InvoiceData"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["InvoiceResponse"];
-                };
-            };
-        };
-    };
-    deleteInvoice: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                companyId: number;
-                invoiceId: number;
             };
             cookie?: never;
         };
@@ -2691,7 +2620,6 @@ export interface operations {
                 "multipart/form-data": {
                     /** Format: binary */
                     file: string;
-                    data?: components["schemas"]["InvoiceData"];
                 };
             };
         };
@@ -3572,6 +3500,50 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["RevenueResponse"];
                 };
+            };
+        };
+    };
+    getInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InvoiceResponse"];
+                };
+            };
+        };
+    };
+    deleteInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                invoiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
