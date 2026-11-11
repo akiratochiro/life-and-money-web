@@ -140,6 +140,8 @@ const companyHref = await page.evaluate(() => document.querySelector('a[href^="/
 if (companyHref) {
   await page.goto(`${BASE}${companyHref}`, { waitUntil: "load" });
   await audit("empresa");
+  await page.goto(`${BASE}${companyHref}/invoices`, { waitUntil: "load" });
+  await audit("notas");
 }
 
 // Swipe lateral no Extrato.

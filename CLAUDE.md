@@ -123,6 +123,11 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   `regimeOptions.ts` (puras, espelham a API só para a UX). Toda chave começa com `"companies"` e a
   mudança é `"company"` no `AFFECTS`. CNPJ vai para a API sem pontuação (`cnpj.ts`): a barra quebraria
   o caminho de `/cnpj/{cnpj}`.
+- **Notas fiscais** (`features/invoices`, decisão 25): envio em duas etapas (pré-visualização →
+  salvar por card); upload é `FormData` no `bodySerializer` (o tipo gerado é só marcador). Do XML, os
+  valores ficam travados; do PDF, `InvoiceFieldsForm` com `MoneyField` (centavos). "Salvar todas"
+  salva um de cada vez. Download por `downloadInvoiceFile` (`shared/lib/download.ts` lê o
+  `filename*`). Chaves debaixo de `["companies", id, "invoices"]`; a mudança é `"invoice"`.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

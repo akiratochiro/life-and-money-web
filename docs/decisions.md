@@ -534,3 +534,34 @@ contador. A maior parte dos usuários não tem CNPJ, e a barra de baixo do celul
 menu não ganha um item morto. Mostrar sete abas "em breve" desde já deixaria o desenho completo à
 vista, mas aba que não faz nada é ruído e, se algo for ao ar no meio do caminho, parece app
 quebrado. O custo é que cada fase precisa lembrar de adicionar a aba dela em `CompanyLayout`.
+
+## 25. Notas fiscais: envio em duas etapas, XML travado e PDF para conferir
+
+**Contexto.** A aba Notas fiscais (decisão 20 da API) recebe arquivos que o usuário baixa do portal
+da NFS-e: o XML, que tem os valores exatos, ou o PDF, que é uma impressão. Muitas vezes são vários de
+uma vez, no fim do mês, e às vezes pelo celular.
+
+**Decisão.**
+- **Duas etapas.** Escolher os arquivos chama a pré-visualização da API, que não grava nada. Cada
+  arquivo vira um card: o do XML com os valores travados e o aviso "lido do XML"; o do PDF com os
+  campos para conferir e completar; o repetido e o recusado com o motivo da API. Cada card salva
+  sozinho, e "Salvar as N notas prontas" salva os do XML **um de cada vez**, para duas notas não
+  passarem juntas pela conferência da cota.
+- **No celular não existe arrastar e soltar**, então o botão "Escolher arquivos" é o caminho
+  principal. A área de soltar é um extra do desktop, e o texto que fala de arrastar só aparece de
+  `md` para cima.
+- **Multipart com `FormData`.** O tipo gerado descreve os arquivos como texto (é como o OpenAPI
+  descreve binário), então o corpo tipado é só um marcador e o que vai de verdade sai do
+  `bodySerializer`. O openapi-fetch deixa o navegador pôr o `Content-Type` com a fronteira.
+- **Dinheiro em centavos** também aqui, com um `MoneyField` do tamanho de um campo comum: o
+  `AmountInput` é o valor em destaque de uma tela, e o formulário da nota tem até dez valores.
+- **A lista** é filtrada por ano e agrupada por mês de competência, com o total das ativas (serviço
+  menos desconto incondicional, que não é receita). A cancelada aparece riscada, com selo. O uso da
+  cota fica no rodapé.
+- As notas moram debaixo da chave `["companies", id, "invoices", ...]`: arquivar a empresa recarrega
+  as notas também, e a mudança `invoice` recarrega as empresas (a primeira nota trava a data de
+  abertura) e o uso da cota.
+
+**Consequências.** O usuário vê, antes de qualquer coisa ficar salva, o que foi entendido de cada
+arquivo e por que algum foi recusado. O custo é um passo a mais e o arquivo viajar duas vezes (até
+2 MB cada), em troca de nenhum arquivo órfão de uma pré-visualização abandonada.

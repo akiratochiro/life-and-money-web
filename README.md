@@ -63,6 +63,7 @@ receive, and you start with a default set of categories. It is a portfolio proje
 | Analytics | Expenses by category in a donut and month-by-month bars, with the average of closed months |
 | Categories | Create, rename and archive your own categories |
 | My account | Profile, register a company, export all your data as JSON, sign out, and delete the account (typing "EXCLUIR" plus the password) |
+| Invoices | Upload NFS-e XMLs (values locked, read from the signed document) or PDFs (fields to check) in two steps, then browse them by year and month with the month's revenue, download the original, cancel or delete |
 | My company | Company data, partner and the tax-regime history (MEI, Simples Nacional, Lucro Presumido or Real), with changes dated in the past or scheduled for the future and an undo for the latest one; a CNPJ lookup pre-fills the registration |
 
 ## Visual identity
