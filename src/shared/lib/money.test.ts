@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { digitsToInt, formatBasisPoints, formatCents, toCents } from "./money";
+import { digitsToInt, formatBasisPoints, formatCents, signedCents, toCents } from "./money";
 
 // O Intl separa o "R$" do número com um espaço não separável (U+00A0), não com um espaço comum.
 const NBSP = " ";
@@ -60,5 +60,13 @@ describe("digitsToInt", () => {
   it("limita ao máximo do campo", () => {
     expect(digitsToInt("10001", 10_000)).toBe(10_000);
     expect(digitsToInt("10000", 10_000)).toBe(10_000);
+  });
+});
+
+describe("signedCents", () => {
+  it("escreve o sinal, e o zero fica sem sinal", () => {
+    expect(signedCents(894850)).toMatch(/^\+R\$\s8\.948,50$/);
+    expect(signedCents(-12000)).toMatch(/^−R\$\s120,00$/);
+    expect(signedCents(0)).toMatch(/^R\$\s0,00$/);
   });
 });

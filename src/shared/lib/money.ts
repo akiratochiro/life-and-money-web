@@ -13,3 +13,9 @@ export function digitsToInt(text: string, max: number): number {
   const digits = text.replace(/\D/g, "");
   return Math.min(Number(digits || "0"), max);
 }
+
+/** Com o sinal escrito ("+R$ 10,00", "−R$ 5,00"): a cor nunca é a única pista de que ficou negativo. */
+export function signedCents(cents: number): string {
+  if (cents === 0) return formatCents(0);
+  return `${cents > 0 ? "+" : "−"}${formatCents(Math.abs(cents))}`;
+}

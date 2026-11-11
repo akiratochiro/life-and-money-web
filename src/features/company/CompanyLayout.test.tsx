@@ -26,6 +26,11 @@ const problem = (status: number, detail: string) =>
 const SIMPLES = { id: 2, legalNature: "SLU", taxRegime: "SIMPLES_NACIONAL", annexConfig: "FATOR_R", validFrom: "2025-03" };
 const MEI = { id: 1, legalNature: "MEI", taxRegime: "SIMEI", meiActivity: "SERVICOS", validFrom: "2024-03", validTo: "2025-02" };
 
+const OVERVIEW = {
+  month: "2026-11", open: true, revenue: 0, expenses: { paid: 0, pending: 0, total: 0 },
+  taxes: { paid: 0, expected: 0, total: 0, withoutExpected: 0 }, result: 0, withdrawals: { total: 0, count: 0 }, notice: "",
+};
+
 function company(overrides: Record<string, unknown> = {}) {
   return {
     id: 7,
@@ -53,6 +58,8 @@ function serve(data: { company?: unknown; regimes?: unknown[]; companyStatus?: n
     if (path === "/companies/{id}/regimes") return ok(data.regimes ?? [MEI, SIMPLES]);
     if (path === "/companies/{companyId}/partners") return ok([{ id: 3, name: "Ana Souza", me: true }]);
     if (path === "/companies/{companyId}/revenue") return ok({ granularity: "MONTH", from: "", to: "", total: 0, points: [] });
+    if (path === "/companies/{companyId}/overview") return ok(OVERVIEW);
+    if (path === "/companies/{companyId}/upcoming") return ok([]);
     throw new Error(`GET inesperado: ${path}`);
   });
 }

@@ -928,6 +928,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/upcoming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Impostos e despesas fixas atrasados (até 3 meses) e dos próximos 30 dias */
+        get: operations["companyUpcoming"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/taxes": {
         parameters: {
             query?: never;
@@ -988,6 +1005,23 @@ export interface paths {
         };
         /** Pró-labore para o Fator R atingir a meta e o custo do Anexo III contra o V, com o faturamento informado */
         get: operations["proLaboreCalculator"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Os cards do mês: receita, despesas, impostos da competência, resultado e retiradas */
+        get: operations["companyOverview"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2160,6 +2194,19 @@ export interface components {
             /** @enum {string} */
             status: "OK" | "WARNING" | "EXCEEDED" | "IN_PROGRESS" | "REACHED";
         };
+        UpcomingItem: {
+            /** @enum {string} */
+            source: "TAX" | "EXPENSE";
+            name: string;
+            /** Format: date */
+            dueDate: string;
+            /** @description O previsto; ausente quando não há (declaração, personalizada sem valor fixo) */
+            amount?: number;
+            /** @enum {string} */
+            status: "PENDING" | "OVERDUE";
+            /** @description O mês do vencimento, para abrir a aba nele */
+            month: string;
+        };
         TaxMonthResponse: {
             /** @example 2026-11 */
             month: string;
@@ -2216,6 +2263,44 @@ export interface components {
             netProLabore: number;
             /** @description DAS + INSS + IRRF do mês */
             totalCost: number;
+        };
+        CompanyOverviewResponse: {
+            /** @example 2026-11 */
+            month: string;
+            /** @description O mês ainda não acabou: os valores são previsão */
+            open: boolean;
+            /** @description Notas ativas com competência no mês */
+            revenue: number;
+            expenses: components["schemas"]["Expenses"];
+            taxes: components["schemas"]["Taxes"];
+            result: number;
+            withdrawals: components["schemas"]["Withdrawals"];
+            notice: string;
+        };
+        Expenses: {
+            paid: number;
+            /** @description Previsto das fixas ainda não pagas */
+            pending: number;
+            /** @description Sem a categoria Impostos, que entra pelo card de impostos */
+            total: number;
+        };
+        Taxes: {
+            /** @description Os já pagos, pelo valor pago */
+            paid: number;
+            /** @description Os ainda não pagos, pelo previsto */
+            expected: number;
+            total: number;
+            /**
+             * Format: int32
+             * @description Impostos da competência sem valor previsto, contados como zero
+             */
+            withoutExpected: number;
+        };
+        Withdrawals: {
+            /** @description Bruto dos pagos no mês, pela data do pagamento */
+            total: number;
+            /** Format: int32 */
+            count: number;
         };
         ExpenseMonthResponse: {
             /** @example 2026-11 */
@@ -4239,6 +4324,28 @@ export interface operations {
             };
         };
     };
+    companyUpcoming: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UpcomingItem"][];
+                };
+            };
+        };
+    };
     taxMonth: {
         parameters: {
             query: {
@@ -4332,6 +4439,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ProLaboreCalculatorResponse"];
+                };
+            };
+        };
+    };
+    companyOverview: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyOverviewResponse"];
                 };
             };
         };
