@@ -144,6 +144,19 @@ if (companyHref) {
   await audit("notas");
   await page.goto(`${BASE}${companyHref}/expenses`, { waitUntil: "load" });
   await audit("despesas");
+  await page.goto(`${BASE}${companyHref}/taxes`, { waitUntil: "load" });
+  await audit("impostos");
+  for (const [label, name] of [["Obrigações", "obrigacoes"], ["Calculadora de pró-labore", "calculadora"]]) {
+    const [button] = await page.$$(`xpath/.//button[normalize-space()='${label}']`);
+    if (button) {
+      await button.tap();
+      await audit(name);
+      await page.keyboard.press("Escape");
+      await settle();
+    }
+  }
+  await page.goto(`${BASE}${companyHref}/withdrawals`, { waitUntil: "load" });
+  await audit("retiradas");
 }
 
 // Swipe lateral no Extrato.

@@ -596,3 +596,35 @@ campos, o `MoneyField` nesse uso e o "corrigir" do detalhe; os valores são semp
 
 **Consequências.** O gráfico fica legível e acessível em qualquer largura, ao custo de não dar para
 "tocar numa barra" para ver o valor dela no celular. Os destaques e a tabela cobrem esse caso.
+
+## 27. Impostos e Retiradas: a conta à mostra, o caso comum em um toque
+
+**Contexto.** A Fase 4 trouxe os vencimentos de impostos com o previsto e a memória de cálculo, o
+pagamento que vira despesa, as obrigações, a calculadora de pró-labore e o pró-labore planejado e pago
+(decisões 23 a 26 da API).
+
+**Decisão.**
+- **Aba Impostos** com o `MonthSwitcher`, os totais "A pagar" e "Pago", o aviso de estimativa sempre à
+  vista e o status por texto (Pendente, Atrasado, Pago; "Entregue" nas declarações).
+- **A memória de cálculo vai em linguagem simples**, linha a linha, com o RBT12 explicado em uma frase
+  conforme o método (primeiro mês, proporcional, 12 meses). É o que deixa o usuário conferir o número
+  com o contador em vez de confiar às cegas.
+- **O valor pago já vem com o previsto**, e a data com o vencimento (ou hoje, se ainda não venceu): o
+  caso comum é um toque. A declaração só pede a data. Desfazer pede confirmação e avisa que a despesa
+  de Impostos some junto.
+- **Obrigações numa folha**: as do sistema com cadeado, só com o "Ativa"; quando não valem no regime
+  atual, a linha diz. As personalizadas são criadas, editadas e excluídas ali.
+- **Calculadora só para o Simples**, começando com a receita do mês passado e já calculada; depois,
+  recalcula no botão, e não a cada dígito (uma requisição por tecla seria desperdício). Anexo III e V
+  lado a lado, com o mais barato destacado.
+- **Aba Retiradas**, e não "Pró-labore": a distribuição de lucros da Fase 6 entra nela sem renomear. Some
+  no MEI, que não tem pró-labore. Antes de 01/2026 o formulário já pede INSS e IRRF do holerite, em vez
+  de esperar a recusa da API; os avisos da API (pagamento em outro mês, abaixo do mínimo) aparecem
+  antes de a folha fechar.
+- **A aba ativa é trazida para a vista**: com cinco abas a barra rola no celular, e Impostos e
+  Retiradas ficavam escondidas à direita (a auditoria mobile mostrou).
+- Imposto e retirada invalidam `companies`: o pagamento cria a despesa e o pró-labore muda o DARF e o
+  Fator R, e tudo mora debaixo da chave da empresa.
+
+**Consequências.** O usuário vê de onde vem cada número e paga o caso comum sem digitar. A calculadora
+não reage enquanto se digita, o que custa um toque a mais em troca de não disparar uma conta por dígito.

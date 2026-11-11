@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, NavLink, Outlet, useParams } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { Link, NavLink, Outlet, useLocation, useParams } from "react-router";
 import { useArchiveCompany, useCompany, useUnarchiveCompany, useUpdateCompany, type Company } from "./companyApi";
 import { CompanyForm } from "./CompanyForm";
 import { CompanySkeleton } from "./CompanySkeleton";
@@ -27,6 +27,14 @@ export function CompanyLayout() {
   const companyId = Number(useParams().companyId);
   const company = useCompany(companyId);
   const [editing, setEditing] = useState(false);
+  const tabBar = useRef<HTMLElement>(null);
+  const { pathname } = useLocation();
+
+  // Com cinco abas, a barra rola no celular: a aba ativa (Impostos, Retiradas) ficaria escondida à
+  // direita sem que ninguém percebesse em qual aba está. Ela é trazida para a vista a cada troca.
+  useEffect(() => {
+    tabBar.current?.querySelector('[aria-current="page"]')?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  }, [pathname, company.data]);
 
   if (company.isPending) return <CompanySkeleton />;
   if (company.isError) {
@@ -65,7 +73,7 @@ export function CompanyLayout() {
       </header>
 
       {tabs.length > 1 && (
-        <nav aria-label="Seções da empresa" className="flex gap-1 overflow-x-auto rounded-full bg-sunken p-1">
+        <nav ref={tabBar} aria-label="Seções da empresa" className="flex gap-1 overflow-x-auto rounded-full bg-sunken p-1">
           {tabs.map((tab) => (
             <NavLink
               key={tab.to}
