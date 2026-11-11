@@ -133,6 +133,10 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   de 44 px). `features/companyExpenses`: aba Despesas com `expenseMonthQuery` + prefetch, status por
   texto, Impostos (`system`) nunca escolhível, comprovante em dois passos (salvar, depois o arquivo),
   pagamento de fixa corrigido só em valor e data. A mudança é `"companyExpense"` no `AFFECTS`.
+- **Retiradas e a ponte PJ → PF** (decisão 29): lançar é um botão depois de salvar (só o "sou eu");
+  a transação lançada tem `origin` e abre no extrato com valor e data travados (`TransactionForm` com
+  `locked`). Excluir pergunta pela outra ponta; "as duas" é a exclusão da retirada com `deletePersonal`.
+  A mudança `withdrawal` recarrega empresas e finanças pessoais.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

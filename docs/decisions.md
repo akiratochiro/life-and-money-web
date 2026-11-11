@@ -647,3 +647,29 @@ não reage enquanto se digita, o que custa um toque a mais em troca de não disp
 
 **Consequências.** Um número da visão geral bate sempre com a aba de origem, porque a regra é a mesma
 da API. A lista curta não substitui o calendário fiscal da Fase 9.
+
+## 29. Retiradas e extrato: lançar com um toque, a retirada manda no valor
+
+**Contexto.** A Fase 6 liga a retirada do sócio às finanças pessoais e traz a distribuição de lucros
+(decisão 28 da API).
+
+**Decisão.**
+- **Lançar é um botão depois de salvar** (e no detalhe, para depois), só na retirada do "sou eu", com a
+  categoria padrão já escolhida ("Pró-labore (nova)" quando ainda não existe). Uma caixa já marcada no
+  formulário lançaria sem o usuário perceber.
+- **O formulário escolhe Pró-labore ou Lucros** (segmentado em argila neutra); no MEI, só a distribuição,
+  e a aba Retiradas volta a aparecer para ele. A distribuição pede o valor e o IRRF opcional, sem mês da
+  folha.
+- **Excluir pergunta pela outra ponta**: na empresa, "Excluir as duas" ou "Só a retirada"; no extrato,
+  "Apagar as duas" (a exclusão da retirada com `deletePersonal`) ou "Só o lançamento". Com a empresa
+  arquivada, o extrato só apaga o lançamento.
+- **No extrato, a transação lançada mostra valor e data só para leitura** (`TransactionForm` com
+  `locked`), com a origem e o link para a empresa; categoria e descrição continuam livres. A atualização
+  otimista preserva a `origin` do cache.
+- **`withdrawal` no `AFFECTS` recarrega também as finanças pessoais** (transações, dashboards,
+  categorias), porque lançar cria uma receita e pode criar a categoria. Apagar só o lançamento invalida
+  `withdrawal` no `onSuccess`, para a empresa ver a ligação sumir, sem fazer toda transação recarregar as
+  empresas.
+
+**Consequências.** Valor e data nunca divergem entre a empresa e o extrato. O custo é um passo a mais
+para corrigir um valor lançado (ir à empresa), que o diálogo explica com o link.

@@ -157,6 +157,13 @@ if (companyHref) {
   }
   await page.goto(`${BASE}${companyHref}/withdrawals`, { waitUntil: "load" });
   await audit("retiradas");
+  const [newWithdrawal] = await page.$$("xpath/.//button[normalize-space()='Registrar retirada']");
+  if (newWithdrawal) {
+    await newWithdrawal.tap();
+    await audit("nova-retirada");
+    await page.keyboard.press("Escape");
+    await settle();
+  }
 }
 
 // Swipe lateral no Extrato.
