@@ -55,6 +55,17 @@ describe("receita da empresa", () => {
     expect(mocks.GET.mock.calls.at(-1)![1].params.query.granularity).toBe("DAY");
   });
 
+  it("quando o período atual é o maior, não repete o destaque", async () => {
+    mocks.GET.mockReturnValue(ok(revenue("MONTH", [
+      { start: "2026-10-01", end: "2026-10-31", amount: 100, invoices: 1 },
+      { start: "2026-11-01", end: "2026-11-30", amount: 4200, invoices: 1 },
+    ])));
+    open();
+
+    expect(await screen.findByText("R$ 4.300,00")).toBeInTheDocument();
+    expect(screen.queryByText(/^Maior:/)).not.toBeInTheDocument();
+  });
+
   it("sem nota ativa no período, aponta para as notas fiscais", async () => {
     mocks.GET.mockReturnValue(ok(revenue("MONTH", [{ start: "2026-11-01", end: "2026-11-30", amount: 0, invoices: 0 }])));
     open();

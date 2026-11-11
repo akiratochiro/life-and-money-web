@@ -90,7 +90,8 @@ export function RevenueCard({ companyId }: { companyId: number }) {
                 <dd className="font-semibold tabular-nums">{formatCents(toCents(current.amount))}</dd>
               </div>
             )}
-            {best && toCents(best.amount) > 0 && (
+            {/* Se o maior é o próprio período atual, o segundo destaque só repetiria o número. */}
+            {best && toCents(best.amount) > 0 && best.start !== current?.start && (
               <div className="flex flex-col rounded-2xl bg-sunken p-3">
                 <dt className="text-text-muted">Maior: {periodLabel(best.start, best.end, granularity)}</dt>
                 <dd className="font-semibold tabular-nums">{formatCents(toCents(best.amount))}</dd>
