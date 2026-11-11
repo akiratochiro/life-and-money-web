@@ -1,6 +1,6 @@
 import { useId } from "react";
 import { WITHHOLDINGS, type InvoiceDraft } from "./invoiceDraft";
-import { MoneyField } from "./MoneyField";
+import { MoneyField } from "../../shared/ui/MoneyField";
 import { TextField } from "../../shared/ui/TextField";
 import { todayIso } from "../../shared/lib/dates";
 

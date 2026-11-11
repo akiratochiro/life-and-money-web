@@ -19,6 +19,7 @@ import { PrivacyPage } from "../features/legal/PrivacyPage";
 import { CompanyLayout } from "../features/company/CompanyLayout";
 import { CompanyOverviewPage } from "../features/company/CompanyOverviewPage";
 import { InvoicesPage } from "../features/invoices/InvoicesPage";
+import { ExpensesPage } from "../features/companyExpenses/ExpensesPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <CompanyOverviewPage /> },
               { path: "invoices", element: <InvoicesPage /> },
+              { path: "expenses", element: <ExpensesPage /> },
             ],
           },
         ],

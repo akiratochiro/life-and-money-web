@@ -17,6 +17,7 @@ import { ApiError } from "../../shared/api/problem";
 const TABS = [
   { to: "", label: "Visão geral" },
   { to: "invoices", label: "Notas fiscais" },
+  { to: "expenses", label: "Despesas" },
 ];
 
 export function CompanyLayout() {

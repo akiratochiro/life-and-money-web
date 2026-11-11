@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { digitsToInt, formatCents } from "../../shared/lib/money";
+import { digitsToInt, formatCents } from "../lib/money";
 
 const MAX_CENTS = 99_999_999_999;
 
