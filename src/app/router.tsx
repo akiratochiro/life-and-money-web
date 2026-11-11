@@ -20,6 +20,7 @@ import { CompanyLayout } from "../features/company/CompanyLayout";
 import { CompanyOverviewPage } from "../features/company/CompanyOverviewPage";
 import { InvoicesPage } from "../features/invoices/InvoicesPage";
 import { ExpensesPage } from "../features/companyExpenses/ExpensesPage";
+import { TaxesPage } from "../features/taxes/TaxesPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
               { index: true, element: <CompanyOverviewPage /> },
               { path: "invoices", element: <InvoicesPage /> },
               { path: "expenses", element: <ExpensesPage /> },
+              { path: "taxes", element: <TaxesPage /> },
             ],
           },
         ],

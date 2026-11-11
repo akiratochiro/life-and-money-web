@@ -18,6 +18,7 @@ const TABS = [
   { to: "", label: "Visão geral" },
   { to: "invoices", label: "Notas fiscais" },
   { to: "expenses", label: "Despesas" },
+  { to: "taxes", label: "Impostos" },
 ];
 
 export function CompanyLayout() {
