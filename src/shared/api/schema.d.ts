@@ -102,6 +102,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Empresas em ordem alfabética */
+        get: operations["listCompanies"];
+        put?: never;
+        /** Cadastra a empresa, o enquadramento a partir do mês da abertura e você como sócio */
+        post: operations["createCompany"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{id}/unarchive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["unarchiveCompany"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{id}/regimes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Histórico de enquadramento, do mais antigo ao mais recente */
+        get: operations["listCompanyRegimes"];
+        put?: never;
+        /** Novo enquadramento a partir de um mês; fecha o atual no mês anterior e devolve o histórico */
+        post: operations["changeCompanyRegime"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Arquiva a empresa, preservando todo o histórico */
+        post: operations["archiveCompany"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sócios da empresa, você primeiro */
+        get: operations["listPartners"];
+        put?: never;
+        /** Adiciona um sócio (o MEI não tem sócios) */
+        post: operations["addPartner"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/categories": {
         parameters: {
             query?: never;
@@ -316,6 +403,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCompany"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edita os dados cadastrais; o que não vier fica como está */
+        patch: operations["updateCompany"];
+        trace?: never;
+    };
+    "/companies/{companyId}/partners/{partnerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove um sócio; você não pode se remover */
+        delete: operations["removePartner"];
+        options?: never;
+        head?: never;
+        patch: operations["renamePartner"];
+        trace?: never;
+    };
     "/categories/{id}": {
         parameters: {
             query?: never;
@@ -458,6 +579,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cnpj/{cnpj}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dados públicos do CNPJ para pré-preencher o cadastro; nunca falha por causa da BrasilAPI */
+        get: operations["lookupCnpj"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/budgets": {
         parameters: {
             query?: never;
@@ -509,6 +647,23 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{id}/regimes/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Desfaz a última mudança de enquadramento, reabrindo a anterior, e devolve o histórico */
+        delete: operations["undoCompanyRegimeChange"];
         options?: never;
         head?: never;
         patch?: never;
@@ -629,6 +784,131 @@ export interface components {
              * @example 2027-10
              */
             endMonth?: string;
+        };
+        CreateCompanyRequest: {
+            name: string;
+            emoji: string;
+            /**
+             * @description Opcional; com ou sem pontuação, numérico ou alfanumérico
+             * @example 12.ABC.345/01DE-35
+             */
+            cnpj?: string;
+            /** Format: date */
+            openingDate: string;
+            /** @enum {string} */
+            legalNature: "MEI" | "EI" | "SLU" | "LTDA" | "SOCIEDADE_SIMPLES";
+            /** @enum {string} */
+            taxRegime: "SIMEI" | "SIMPLES_NACIONAL" | "LUCRO_PRESUMIDO" | "LUCRO_REAL";
+            /**
+             * @description Obrigatório no Simples Nacional, ausente nos outros regimes
+             * @enum {string}
+             */
+            annexConfig?: "ANEXO_III_FIXO" | "FATOR_R";
+            /**
+             * @description Obrigatória no MEI, ausente nas outras naturezas
+             * @enum {string}
+             */
+            meiActivity?: "SERVICOS" | "COMERCIO_INDUSTRIA" | "AMBOS";
+            /**
+             * @description Fração; sem ela, 0.28. Serve só para alertas: o Anexo é decidido pelo limite legal
+             * @example 0.28
+             */
+            fatorRTarget?: number;
+            /** @description Saldo da conta PJ na data do saldo; sem ele, zero. Pode ser negativo */
+            openingBalance?: number;
+            /**
+             * Format: date
+             * @description Sem ela, hoje. Não pode ser anterior à abertura nem estar no futuro
+             */
+            openingBalanceDate?: string;
+            /** @description Nome do sócio que é você; sem ele, o nome da sua conta */
+            partnerName?: string;
+        };
+        CompanyRegimeResponse: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            legalNature: "MEI" | "EI" | "SLU" | "LTDA" | "SOCIEDADE_SIMPLES";
+            /** @enum {string} */
+            taxRegime: "SIMEI" | "SIMPLES_NACIONAL" | "LUCRO_PRESUMIDO" | "LUCRO_REAL";
+            /**
+             * @description Só no Simples Nacional
+             * @enum {string}
+             */
+            annexConfig?: "ANEXO_III_FIXO" | "FATOR_R";
+            /**
+             * @description Só no MEI
+             * @enum {string}
+             */
+            meiActivity?: "SERVICOS" | "COMERCIO_INDUSTRIA" | "AMBOS";
+            /** @example 2024-03 */
+            validFrom: string;
+            /**
+             * @description Ausente na vigência mais recente, que não tem fim
+             * @example 2025-02
+             */
+            validTo?: string;
+        };
+        CompanyResponse: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            emoji: string;
+            /**
+             * @description Sem pontuação; ausente quando não foi informado
+             * @example 12ABC34501DE35
+             */
+            cnpj?: string;
+            /** Format: date */
+            openingDate: string;
+            /** @description Se a data de abertura ainda pode mudar: só enquanto o enquadramento nunca mudou e não há notas fiscais */
+            openingDateEditable: boolean;
+            /** @enum {string} */
+            revenueBasis: "COMPETENCIA" | "CAIXA";
+            /**
+             * @description Fração: 0.28 é 28%
+             * @example 0.28
+             */
+            fatorRTarget: number;
+            openingBalance: number;
+            /** Format: date */
+            openingBalanceDate: string;
+            /** @description O enquadramento que vale no mês corrente */
+            currentRegime: components["schemas"]["CompanyRegimeResponse"];
+            archived: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ChangeRegimeRequest: {
+            /**
+             * @description Primeiro mês do enquadramento novo. Precisa ser depois do início do atual; pode ser no passado (para registrar o histórico) ou no futuro (para agendar)
+             * @example 2025-03
+             */
+            validFrom: string;
+            /** @enum {string} */
+            legalNature: "MEI" | "EI" | "SLU" | "LTDA" | "SOCIEDADE_SIMPLES";
+            /** @enum {string} */
+            taxRegime: "SIMEI" | "SIMPLES_NACIONAL" | "LUCRO_PRESUMIDO" | "LUCRO_REAL";
+            /**
+             * @description Obrigatório no Simples Nacional, ausente nos outros regimes
+             * @enum {string}
+             */
+            annexConfig?: "ANEXO_III_FIXO" | "FATOR_R";
+            /**
+             * @description Obrigatória no MEI, ausente nas outras naturezas
+             * @enum {string}
+             */
+            meiActivity?: "SERVICOS" | "COMERCIO_INDUSTRIA" | "AMBOS";
+        };
+        PartnerRequest: {
+            name: string;
+        };
+        PartnerResponse: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            /** @description O sócio que é o próprio usuário */
+            me: boolean;
         };
         CreateCategoryRequest: {
             name: string;
@@ -780,6 +1060,21 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        UpdateCompanyRequest: {
+            name?: string;
+            emoji?: string;
+            /** @description Texto vazio remove o CNPJ; ausente, fica como está */
+            cnpj?: string;
+            /**
+             * Format: date
+             * @description Só enquanto openingDateEditable; move junto o início da primeira vigência
+             */
+            openingDate?: string;
+            fatorRTarget?: number;
+            openingBalance?: number;
+            /** Format: date */
+            openingBalanceDate?: string;
+        };
         UpdateCategoryRequest: {
             /** @description Opcional; ausente para manter o nome */
             name?: string;
@@ -806,6 +1101,8 @@ export interface components {
             goals: components["schemas"]["SavingsGoalResponse"][];
             /** @description Contas a pagar e a receber, com todo o histórico */
             bills: components["schemas"]["BillExport"][];
+            /** @description Empresas, arquivadas inclusive, com o histórico de enquadramento e os sócios */
+            companies: components["schemas"]["CompanyExport"][];
         };
         BillExport: {
             /** Format: int64 */
@@ -818,6 +1115,24 @@ export interface components {
             endMonth?: string;
             terms: components["schemas"]["Terms"][];
             payments: components["schemas"]["Payment"][];
+        };
+        CompanyExport: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            emoji: string;
+            cnpj?: string;
+            /** Format: date */
+            openingDate: string;
+            /** @enum {string} */
+            revenueBasis: "COMPETENCIA" | "CAIXA";
+            fatorRTarget: number;
+            openingBalance: number;
+            /** Format: date */
+            openingBalanceDate: string;
+            archived: boolean;
+            regimes: components["schemas"]["CompanyRegimeResponse"][];
+            partners: components["schemas"]["PartnerResponse"][];
         };
         Payment: {
             /** @example 2026-11 */
@@ -921,6 +1236,23 @@ export interface components {
             usedPercentage?: number;
             /** @enum {string} */
             status: "OK" | "WARNING" | "EXCEEDED" | "IN_PROGRESS" | "REACHED";
+        };
+        CnpjLookupResponse: {
+            /** @description Falso quando a consulta não respondeu; o cadastro segue à mão */
+            available: boolean;
+            /** @description Falso quando a consulta não conhece o CNPJ */
+            found: boolean;
+            /** @description Razão social */
+            name?: string;
+            /** @description Nome fantasia */
+            tradeName?: string;
+            /** Format: date */
+            openingDate?: string;
+            /**
+             * @description Só quando o código da Receita leva a uma natureza sem ambiguidade
+             * @enum {string}
+             */
+            legalNature?: "MEI" | "EI" | "SLU" | "LTDA" | "SOCIEDADE_SIMPLES";
         };
         DeleteAccountRequest: {
             password: string;
@@ -1212,6 +1544,192 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["SavingsGoalResponse"];
+                };
+            };
+        };
+    };
+    listCompanies: {
+        parameters: {
+            query?: {
+                includeArchived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"][];
+                };
+            };
+        };
+    };
+    createCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCompanyRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"];
+                };
+            };
+        };
+    };
+    unarchiveCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"];
+                };
+            };
+        };
+    };
+    listCompanyRegimes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyRegimeResponse"][];
+                };
+            };
+        };
+    };
+    changeCompanyRegime: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeRegimeRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyRegimeResponse"][];
+                };
+            };
+        };
+    };
+    archiveCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"];
+                };
+            };
+        };
+    };
+    listPartners: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PartnerResponse"][];
+                };
+            };
+        };
+    };
+    addPartner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PartnerResponse"];
                 };
             };
         };
@@ -1542,6 +2060,102 @@ export interface operations {
             };
         };
     };
+    getCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"];
+                };
+            };
+        };
+    };
+    updateCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCompanyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"];
+                };
+            };
+        };
+    };
+    removePartner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                partnerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    renamePartner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                partnerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PartnerResponse"];
+                };
+            };
+        };
+    };
     updateCategory: {
         parameters: {
             query?: never;
@@ -1738,6 +2352,28 @@ export interface operations {
             };
         };
     };
+    lookupCnpj: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cnpj: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CnpjLookupResponse"];
+                };
+            };
+        };
+    };
     list_3: {
         parameters: {
             query: {
@@ -1798,6 +2434,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["BillOccurrenceResponse"][];
+                };
+            };
+        };
+    };
+    undoCompanyRegimeChange: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyRegimeResponse"][];
                 };
             };
         };
