@@ -2,6 +2,7 @@ import { useState } from "react";
 import { expenseMonthQuery, useExpenseCategories, useExpenseMonth, type ExpenseItem } from "./companyExpensesApi";
 import { NewExpenseSheet } from "./NewExpenseSheet";
 import { ExpenseDetailSheet } from "./ExpenseDetailSheet";
+import { ExpenseCategoriesSheet } from "./ExpenseCategoriesSheet";
 import { useCompanyContext } from "../company/companyContext";
 import { CategoryTile } from "../categories/CategoryGlyph";
 import { usePrefetchAdjacentMonths } from "../../shared/api/usePrefetchAdjacentMonths";
@@ -26,6 +27,7 @@ export function ExpensesPage() {
   const categories = useExpenseCategories(company.id, true);
   usePrefetchAdjacentMonths(month, (neighbor) => expenseMonthQuery(company.id, neighbor));
   const [creating, setCreating] = useState(false);
+  const [managingCategories, setManagingCategories] = useState(false);
   const [open, setOpen] = useState<ExpenseItem>();
 
   const allCategories = categories.data ?? [];
@@ -50,10 +52,15 @@ export function ExpensesPage() {
       )}
 
       {!company.archived && (
-        <button type="button" onClick={() => setCreating(true)}
-          className="h-12 self-start rounded-full bg-accent px-6 font-bold text-on-accent shadow-clay-accent transition active:scale-95">
-          Nova despesa
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="button" onClick={() => setCreating(true)}
+            className="h-12 rounded-full bg-accent px-6 font-bold text-on-accent shadow-clay-accent transition active:scale-95">
+            Nova despesa
+          </button>
+          <button type="button" onClick={() => setManagingCategories(true)} className="flex min-h-11 items-center text-sm font-bold text-link">
+            Categorias da empresa
+          </button>
+        </div>
       )}
 
       {expenses.isPending ? (
@@ -88,6 +95,7 @@ export function ExpensesPage() {
         </ul>
       )}
 
+      {managingCategories && <ExpenseCategoriesSheet companyId={company.id} onClose={() => setManagingCategories(false)} />}
       {creating && <NewExpenseSheet companyId={company.id} categories={allCategories} onClose={() => setCreating(false)} />}
       {open && (
         <ExpenseDetailSheet key={keyOf(open)} companyId={company.id} month={month}
