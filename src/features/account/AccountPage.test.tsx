@@ -11,7 +11,11 @@ const mocks = vi.hoisted(() => ({
   downloadAccountExport: vi.fn<() => Promise<void>>(),
   endSession: vi.fn(),
   logout: vi.fn(),
+  GET: vi.fn(),
 }));
+
+// A seção de empresas busca a lista pela API; aqui, uma empresa ativa e uma arquivada.
+vi.mock("../../shared/api/client", () => ({ api: { GET: mocks.GET } }));
 
 vi.mock("./accountApi", async (original) => ({
   ...(await original<typeof import("./accountApi")>()),
@@ -50,8 +54,20 @@ async function startDeletion(confirmation: string, password: string) {
   if (password) await userEvent.type(screen.getByLabelText("Sua senha"), password);
 }
 
+const COMPANIES = [
+  {
+    id: 7, name: "Ana Design", emoji: "🎨", archived: false,
+    currentRegime: { id: 1, legalNature: "MEI", taxRegime: "SIMEI", meiActivity: "SERVICOS", validFrom: "2024-03" },
+  },
+  {
+    id: 8, name: "Antiga", emoji: "📦", archived: true,
+    currentRegime: { id: 2, legalNature: "LTDA", taxRegime: "LUCRO_REAL", validFrom: "2020-01" },
+  },
+];
+
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.GET.mockResolvedValue({ data: COMPANIES, response: new Response(null, { status: 200 }) });
 });
 
 describe("AccountPage", () => {
@@ -67,6 +83,15 @@ describe("AccountPage", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Sair da conta" }));
     expect(mocks.logout).toHaveBeenCalledOnce();
+  });
+
+  it("lista as empresas, separa as arquivadas e oferece cadastrar outra", async () => {
+    open();
+
+    expect(await screen.findByRole("link", { name: /Ana Design/ })).toHaveAttribute("href", "/companies/7");
+    expect(screen.getByText("MEI · SIMEI · Serviços")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Desarquivar Antiga" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cadastrar empresa" })).toBeInTheDocument();
   });
 
   it("só libera a exclusão com EXCLUIR digitado exatamente e a senha preenchida", async () => {

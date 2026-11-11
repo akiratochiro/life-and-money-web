@@ -10,6 +10,7 @@ import { formatWait, useRetryCountdown } from "../../shared/api/useRetryCountdow
 import { Card } from "../../shared/ui/Card";
 import { TextField } from "../../shared/ui/TextField";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
+import { CompanySection } from "../company/CompanySection";
 
 export function AccountPage() {
   const me = useMe();
@@ -39,10 +40,12 @@ export function AccountPage() {
         )}
       </Card>
 
+      <CompanySection />
+
       <Card className="flex flex-col gap-3">
         <h2 className="font-display text-base font-semibold">Seus dados</h2>
         <p className="text-sm leading-relaxed text-text-soft">
-          Baixe um arquivo JSON com tudo o que está na sua conta: categorias, transações, orçamento e metas.
+          Baixe um arquivo JSON com tudo o que está na sua conta: categorias, transações, orçamento, metas, contas e empresas.
         </p>
         <button
           type="button"
