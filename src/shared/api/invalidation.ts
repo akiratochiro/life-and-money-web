@@ -10,7 +10,9 @@ export type Change =
   | "billPayment"
   | "company"
   | "invoice"
-  | "companyExpense";
+  | "companyExpense"
+  | "tax"
+  | "withdrawal";
 
 /**
  * Quais famílias de queries cada mudança deixa desatualizadas. É o contrato que o compilador não
@@ -29,6 +31,9 @@ export type Change =
  *   depende dela por enquanto; a ponte com as transações chega com as retiradas.
  * - nota fiscal (salvar, corrigir, cancelar, excluir): as empresas (as notas moram debaixo da chave
  *   da empresa, e a primeira nota trava a data de abertura) e o uso da cota de arquivos.
+ * - imposto (pagar, desfazer, obrigações): as empresas. O pagamento cria ou apaga uma despesa de
+ *   Impostos, e as despesas também moram debaixo da chave da empresa.
+ * - retirada (pró-labore pago ou planejado): as empresas, porque muda o DARF e o Fator R dos impostos.
  */
 export const AFFECTS: Record<Change, readonly string[]> = {
   transaction: ["transactions", "dashboard", "goals", "bills"],
@@ -40,6 +45,8 @@ export const AFFECTS: Record<Change, readonly string[]> = {
   company: ["companies"],
   invoice: ["companies", "attachments"],
   companyExpense: ["companies", "attachments"],
+  tax: ["companies"],
+  withdrawal: ["companies"],
 };
 
 export function invalidate(queryClient: QueryClient, change: Change): Promise<void> {

@@ -75,6 +75,14 @@ describe("o que cada mudança recarrega", () => {
     expect(await staleAfter("invoice")).toEqual(["companies", "company", "companyRegimes", "invoices", "attachmentUsage"]);
   });
 
+  it("um imposto: as empresas (impostos e a despesa de Impostos debaixo delas)", async () => {
+    expect(await staleAfter("tax")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
+  });
+
+  it("uma retirada: as empresas (o DARF e o Fator R mudam junto)", async () => {
+    expect(await staleAfter("withdrawal")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
+  });
+
   it("nenhuma mudança das finanças pessoais recarrega as empresas", async () => {
     for (const change of ["transaction", "goal", "category", "budget", "bill", "billPayment"] as const) {
       expect(await staleAfter(change)).not.toContain("companies");

@@ -36,6 +36,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/withdrawals/{withdrawalId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Muda a data e o bruto; o sócio e o mês da folha não mudam */
+        put: operations["updateWithdrawal"];
+        post?: never;
+        delete: operations["deleteWithdrawal"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/recurring-expenses/{recurringId}": {
         parameters: {
             query?: never;
@@ -49,6 +66,24 @@ export interface paths {
         post?: never;
         /** Apaga se nunca foi paga; senão, encerra no mês anterior */
         delete: operations["deleteRecurringExpense"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/partners/{partnerId}/pro-labore-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Define o pró-labore planejado a partir deste mês */
+        put: operations["setProLaborePlan"];
+        post?: never;
+        /** Encerra o pró-labore planejado a partir deste mês */
+        delete: operations["removeProLaborePlan"];
         options?: never;
         head?: never;
         patch?: never;
@@ -224,6 +259,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/withdrawals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retiradas pagas no ano, da mais recente para a mais antiga */
+        get: operations["listWithdrawals"];
+        put?: never;
+        /** Registra um pró-labore pago, com o INSS e o IRRF calculados */
+        post: operations["createWithdrawal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/taxes/{obligationId}/occurrences/{competence}/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Paga o imposto (vira despesa de impostos) ou marca a declaração como entregue */
+        post: operations["payTax"];
+        /** Desfaz o pagamento ou a entrega; a despesa de impostos some junto */
+        delete: operations["unpayTax"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/recurring-expenses": {
         parameters: {
             query?: never;
@@ -271,6 +342,24 @@ export interface paths {
         put?: never;
         /** Adiciona um sócio (o MEI não tem sócios) */
         post: operations["addPartner"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/obligations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** As obrigações do sistema e as personalizadas */
+        get: operations["listObligations"];
+        put?: never;
+        /** Cria uma obrigação personalizada */
+        post: operations["createObligation"];
         delete?: never;
         options?: never;
         head?: never;
@@ -645,6 +734,24 @@ export interface paths {
         patch: operations["renamePartner"];
         trace?: never;
     };
+    "/companies/{companyId}/obligations/{obligationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Exclui uma personalizada sem pagamentos */
+        delete: operations["deleteObligation"];
+        options?: never;
+        head?: never;
+        /** Ativa ou desativa; nas personalizadas, muda os campos */
+        patch: operations["updateObligation"];
+        trace?: never;
+    };
     "/companies/{companyId}/expense-categories/{categoryId}": {
         parameters: {
             query?: never;
@@ -711,6 +818,23 @@ export interface paths {
          * @description Perfil, categorias (inclusive arquivadas), transações, histórico do orçamento e metas, no mesmo formato das outras respostas. Vem como anexo para download.
          */
         get: operations["export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tax-parameters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Os parâmetros tributários que valem na data, com a fonte legal de cada um */
+        get: operations["taxParameters"];
         put?: never;
         post?: never;
         delete?: never;
@@ -804,6 +928,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/taxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Os vencimentos do mês, com o previsto, a memória de cálculo e o pagamento */
+        get: operations["taxMonth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/revenue": {
         parameters: {
             query?: never;
@@ -813,6 +954,40 @@ export interface paths {
         };
         /** Receita por competência (notas ativas), por dia, semana ISO ou mês, com zero nos períodos vazios */
         get: operations["companyRevenue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/pro-labore-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** O pró-labore planejado de cada sócio, como vale hoje */
+        get: operations["listProLaborePlans"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/companies/{companyId}/pro-labore-calculator": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pró-labore para o Fator R atingir a meta e o custo do Anexo III contra o V, com o faturamento informado */
+        get: operations["proLaboreCalculator"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1042,6 +1217,43 @@ export interface components {
             /** @enum {string} */
             status: "IN_PROGRESS" | "REACHED" | "OVERDUE";
         };
+        WithdrawalRequest: {
+            /** Format: int64 */
+            partnerId: number;
+            /** @enum {string} */
+            kind: "PRO_LABORE" | "DISTRIBUICAO_LUCROS";
+            /**
+             * @description O mês da folha do pró-labore
+             * @example 2026-11
+             */
+            competenceMonth: string;
+            /** Format: date */
+            paymentDate: string;
+            grossAmount: number;
+            /** @description Só nos meses que o app não calcula (antes de 2026): o INSS retido, como no holerite */
+            inssAmount?: number;
+            /** @description Só nos meses que o app não calcula: o IRRF retido, como no holerite */
+            irrfAmount?: number;
+        };
+        WithdrawalResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            partnerId: number;
+            /** @enum {string} */
+            kind: "PRO_LABORE" | "DISTRIBUICAO_LUCROS";
+            /** @example 2026-11 */
+            competenceMonth?: string;
+            /** Format: date */
+            paymentDate: string;
+            grossAmount: number;
+            inssAmount: number;
+            irrfAmount: number;
+            netAmount: number;
+            /** @description Falso quando o INSS e o IRRF foram informados (mês que o app não calcula) */
+            calculated: boolean;
+            warnings: string[];
+        };
         RecurringExpenseRequest: {
             name: string;
             amount: number;
@@ -1085,6 +1297,16 @@ export interface components {
             dueDay: number;
             validFrom: string;
             validTo?: string;
+        };
+        ProLaborePlanRequest: {
+            grossAmount: number;
+        };
+        ProLaborePlanResponse: {
+            /** Format: int64 */
+            partnerId: number;
+            grossAmount: number;
+            /** @example 2026-11 */
+            validFrom: string;
         };
         OneOffExpenseRequest: {
             name: string;
@@ -1283,6 +1505,111 @@ export interface components {
              */
             meiActivity?: "SERVICOS" | "COMERCIO_INDUSTRIA" | "AMBOS";
         };
+        PayTaxRequest: {
+            /** @description O valor pago; ausente nas declarações, que só são marcadas como entregues */
+            amount?: number;
+            /**
+             * Format: date
+             * @description O dia do pagamento (ou da entrega); não pode estar no futuro
+             */
+            date: string;
+        };
+        Darf: {
+            proLabores: components["schemas"]["ProLaboreLine"][];
+        };
+        Payment: {
+            /** @description O valor pago, da despesa de impostos */
+            paidAmount?: number;
+            /**
+             * Format: date
+             * @description O dia do pagamento, da despesa de impostos
+             */
+            paidDate?: string;
+            /**
+             * Format: date
+             * @description O dia da entrega, nas declarações
+             */
+            deliveredOn?: string;
+            /** @description O previsto no momento do pagamento */
+            expectedAtPayment?: number;
+            /** @description Pago − previsto, quando os dois existem */
+            difference?: number;
+            /**
+             * Format: int64
+             * @description A despesa de impostos criada com o pagamento
+             */
+            expenseId?: number;
+        };
+        ProLaboreLine: {
+            /** Format: int64 */
+            partnerId: number;
+            partnerName: string;
+            gross: number;
+            inss: number;
+            irrf: number;
+            /** @description Falso quando é o pró-labore planejado, ainda não registrado */
+            registered: boolean;
+        };
+        Simei: {
+            inss: number;
+            icms: number;
+            iss: number;
+        };
+        Simples: {
+            revenue: number;
+            revenueWithIssWithheld: number;
+            rbt12: number;
+            /** @description FIRST_MONTH, PROPORTIONAL ou TWELVE_MONTHS */
+            rbt12Method: string;
+            windowFrom: string;
+            windowTo: string;
+            /** @enum {string} */
+            annex: "III" | "V";
+            /** @description Só quando o Anexo sai do Fator R */
+            fatorR?: number;
+            /** @description A folha da janela, quando há Fator R */
+            payroll?: number;
+            /** Format: int32 */
+            bracket: number;
+            nominalRate: number;
+            deduction: number;
+            effectiveRate: number;
+            issRate: number;
+        };
+        TaxCalculation: {
+            /** @description DAS do Simples Nacional */
+            simples?: components["schemas"]["Simples"];
+            /** @description DAS-MEI */
+            simei?: components["schemas"]["Simei"];
+            /** @description DARF do pró-labore */
+            darf?: components["schemas"]["Darf"];
+        };
+        TaxOccurrenceResponse: {
+            /** Format: int64 */
+            obligationId: number;
+            /** @enum {string} */
+            kind: "DAS" | "DAS_MEI" | "DARF_PREVIDENCIARIO" | "DEFIS" | "DASN_SIMEI" | "CUSTOM";
+            name: string;
+            /**
+             * @description O mês de apuração; nas anuais, janeiro do ano-calendário
+             * @example 2026-10
+             */
+            competence: string;
+            /** Format: date */
+            dueDate: string;
+            /** @enum {string} */
+            status: "PAID" | "PENDING" | "OVERDUE";
+            /** @description Ausente quando o app não calcula (veja note) */
+            expectedAmount?: number;
+            /** @description Por que não há previsto, ou um aviso sobre ele */
+            note?: string;
+            /** @description De onde veio o previsto */
+            calculation?: components["schemas"]["TaxCalculation"];
+            /** @description Presente quando pago (ou entregue, nas declarações) */
+            payment?: components["schemas"]["Payment"];
+            /** @description Declaração anual: marca-se como entregue, sem valor */
+            declaration: boolean;
+        };
         PayRecurringExpenseRequest: {
             /** @description O valor pago; sem ele, o previsto */
             amount?: number;
@@ -1301,6 +1628,45 @@ export interface components {
             name: string;
             /** @description O sócio que é o próprio usuário */
             me: boolean;
+        };
+        ObligationRequest: {
+            name: string;
+            /** @enum {string} */
+            recurrence: "MONTHLY" | "YEARLY" | "ONCE";
+            /** Format: int32 */
+            dueDay: number;
+            /**
+             * Format: int32
+             * @description Só na anual: o mês do vencimento (1 a 12)
+             */
+            dueMonth?: number;
+            /** @enum {string} */
+            dueRule: "POSTPONE" | "ANTICIPATE" | "NONE";
+            /** @description Valor fixo, se houver; sem ele, o valor é informado no pagamento */
+            fixedAmount?: number;
+            startMonth: string;
+            endMonth?: string;
+        };
+        ObligationResponse: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            kind: "DAS" | "DAS_MEI" | "DARF_PREVIDENCIARIO" | "DEFIS" | "DASN_SIMEI" | "CUSTOM";
+            name: string;
+            /** @enum {string} */
+            recurrence: "MONTHLY" | "YEARLY" | "ONCE";
+            /** Format: int32 */
+            dueDay: number;
+            /** Format: int32 */
+            dueMonth?: number;
+            /** @enum {string} */
+            dueRule: "POSTPONE" | "ANTICIPATE" | "NONE";
+            fixedAmount?: number;
+            /** @description Do sistema: não pode ser excluída, só desativada */
+            system: boolean;
+            active: boolean;
+            startMonth?: string;
+            endMonth?: string;
         };
         InvoiceResponse: {
             /** Format: int64 */
@@ -1567,6 +1933,12 @@ export interface components {
             /** Format: date */
             openingBalanceDate?: string;
         };
+        ObligationUpdate: {
+            /** @description Ativar ou desativar; vale para todas */
+            active?: boolean;
+            /** @description Só nas personalizadas: os novos campos */
+            changes?: components["schemas"]["ObligationRequest"];
+        };
         UpdateExpenseCategoryRequest: {
             name?: string;
             /** @enum {string} */
@@ -1611,6 +1983,14 @@ export interface components {
             recurringExpenses: components["schemas"]["RecurringExpenseResponse"][];
             /** @description Despesas pagas das empresas (avulsas e pagamentos de fixas) */
             companyExpenses: components["schemas"]["ExpenseResponse"][];
+            /** @description Pró-labores planejados, com o histórico */
+            proLaborePlans: components["schemas"]["ProLaborePlanResponse"][];
+            /** @description Retiradas dos sócios (pró-labores pagos) */
+            withdrawals: components["schemas"]["WithdrawalResponse"][];
+            /** @description Obrigações tributárias das empresas */
+            taxObligations: components["schemas"]["ObligationResponse"][];
+            /** @description Impostos pagos e declarações entregues */
+            taxPayments: components["schemas"]["TaxPaymentExport"][];
         };
         BillExport: {
             /** Format: int64 */
@@ -1652,11 +2032,43 @@ export interface components {
             companyId: number;
             invoice: components["schemas"]["InvoiceResponse"];
         };
-        Payment: {
-            /** @example 2026-11 */
-            month: string;
+        TaxPaymentExport: {
             /** Format: int64 */
-            transactionId: number;
+            obligationId: number;
+            competence: string;
+            expectedAmount?: number;
+            /** Format: int64 */
+            expenseId?: number;
+            /** Format: date */
+            deliveredOn?: string;
+        };
+        Irrf: {
+            bracket: components["schemas"]["IrrfBracket"];
+            /** Format: date */
+            validFrom: string;
+            source: string;
+        };
+        IrrfBracket: {
+            /** Format: int32 */
+            bracket?: number;
+            incomeUpTo?: number;
+            rate?: number;
+            deduction?: number;
+        };
+        Parameter: {
+            /** @enum {string} */
+            key: "MINIMUM_WAGE" | "INSS_CEILING" | "INSS_PRO_LABORE_RATE" | "IRRF_SIMPLIFIED_DISCOUNT" | "IRRF_DEPENDENT_DEDUCTION" | "IRRF_REDUCTION_FULL_LIMIT" | "IRRF_REDUCTION_FULL_MAX" | "IRRF_REDUCTION_PARTIAL_LIMIT" | "IRRF_REDUCTION_A" | "IRRF_REDUCTION_B" | "FATOR_R_THRESHOLD" | "DAS_MEI_INSS_RATE" | "DAS_MEI_ICMS" | "DAS_MEI_ISS" | "MEI_ANNUAL_LIMIT" | "MEI_MONTHLY_LIMIT" | "MEI_TOLERANCE" | "SIMPLES_EPP_THRESHOLD" | "SIMPLES_SUBLIMIT" | "SIMPLES_CEILING" | "SIMPLES_TOLERANCE" | "SIMPLES_ISS_CAP" | "DIVIDENDS_MONTHLY_EXEMPTION" | "DIVIDENDS_IRRF_RATE";
+            value: number;
+            /** Format: date */
+            validFrom: string;
+            source: string;
+        };
+        TaxParametersResponse: {
+            /** Format: date */
+            date: string;
+            parameters: components["schemas"]["Parameter"][];
+            simplesBrackets: components["schemas"]["Simples"][];
+            irrfBrackets: components["schemas"]["Irrf"][];
         };
         Holiday: {
             /** Format: date */
@@ -1667,10 +2079,15 @@ export interface components {
         HolidaysResponse: {
             /** Format: int32 */
             year: number;
-            /** @description Falso quando a BrasilAPI não respondeu: a lista vem vazia, e os prazos das contas consideram só os fins de semana */
+            /** @description Falso só fora do intervalo de anos coberto (1900 a 2199): a lista vem vazia, e os prazos consideram só os fins de semana */
             available: boolean;
             /** @description Só feriados nacionais; estaduais e municipais não entram */
             holidays: components["schemas"]["Holiday"][];
+            /**
+             * @description De onde vieram: da BrasilAPI ou, se ela não respondeu, do cálculo local; ausente quando não há feriados
+             * @enum {string}
+             */
+            source?: "BRASIL_API" | "LOCAL";
         };
         Health: {
             /** @example UP */
@@ -1743,6 +2160,15 @@ export interface components {
             /** @enum {string} */
             status: "OK" | "WARNING" | "EXCEEDED" | "IN_PROGRESS" | "REACHED";
         };
+        TaxMonthResponse: {
+            /** @example 2026-11 */
+            month: string;
+            /** @description Soma do previsto do que ainda não foi pago */
+            expectedPending: number;
+            paidTotal: number;
+            items: components["schemas"]["TaxOccurrenceResponse"][];
+            notice: string;
+        };
         Point: {
             /** Format: date */
             start: string;
@@ -1768,6 +2194,28 @@ export interface components {
             /** @description Serviço menos desconto incondicional das notas ativas */
             total: number;
             points: components["schemas"]["Point"][];
+        };
+        ProLaboreCalculatorResponse: {
+            monthlyRevenue: number;
+            /** @description A meta usada: a da empresa, nunca abaixo do limite legal */
+            target: number;
+            annexIII: components["schemas"]["Scenario"];
+            annexV: components["schemas"]["Scenario"];
+            /** @description Custo do V − custo do III; positivo quando o III sai mais barato */
+            savings: number;
+            /** @enum {string} */
+            cheaper: "III" | "V";
+            notice: string;
+        };
+        Scenario: {
+            proLabore: number;
+            das: number;
+            effectiveRate: number;
+            inss: number;
+            irrf: number;
+            netProLabore: number;
+            /** @description DAS + INSS + IRRF do mês */
+            totalCost: number;
         };
         ExpenseMonthResponse: {
             /** @example 2026-11 */
@@ -1946,6 +2394,54 @@ export interface operations {
             };
         };
     };
+    updateWithdrawal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                withdrawalId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WithdrawalRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WithdrawalResponse"];
+                };
+            };
+        };
+    };
+    deleteWithdrawal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                withdrawalId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     updateRecurringExpense: {
         parameters: {
             query?: never;
@@ -1980,6 +2476,54 @@ export interface operations {
             path: {
                 companyId: number;
                 recurringId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    setProLaborePlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                partnerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProLaborePlanRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProLaborePlanResponse"];
+                };
+            };
+        };
+    };
+    removeProLaborePlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                partnerId: number;
             };
             cookie?: never;
         };
@@ -2436,6 +2980,106 @@ export interface operations {
             };
         };
     };
+    listWithdrawals: {
+        parameters: {
+            query: {
+                year: number;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WithdrawalResponse"][];
+                };
+            };
+        };
+    };
+    createWithdrawal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WithdrawalRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WithdrawalResponse"];
+                };
+            };
+        };
+    };
+    payTax: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                obligationId: number;
+                competence: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PayTaxRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TaxOccurrenceResponse"];
+                };
+            };
+        };
+    };
+    unpayTax: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                obligationId: number;
+                competence: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     listRecurringExpenses: {
         parameters: {
             query?: never;
@@ -2578,6 +3222,54 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PartnerResponse"];
+                };
+            };
+        };
+    };
+    listObligations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ObligationResponse"][];
+                };
+            };
+        };
+    };
+    createObligation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ObligationRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ObligationResponse"];
                 };
             };
         };
@@ -3254,6 +3946,54 @@ export interface operations {
             };
         };
     };
+    deleteObligation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                obligationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateObligation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+                obligationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ObligationUpdate"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ObligationResponse"];
+                };
+            };
+        };
+    };
     updateExpenseCategory: {
         parameters: {
             query?: never;
@@ -3369,6 +4109,28 @@ export interface operations {
             };
         };
     };
+    taxParameters: {
+        parameters: {
+            query: {
+                date: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TaxParametersResponse"];
+                };
+            };
+        };
+    };
     listHolidays: {
         parameters: {
             query: {
@@ -3477,6 +4239,30 @@ export interface operations {
             };
         };
     };
+    taxMonth: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TaxMonthResponse"];
+                };
+            };
+        };
+    };
     companyRevenue: {
         parameters: {
             query: {
@@ -3499,6 +4285,53 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RevenueResponse"];
+                };
+            };
+        };
+    };
+    listProLaborePlans: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProLaborePlanResponse"][];
+                };
+            };
+        };
+    };
+    proLaboreCalculator: {
+        parameters: {
+            query: {
+                monthlyRevenue: number;
+                otherPayroll?: number;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProLaboreCalculatorResponse"];
                 };
             };
         };
