@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTaxMonth, type TaxOccurrence } from "./taxesApi";
 import { TaxDetailSheet } from "./TaxDetailSheet";
 import { ObligationsSheet } from "./ObligationsSheet";
+import { ProLaboreCalculatorSheet } from "./ProLaboreCalculatorSheet";
 import { competenceLabel } from "./taxFormat";
 import { useCompanyContext } from "../company/companyContext";
 import { Badge } from "../../shared/ui/Badge";
@@ -30,6 +31,8 @@ export function TaxesPage() {
   const taxes = useTaxMonth(company.id, month);
   const [open, setOpen] = useState<{ obligationId: number; competence: string }>();
   const [managing, setManaging] = useState(false);
+  const [calculating, setCalculating] = useState(false);
+  const simples = company.currentRegime?.taxRegime === "SIMPLES_NACIONAL";
   const items = taxes.data?.items ?? [];
   const keyOf = (item: { obligationId: number; competence: string }) => `${item.obligationId}-${item.competence}`;
   const opened = open && items.find((item) => keyOf(item) === keyOf(open));
@@ -58,6 +61,11 @@ export function TaxesPage() {
         <button type="button" onClick={() => setManaging(true)} className="flex min-h-11 items-center text-sm font-bold text-link">
           Obrigações
         </button>
+        {simples && (
+          <button type="button" onClick={() => setCalculating(true)} className="flex min-h-11 items-center text-sm font-bold text-link">
+            Calculadora de pró-labore
+          </button>
+        )}
       </div>
 
       {taxes.isPending ? (
@@ -95,6 +103,7 @@ export function TaxesPage() {
         <ObligationsSheet companyId={company.id} taxRegime={company.currentRegime?.taxRegime} readOnly={company.archived}
           onClose={() => setManaging(false)} />
       )}
+      {calculating && <ProLaboreCalculatorSheet companyId={company.id} onClose={() => setCalculating(false)} />}
       {opened && (
         <TaxDetailSheet key={keyOf(opened)} companyId={company.id} occurrence={opened} readOnly={company.archived}
           onClose={() => setOpen(undefined)} />

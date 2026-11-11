@@ -49,9 +49,19 @@ const OBLIGATIONS = [
     fixedAmount: 250, system: false, active: true, startMonth: "2026-01" },
 ];
 
+const scenario = (proLabore: number, das: number, totalCost: number) => ({
+  proLabore, das, effectiveRate: das / 10000, inss: proLabore * 0.11, irrf: 0, netProLabore: proLabore * 0.89, totalCost,
+});
+const COMPARISON = {
+  monthlyRevenue: 10000, target: 0.28, annexIII: scenario(2800, 600, 908), annexV: scenario(1621, 1550, 1728.31),
+  savings: 820.31, cheaper: "III", notice: "Estimativa calculada pelo app.",
+};
+
 function serve(items: unknown[] = [DARF, DAS]) {
   mocks.GET.mockImplementation((path: string) => {
     if (path === "/companies/{companyId}/obligations") return ok(OBLIGATIONS);
+    if (path === "/companies/{companyId}/revenue") return ok({ granularity: "MONTH", from: "", to: "", total: 10000, points: [] });
+    if (path === "/companies/{companyId}/pro-labore-calculator") return ok(COMPARISON);
     if (path === "/companies/{companyId}/taxes") {
       return ok({ month: "2026-10", expectedPending: 330, paidTotal: 401.5, items, notice: "Estimativa calculada pelo app: não substitui o seu contador." });
     }
@@ -59,9 +69,9 @@ function serve(items: unknown[] = [DARF, DAS]) {
   });
 }
 
-function open(archived = false) {
+function open(archived = false, taxRegime = "SIMPLES_NACIONAL") {
   const router = createMemoryRouter(
-    [{ path: "/c", element: <Outlet context={{ id: 7, archived, currentRegime: { taxRegime: "SIMPLES_NACIONAL" } }} />, children: [{ index: true, element: <TaxesPage /> }] }],
+    [{ path: "/c", element: <Outlet context={{ id: 7, archived, currentRegime: { taxRegime } }} />, children: [{ index: true, element: <TaxesPage /> }] }],
     { initialEntries: ["/c"] },
   );
   render(
@@ -204,6 +214,42 @@ describe("aba Impostos", () => {
       await userEvent.click(within(sheet).getByRole("button", { name: "Excluir" }));
 
       expect(await within(sheet).findByRole("alert")).toHaveTextContent("desative em vez de excluir");
+    });
+  });
+
+  describe("calculadora de pró-labore", () => {
+    const calls = () => mocks.GET.mock.calls.filter(([path]) => path === "/companies/{companyId}/pro-labore-calculator");
+
+    it("começa com a receita do mês passado e já mostra a comparação", async () => {
+      open();
+      await userEvent.click(await screen.findByRole("button", { name: "Calculadora de pró-labore" }));
+      const sheet = screen.getByRole("dialog", { name: "Calculadora de pró-labore" });
+
+      const comparison = await within(sheet).findByRole("region", { name: "Comparação" });
+      expect((within(sheet).getByLabelText("Faturamento do mês") as HTMLInputElement).value).toMatch(/10\.000,00/);
+      expect(calls()[0][1].params.query).toEqual({ monthlyRevenue: 10000, otherPayroll: 0 });
+      expect(within(comparison).getByText("Mais barato")).toBeInTheDocument();
+      expect(within(comparison).getByText(/a menos por mês do que no Anexo V/)).toBeInTheDocument();
+    });
+
+    it("recalcula só ao tocar em Calcular", async () => {
+      open();
+      await userEvent.click(await screen.findByRole("button", { name: "Calculadora de pró-labore" }));
+      const sheet = screen.getByRole("dialog", { name: "Calculadora de pró-labore" });
+      await within(sheet).findByRole("region", { name: "Comparação" });
+
+      await userEvent.type(within(sheet).getByLabelText("Outros salários do mês"), "150000");
+      expect(calls()).toHaveLength(1);
+      await userEvent.click(within(sheet).getByRole("button", { name: "Calcular" }));
+
+      expect(calls().at(-1)![1].params.query).toEqual({ monthlyRevenue: 10000, otherPayroll: 1500 });
+    });
+
+    it("não aparece para o MEI", async () => {
+      open(false, "SIMEI");
+      await screen.findByRole("button", { name: "Obrigações" });
+
+      expect(screen.queryByRole("button", { name: "Calculadora de pró-labore" })).not.toBeInTheDocument();
     });
   });
 });
