@@ -5,7 +5,7 @@ import { Logo } from "../../shared/brand/Logo";
 const REPOSITORY = "https://github.com/akiratochiro/life-and-money-web";
 
 /** Data da última mudança no texto. Mude junto com o conteúdo. */
-export const PRIVACY_UPDATED_AT = "9 de novembro de 2026";
+export const PRIVACY_UPDATED_AT = "11 de novembro de 2026";
 
 /**
  * O que o app guarda, onde e por quê. Pública (fora do RequireAuth): quem ainda vai criar a conta
@@ -85,6 +85,10 @@ export function PrivacyPage() {
               (hash) dela, que não permitem descobri-la.
             </li>
             <li>Os feriados do calendário de contas vêm da BrasilAPI, que recebe só o ano consultado.</li>
+            <li>
+              Ao cadastrar uma empresa, se você pedir para buscar os dados pelo CNPJ, nosso servidor consulta o CNPJ na
+              BrasilAPI, que devolve os dados públicos da Receita. Só o CNPJ é enviado, e só quando você clica em buscar.
+            </li>
           </ul>
           <p className="mt-2">
             O servidor guarda registros técnicos (erros, com o número interno da conta) por tempo limitado, para

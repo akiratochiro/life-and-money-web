@@ -62,7 +62,8 @@ receive, and you start with a default set of categories. It is a portfolio proje
 | Bills | A monthly calendar of what is due, payable and receivable, with overdue, pending and paid markers on each day and national holidays highlighted; mark one as paid (with the real amount) or undo it |
 | Analytics | Expenses by category in a donut and month-by-month bars, with the average of closed months |
 | Categories | Create, rename and archive your own categories |
-| My account | Profile, export all your data as JSON, sign out, and delete the account (typing "EXCLUIR" plus the password) |
+| My account | Profile, register a company, export all your data as JSON, sign out, and delete the account (typing "EXCLUIR" plus the password) |
+| My company | Company data, partner and the tax-regime history (MEI, Simples Nacional, Lucro Presumido or Real), with changes dated in the past or scheduled for the future and an undo for the latest one; a CNPJ lookup pre-fills the registration |
 
 ## Visual identity
 

@@ -3,8 +3,9 @@
 ## Auditoria automática (`npm run audit:mobile`)
 
 O Chrome emula um iPhone 13 (390×844, DPR 3, toque, `isMobile`) e, em cada tela (login, Início,
-Extrato, Orçamento, Metas, Contas, Análises, Categorias, Minha conta e Nova transação, além de
-cadastro e privacidade, antes de entrar):
+Extrato, Orçamento, Metas, Contas, Análises, Categorias, Minha conta, a folha de cadastro de empresa,
+a página da primeira empresa do usuário (se ele tiver uma) e Nova transação, além de cadastro e
+privacidade, antes de entrar):
 
 - mede todo elemento tocável e falha se algum tiver menos de 44×44 px (links no meio de um parágrafo
   são exceção, como na WCAG);

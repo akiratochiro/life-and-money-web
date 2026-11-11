@@ -116,6 +116,13 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   conta. O prazo (`payableUntil`) e o status vêm da API; **o front não calcula dia útil**. A
   consulta de feriados (`features/bills/holidaysApi.ts`) fica em cache para sempre quando
   `available`, e um minuto quando não. Sempre deixe claro na tela que só entram feriados nacionais.
+- **Minha Empresa** (`features/company`, decisão 24; plano em `../implementacao_pj*.md`): rotas
+  `/companies/:companyId` com abas como rotas filhas, que entram em `TABS` do `CompanyLayout` quando a
+  fase delas fica pronta; as abas leem a empresa por `useCompanyContext()`. No menu só com empresa
+  ativa (`CompanyNav` no `AppShell`, seção no topo do "Mais"). As regras dos dropdowns ficam em
+  `regimeOptions.ts` (puras, espelham a API só para a UX). Toda chave começa com `"companies"` e a
+  mudança é `"company"` no `AFFECTS`. CNPJ vai para a API sem pontuação (`cnpj.ts`): a barra quebraria
+  o caminho de `/cnpj/{cnpj}`.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

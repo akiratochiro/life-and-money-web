@@ -506,3 +506,31 @@ front cadastrava e já entrava em seguida, o que deixa de ser possível.
 conferir, e uma confirmação ao carregar deixaria quem cadastrou o e-mail de outra pessoa (com a
 própria senha) ganhar a conta sem a dona do e-mail fazer nada. O custo é um passo a mais para quem
 está chegando, além de esperar o e-mail.
+
+## 24. Minha Empresa: no menu só com empresa ativa, abas que chegam com cada fase
+
+**Contexto.** O módulo de finanças PJ (decisões 17 e 18 da API) traz uma área nova, por empresa, que
+vai ganhar abas fase a fase: visão geral, notas fiscais, despesas, impostos, retiradas, calendário e
+contador. A maior parte dos usuários não tem CNPJ, e a barra de baixo do celular já está cheia.
+
+**Decisão.**
+- **Menu:** "Minha Empresa" só aparece com pelo menos uma empresa ativa, logo abaixo do Início. Com
+  uma empresa, é um item que leva direto a ela. Com várias, o título e uma entrada por empresa (emoji
+  e nome), sempre à vista, sem submenu que abre e fecha. No celular, as empresas ficam numa seção
+  "Minhas empresas" no topo do "Mais", e o "Mais" fica marcado na página da empresa.
+- **Rotas em inglês**, como as outras: `/companies/:companyId`, com cada aba como rota filha, para o
+  voltar do navegador e os links funcionarem.
+- **As abas aparecem quando a fase delas fica pronta.** Com uma aba só, a barra nem aparece. O
+  cadastro mora em Minha conta, onde também ficam as arquivadas, com o desarquivar.
+- **O formulário espelha as regras de enquadramento só para a experiência** (`regimeOptions.ts`,
+  função pura testada): MEI trava o SIMEI, o anexo só aparece no Simples, a atividade só no MEI. Quem
+  decide é a API, e o erro dela aparece no campo. O formulário avisa, desde o cadastro, até quando a
+  data de abertura pode ser corrigida, e na edição trava o campo com o motivo.
+- **A busca pelo CNPJ preenche só o que está em branco**: o que o usuário digitou vale mais que a
+  consulta. Ela nunca impede o cadastro, e um CNPJ não encontrado avisa que os CNPJs com letras podem
+  ainda não aparecer na consulta pública.
+
+**Consequências.** Quem não tem empresa não vê nada novo além de um card em Minha conta, e o
+menu não ganha um item morto. Mostrar sete abas "em breve" desde já deixaria o desenho completo à
+vista, mas aba que não faz nada é ruído e, se algo for ao ar no meio do caminho, parece app
+quebrado. O custo é que cada fase precisa lembrar de adicionar a aba dela em `CompanyLayout`.

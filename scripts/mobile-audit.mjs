@@ -127,6 +127,21 @@ for (const [name, path] of [
   await audit(name);
 }
 
+// Minha Empresa: o cadastro (folha em Minha conta) e a página da primeira empresa, se houver.
+await page.goto(`${BASE}/account`, { waitUntil: "load" });
+await settle(1500);
+const [newCompany] = await page.$$("xpath/.//button[normalize-space()='Cadastrar empresa']");
+if (newCompany) {
+  await newCompany.tap();
+  await audit("cadastro-empresa");
+  await page.keyboard.press("Escape");
+}
+const companyHref = await page.evaluate(() => document.querySelector('a[href^="/companies/"]')?.getAttribute("href"));
+if (companyHref) {
+  await page.goto(`${BASE}${companyHref}`, { waitUntil: "load" });
+  await audit("empresa");
+}
+
 // Swipe lateral no Extrato.
 await page.goto(`${BASE}/transactions`, { waitUntil: "load" });
 await settle();
