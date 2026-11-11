@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { AnimatePresence, m } from "motion/react";
 import { pageEnter } from "../shared/ui/motion";
 import {
+  BriefcaseIcon,
   CalendarIcon,
   ChartIcon,
   GaugeIcon,
@@ -16,6 +17,7 @@ import {
 } from "../shared/ui/icons";
 import { Logo } from "../shared/brand/Logo";
 import { BottomSheet } from "../shared/ui/BottomSheet";
+import { useCompanies, type Company } from "../features/company/companyApi";
 
 /** Duas de cada lado do "+": com cinco posições iguais, ele fica no centro exato da barra. */
 const primary = [
@@ -55,8 +57,9 @@ function sideItemClass(state: { isActive: boolean }) {
 export function AppShell() {
   const { pathname } = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
+  const companies = useCompanies().data ?? [];
   const fullScreen = FULL_SCREEN_ON_MOBILE.includes(pathname);
-  const onSecondary = secondary.some((item) => pathname.startsWith(item.to));
+  const onSecondary = secondary.some((item) => pathname.startsWith(item.to)) || pathname.startsWith("/companies/");
 
   return (
     <div className="min-h-dvh bg-canvas md:flex">
@@ -64,10 +67,14 @@ export function AppShell() {
         <Logo className="mb-6 px-1" />
         <nav aria-label="Navegação principal" className="flex flex-col gap-1">
           {[...primary, ...secondary].map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} end={to === "/"} className={sideItemClass}>
-              <Icon />
-              {label}
-            </NavLink>
+            <Fragment key={to}>
+              <NavLink to={to} end={to === "/"} className={sideItemClass}>
+                <Icon />
+                {label}
+              </NavLink>
+              {/* Logo abaixo do Início, e só para quem tem empresa ativa. */}
+              {to === "/" && <CompanyNav companies={companies} />}
+            </Fragment>
           ))}
         </nav>
         <NavLink
@@ -128,6 +135,24 @@ export function AppShell() {
       )}
 
       <BottomSheet title="Mais" open={moreOpen} onClose={() => setMoreOpen(false)}>
+        {companies.length > 0 && (
+          <nav aria-label="Minhas empresas" className="mb-2 flex flex-col border-b border-line pb-2">
+            <h3 className="px-3 pb-1 text-sm font-semibold text-text-muted">Minhas empresas</h3>
+            {companies.map((company) => (
+              <NavLink
+                key={company.id}
+                to={`/companies/${company.id}`}
+                onClick={() => setMoreOpen(false)}
+                className={(state) =>
+                  `flex min-h-13 items-center gap-3 rounded-2xl px-3 font-bold transition active:bg-sunken ${navClass(state)}`
+                }
+              >
+                <span aria-hidden="true" className="w-[22px] text-center text-xl">{company.emoji}</span>
+                {company.name}
+              </NavLink>
+            ))}
+          </nav>
+        )}
         <nav aria-label="Mais telas" className="flex flex-col">
           {secondary.map(({ to, label, icon: Icon }) => (
             <NavLink
@@ -144,6 +169,43 @@ export function AppShell() {
           ))}
         </nav>
       </BottomSheet>
+    </div>
+  );
+}
+
+/**
+ * "Minha Empresa" na sidebar. Com uma empresa, um item que leva direto a ela; com várias, o título
+ * e, logo abaixo, uma entrada por empresa (emoji e nome), sempre à vista: um submenu que abre e
+ * fecha esconderia a navegação atrás de um clique a mais.
+ */
+function CompanyNav({ companies }: { companies: Company[] }) {
+  if (companies.length === 0) return null;
+  if (companies.length === 1) {
+    return (
+      <NavLink to={`/companies/${companies[0].id}`} className={sideItemClass}>
+        <BriefcaseIcon />
+        Minha Empresa
+      </NavLink>
+    );
+  }
+  return (
+    <div role="group" aria-labelledby="company-nav-title" className="flex flex-col">
+      <span id="company-nav-title" className="flex h-12 items-center gap-3 px-3 font-bold text-text-muted">
+        <BriefcaseIcon />
+        Minha Empresa
+      </span>
+      {companies.map((company) => (
+        <NavLink
+          key={company.id}
+          to={`/companies/${company.id}`}
+          className={(state) =>
+            `flex min-h-11 items-center gap-2 rounded-2xl pl-9 pr-3 text-sm font-bold transition hover:text-text ${navClass(state)}`
+          }
+        >
+          <span aria-hidden="true" className="text-base">{company.emoji}</span>
+          <span className="truncate">{company.name}</span>
+        </NavLink>
+      ))}
     </div>
   );
 }
