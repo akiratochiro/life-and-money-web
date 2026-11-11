@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router";
 import type { Category } from "../categories/categoriesApi";
 import { TransactionForm } from "./TransactionForm";
 import { useDeleteTransaction, useUpdateTransaction, type Transaction } from "./transactionsApi";
+import { useDeleteWithdrawal } from "../withdrawals/withdrawalsApi";
+import { useInvalidate } from "../../shared/api/invalidation";
 import { toCents } from "../../shared/lib/money";
 import { CloseIcon } from "../../shared/ui/icons";
 
@@ -15,6 +18,10 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
   const dialogRef = useRef<HTMLDialogElement>(null);
   const updateTransaction = useUpdateTransaction();
   const deleteTransaction = useDeleteTransaction();
+  const origin = transaction.origin;
+  // Excluir as duas é a exclusão da retirada com deletePersonal (a origem é a dona do lançamento).
+  const deleteWithdrawal = useDeleteWithdrawal(origin?.companyId ?? 0);
+  const invalidate = useInvalidate();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   useEffect(() => {
@@ -55,6 +62,17 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
           goalId: transaction.goalId ?? null,
         }}
         submitLabel="Salvar alterações"
+        locked={origin && (
+          <>
+            Vem de {origin.label}. O valor e a data mudam na retirada
+            {origin.editable ? (
+              <>
+                {", "}
+                <Link to={`/companies/${origin.companyId}/withdrawals`} className="font-bold text-link">na página da empresa</Link>.
+              </>
+            ) : " (a empresa está arquivada)."}
+          </>
+        )}
         // Otimista: o diálogo fecha na hora e o extrato já mostra a mudança. Um erro desfaz a
         // mudança e aparece como aviso (useUpdateTransaction, useDeleteTransaction).
         pending={false}
@@ -66,17 +84,34 @@ export function EditTransactionDialog({ transaction, category, onClose }: Props)
         footer={
           confirmingDelete ? (
             <div className="flex flex-col gap-3 rounded-2xl bg-surface p-4">
-              <p className="text-sm text-text-soft">Apagar esta transação? Isso não pode ser desfeito.</p>
+              <p className="text-sm text-text-soft">
+                {origin?.editable
+                  ? `Este lançamento vem de ${origin.label}. Apagar também a retirada na empresa?`
+                  : "Apagar esta transação? Isso não pode ser desfeito."}
+              </p>
+              {origin?.editable && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteWithdrawal.mutate({ withdrawalId: origin.withdrawalId, deletePersonal: true });
+                    close();
+                  }}
+                  className="h-11 rounded-full bg-danger-strong font-bold text-on-accent transition active:scale-95"
+                >
+                  Apagar as duas
+                </button>
+              )}
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => {
-                    deleteTransaction.mutate(id);
+                    // Só o lançamento: a retirada fica e perde a ligação, então a empresa recarrega também.
+                    deleteTransaction.mutate(id, { onSuccess: () => origin && invalidate("withdrawal") });
                     close();
                   }}
                   className="h-11 flex-1 rounded-full bg-danger-strong font-bold text-on-accent transition active:scale-95"
                 >
-                  Apagar
+                  {origin?.editable ? "Só o lançamento" : "Apagar"}
                 </button>
                 <button
                   type="button"

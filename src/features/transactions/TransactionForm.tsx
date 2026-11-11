@@ -7,7 +7,8 @@ import { ApiError } from "../../shared/api/problem";
 import { AmountInput } from "../../shared/ui/AmountInput";
 import { TextField } from "../../shared/ui/TextField";
 import { Button } from "../../shared/ui/Button";
-import { todayIso, yesterdayIso } from "../../shared/lib/dates";
+import { formatDate, todayIso, yesterdayIso } from "../../shared/lib/dates";
+import { formatCents } from "../../shared/lib/money";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { CategoryTile } from "../categories/CategoryGlyph";
 import { NewCategorySheet } from "../categories/NewCategorySheet";
@@ -49,9 +50,14 @@ type Props = {
   footer?: ReactNode;
   /** Tela cheia no celular: foco direto no valor e o botão preso na base, acima do teclado. */
   fullScreen?: boolean;
+  /**
+   * Valor e data vêm de outra feature (a retirada lançada, Fase 6) e são mudados lá: aparecem só para
+   * leitura, com a explicação, e o tipo não muda. Categoria e descrição continuam editáveis.
+   */
+  locked?: ReactNode;
 };
 
-export function TransactionForm({ initial, submitLabel, pending, error, onSubmit, footer, fullScreen = false }: Props) {
+export function TransactionForm({ initial, submitLabel, pending, error, onSubmit, footer, fullScreen = false, locked }: Props) {
   const categories = useCategories(true);
   const goals = useGoals();
 
@@ -100,6 +106,13 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
   return (
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+        {locked ? (
+          <section aria-label="Valor e data" className="flex flex-col gap-1 rounded-2xl bg-surface p-4">
+            <span className="font-display text-2xl font-bold tabular-nums">{formatCents(cents)}</span>
+            <span className="text-sm text-text-soft">{formatDate(date)}</span>
+            <div className="text-sm text-text-muted">{locked}</div>
+          </section>
+        ) : (
         <div role="group" aria-label="Tipo de transação" className="grid grid-cols-3 gap-1 rounded-full bg-surface p-1">
           {TYPES.map((option) => (
             <button
@@ -116,8 +129,9 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
             </button>
           ))}
         </div>
+        )}
 
-        <AmountInput label="Valor" cents={cents} onChange={setCents} autoFocus={fullScreen} />
+        {!locked && <AmountInput label="Valor" cents={cents} onChange={setCents} autoFocus={fullScreen} />}
 
         <fieldset className="flex flex-col gap-3">
           <legend className="mb-3 text-sm font-semibold text-text-muted">Categoria</legend>
@@ -161,7 +175,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
           )}
         </fieldset>
 
-        <fieldset className="flex flex-col gap-3">
+        {!locked && <fieldset className="flex flex-col gap-3">
           <legend className="mb-3 text-sm font-semibold text-text-muted">Data</legend>
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" aria-pressed={date === today} onClick={() => setDate(today)} className={chipClass(date === today)}>
@@ -181,7 +195,7 @@ export function TransactionForm({ initial, submitLabel, pending, error, onSubmit
               />
             </label>
           </div>
-        </fieldset>
+        </fieldset>}
 
         <TextField
           label="Descrição (opcional)"

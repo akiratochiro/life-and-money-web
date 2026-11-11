@@ -136,7 +136,8 @@ export function useUpdateTransaction() {
         updateMonth(queryClient, monthOf(before.transactionDate), (list) => removeTransaction(list, id));
         updateGoal(queryClient, before.goalId, -before.amount);
       }
-      const after = { ...provisionalTransaction(body, id), createdAt: before?.createdAt ?? new Date().toISOString() };
+      // A origem (retirada lançada) não vem do formulário: fica a do cache até a resposta chegar.
+      const after = { ...provisionalTransaction(body, id), createdAt: before?.createdAt ?? new Date().toISOString(), origin: before?.origin };
       updateMonth(queryClient, monthOf(body.transactionDate), (list) => insertTransaction(list, after));
       updateGoal(queryClient, body.goalId, body.amount);
       return { snapshot, reachedGoal: newlyReached(goalsBefore, goals(queryClient)) };
