@@ -12,13 +12,15 @@ import { ApiError } from "../../shared/api/problem";
 
 /**
  * As abas aparecem quando a fase de cada uma fica pronta (decisão 24): aba que não faz nada é
- * ruído. Com uma aba só, a barra nem aparece.
+ * ruído. Com uma aba só, a barra nem aparece. Retiradas some no MEI, que não tem pró-labore (até a
+ * retirada de lucro chegar, na Fase 6).
  */
-const TABS = [
+const TABS: { to: string; label: string; hiddenFor?: string }[] = [
   { to: "", label: "Visão geral" },
   { to: "invoices", label: "Notas fiscais" },
   { to: "expenses", label: "Despesas" },
   { to: "taxes", label: "Impostos" },
+  { to: "withdrawals", label: "Retiradas", hiddenFor: "SIMEI" },
 ];
 
 export function CompanyLayout() {
@@ -37,6 +39,7 @@ export function CompanyLayout() {
   }
 
   const data = company.data;
+  const tabs = TABS.filter((tab) => tab.hiddenFor !== data.currentRegime.taxRegime);
   return (
     <div className="flex flex-col gap-6">
       <header className="flex items-center gap-4">
@@ -61,9 +64,9 @@ export function CompanyLayout() {
         )}
       </header>
 
-      {TABS.length > 1 && (
+      {tabs.length > 1 && (
         <nav aria-label="Seções da empresa" className="flex gap-1 overflow-x-auto rounded-full bg-sunken p-1">
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <NavLink
               key={tab.to}
               to={tab.to}

@@ -21,6 +21,7 @@ import { CompanyOverviewPage } from "../features/company/CompanyOverviewPage";
 import { InvoicesPage } from "../features/invoices/InvoicesPage";
 import { ExpensesPage } from "../features/companyExpenses/ExpensesPage";
 import { TaxesPage } from "../features/taxes/TaxesPage";
+import { WithdrawalsPage } from "../features/withdrawals/WithdrawalsPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
               { path: "invoices", element: <InvoicesPage /> },
               { path: "expenses", element: <ExpensesPage /> },
               { path: "taxes", element: <TaxesPage /> },
+              { path: "withdrawals", element: <WithdrawalsPage /> },
             ],
           },
         ],

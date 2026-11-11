@@ -130,6 +130,25 @@ describe("página da empresa", () => {
     expect(await screen.findByRole("note")).toHaveTextContent("o app não calcula os impostos");
   });
 
+  it("mostra as abas da empresa na ordem", async () => {
+    serve();
+    open();
+    const nav = await screen.findByRole("navigation", { name: "Seções da empresa" });
+    expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual([
+      "Visão geral", "Notas fiscais", "Despesas", "Impostos", "Retiradas",
+    ]);
+  });
+
+  it("no MEI não há a aba Retiradas", async () => {
+    const mei = { ...MEI, validTo: undefined };
+    serve({ company: company({ currentRegime: mei }), regimes: [mei] });
+    open();
+
+    const nav = await screen.findByRole("navigation", { name: "Seções da empresa" });
+    expect(within(nav).getByRole("link", { name: "Impostos" })).toBeInTheDocument();
+    expect(within(nav).queryByRole("link", { name: "Retiradas" })).not.toBeInTheDocument();
+  });
+
   it("editar abre a folha com os dados atuais", async () => {
     serve();
     open();
