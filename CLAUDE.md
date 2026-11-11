@@ -128,6 +128,11 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   valores ficam travados; do PDF, `InvoiceFieldsForm` com `MoneyField` (centavos). "Salvar todas"
   salva um de cada vez. Download por `downloadInvoiceFile` (`shared/lib/download.ts` lê o
   `filename*`). Chaves debaixo de `["companies", id, "invoices"]`; a mudança é `"invoice"`.
+- **Receita e despesas da empresa** (decisão 26): `RevenueCard` (em `features/invoices`) na Visão geral,
+  com barras só de desenho e uma tabela `sr-only`; nada de barra clicável com mais de ~6 barras (alvo
+  de 44 px). `features/companyExpenses`: aba Despesas com `expenseMonthQuery` + prefetch, status por
+  texto, Impostos (`system`) nunca escolhível, comprovante em dois passos (salvar, depois o arquivo),
+  pagamento de fixa corrigido só em valor e data. A mudança é `"companyExpense"` no `AFFECTS`.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

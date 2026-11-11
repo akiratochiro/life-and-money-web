@@ -565,3 +565,29 @@ uma vez, no fim do mês, e às vezes pelo celular.
 **Consequências.** O usuário vê, antes de qualquer coisa ficar salva, o que foi entendido de cada
 arquivo e por que algum foi recusado. O custo é um passo a mais e o arquivo viajar duas vezes (até
 2 MB cada), em troca de nenhum arquivo órfão de uma pré-visualização abandonada.
+
+## 26. Receita na visão geral com barras só de desenho, e despesas da empresa numa aba
+
+**Contexto.** A Fase 3 trouxe a receita por competência (decisão 22 da API) e as despesas da empresa
+(decisão 21 da API): avulsas, fixas com pagamento por mês e comprovantes.
+
+**Decisão.**
+- **A receita mora na Visão geral**, onde a Fase 5 vai pôr os cards do mês. O seletor Dia, Semana e
+  Mês usa o período padrão de cada um (30 dias, 12 semanas, 12 meses).
+- **As barras são só desenho** (`aria-hidden`). Com 12 ou 30 barras no celular, cada uma teria de
+  10 a 26 px, abaixo dos 44 px de um alvo de toque, e a auditoria mobile reprovaria barras clicáveis
+  como as das `MonthlyBars` de 6 meses. O card destaca o total, o período atual e o maior período, e os
+  valores de cada barra ficam numa tabela `sr-only` para o leitor de tela.
+- **Aba Despesas** com `MonthSwitcher` e prefetch dos meses vizinhos, como nas telas PF. O status vai
+  por texto além da cor (Paga, Pendente, Atrasada). A categoria Impostos nunca é oferecida para
+  escolha e aparece com cadeado na folha de categorias.
+- **O comprovante sobe em dois passos** (salvar a despesa e depois o arquivo). Se o arquivo falhar
+  (cota, tipo), a despesa fica salva e um aviso diz que o comprovante não subiu. A alternativa, um
+  único multipart com a despesa e o arquivo, faria uma despesa válida ser recusada por causa do
+  anexo opcional.
+- **Corrigir o pagamento de uma fixa mostra só valor e data**, que é o que a API muda; nome e
+  categoria vêm da fixa. Editar a fixa pendente abre os termos, que valem a partir deste mês.
+- O `MoneyField` subiu para `shared/ui` quando ganhou o segundo uso.
+
+**Consequências.** O gráfico fica legível e acessível em qualquer largura, ao custo de não dar para
+"tocar numa barra" para ver o valor dela no celular. Os destaques e a tabela cobrem esse caso.

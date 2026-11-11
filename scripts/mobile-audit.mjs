@@ -142,6 +142,8 @@ if (companyHref) {
   await audit("empresa");
   await page.goto(`${BASE}${companyHref}/invoices`, { waitUntil: "load" });
   await audit("notas");
+  await page.goto(`${BASE}${companyHref}/expenses`, { waitUntil: "load" });
+  await audit("despesas");
 }
 
 // Swipe lateral no Extrato.
