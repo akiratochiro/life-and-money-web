@@ -67,7 +67,7 @@ receive, and you start with a default set of categories. It is a portfolio proje
 | Company taxes | What is due each month (DAS, DAS-MEI, the pró-labore DARF, the yearly declarations and your own obligations) with the expected amount, how it was calculated and the status; paying prefills the expected amount and becomes a "Taxes" expense; a pró-labore calculator compares Anexo III and Anexo V |
 | Withdrawals | The planned pró-labore of each partner and the paid ones of the year, with INSS, IRRF and net calculated (values from the payslip before 2026) |
 | Company expenses | The month's one-off and recurring expenses with paid and pending totals, paying a recurring month with the real amount and date, receipts, and per-company categories (with the ones that count as payroll for the Fator R) |
-| My company | Revenue by day, week or month on the overview, company data, partner and the tax-regime history (MEI, Simples Nacional, Lucro Presumido or Real), with changes dated in the past or scheduled for the future and an undo for the latest one; a CNPJ lookup pre-fills the registration |
+| My company | The month at a glance (revenue, expenses, taxes by competence, result with its sign, withdrawals) and what is overdue or due in the next 30 days; revenue by day, week or month on the overview, company data, partner and the tax-regime history (MEI, Simples Nacional, Lucro Presumido or Real), with changes dated in the past or scheduled for the future and an undo for the latest one; a CNPJ lookup pre-fills the registration |
 
 ## Visual identity
 

@@ -628,3 +628,22 @@ pagamento que vira despesa, as obrigações, a calculadora de pró-labore e o pr
 
 **Consequências.** O usuário vê de onde vem cada número e paga o caso comum sem digitar. A calculadora
 não reage enquanto se digita, o que custa um toque a mais em troca de não disparar uma conta por dígito.
+
+## 28. Visão geral da empresa: os cards do mês e o que vence
+
+**Contexto.** A Fase 5 junta numa tela o mês da empresa (decisão 27 da API) e os próximos vencimentos.
+
+**Decisão.**
+- **Os cards vêm prontos da API** (`/overview`): o front não soma abas. As regras (impostos pela
+  competência, despesa de Impostos fora, pago no lugar do previsto) ficam num lugar só.
+- **Cada card é um link para a aba dele**, com 44 px ou mais; o Resultado ocupa a largura toda, com o
+  **sinal escrito** ("+R$", "−R$", em `signedCents`) além do verde ou vermelho, e diz "Resultado
+  previsto" no mês corrente. O card de Retiradas some no MEI, como a aba.
+- **Navegação entre meses** com prefetch dos vizinhos, como nas telas PF.
+- **Próximos vencimentos** mostram até 5 (atrasados primeiro) e "E mais N" com os links para Impostos
+  e Despesas; o status vai por texto (Atrasado, Pendente).
+- **Sem entrada nova no mapa de invalidação**: as duas queries moram debaixo de `["companies", id]`, que
+  nota, despesa, imposto e retirada já recarregam.
+
+**Consequências.** Um número da visão geral bate sempre com a aba de origem, porque a regra é a mesma
+da API. A lista curta não substitui o calendário fiscal da Fase 9.
