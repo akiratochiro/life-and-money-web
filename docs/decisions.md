@@ -791,3 +791,26 @@ da API). Falta a tela.
 
 **Consequências.** O usuário vê o que falta antes de baixar e manda um ZIP completo. O ZIP inteiro passa pela
 memória do navegador como Blob, o que é aceitável para um mês (a cota de anexos é de 50 MB).
+
+## 35. A linha do tempo do enquadramento e o suporte discreto
+
+**Contexto.** Antes de ir ao ar, dois pedidos: o histórico de enquadramento deveria parecer uma linha do tempo
+quando a empresa muda de regime, e os usuários precisam de um contato de suporte, mas "mais escondido".
+
+**Decisão.**
+- **Linha do tempo só quando houve mudança.** Com mais de um enquadramento, uma linha vertical com um ponto
+  por vigência, da mais nova à mais antiga: a atual com ponto cheio e o selo "Atual", a agendada tracejada com
+  "Agendado", e as passadas com quanto duraram ("2 meses"). O status é texto e selo, não só o ponto. As regras
+  são funções puras (`regimeStatus`, `regimeMonths`), testadas. Com um enquadramento só, o card fica como antes.
+- **Suporte por um formulário, não por um endereço na tela.** Um link pequeno no fim de Minha conta ("Precisa
+  de ajuda? Fale com o suporte") abre uma folha com assunto opcional e mensagem (10 a 3.000 caracteres, com
+  contador). A API manda a mensagem por e-mail, com o "Responder" para a conta (decisão 34 da API). A tela de
+  sucesso diz em qual e-mail a resposta chega.
+- **O endereço do suporte nunca entra no front.** O repositório do front é público, e um endereço no site seria
+  colhido por robôs de spam. Ele fica só na variável `SUPPORT_EMAIL` da API.
+- **Só para quem está logado**, o que também barra spam. Quem não consegue entrar usa o "Esqueci a senha" e o
+  reenvio da confirmação, que já existem.
+- **A Privacidade diz** que a mensagem de suporte sai pelo Brevo com o nome, o e-mail e o texto.
+
+**Consequências.** O contato existe sem expor o endereço. O custo é não haver canal para quem não tem conta, o
+que foi aceito.

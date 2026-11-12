@@ -155,6 +155,9 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   (nunca antes da abertura); a prévia sai das consultas que já existem (notas do ano, despesas do mês, retiradas),
   sem endpoint novo. O download é o fetch autenticado com `parseAs: "blob"` e o nome do `Content-Disposition`,
   como o da nota; não invalida nada. O 429 usa o `useRetryCountdown`.
+- **Suporte e enquadramento** (decisão 35): o link "Fale com o suporte" fica no fim de Minha conta (discreto de
+  propósito) e abre a `SupportSheet`; o endereço do suporte **nunca** entra no front (o repositório é público). O
+  histórico de enquadramento vira linha do tempo (`regimeStatus`, `regimeMonths`) só com mais de um enquadramento.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 
