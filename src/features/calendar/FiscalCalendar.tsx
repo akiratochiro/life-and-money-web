@@ -31,7 +31,8 @@ function EventItem({ event, showDate }: { event: CalendarEvent; showDate: boolea
             {event.title}
           </span>
           <span className="truncate text-xs text-text-muted">
-            {[event.company?.name, event.detail, showDate ? when : null].filter(Boolean).join(" · ")}
+            {/* A data vem primeiro: numa linha cortada, é ela que não pode sumir. */}
+            {[showDate ? when : null, event.company?.name, event.detail].filter(Boolean).join(" · ")}
           </span>
         </span>
         <span className="flex flex-col items-end gap-1">

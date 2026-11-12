@@ -121,7 +121,7 @@ await page.waitForFunction(() => location.pathname === "/", { timeout: 20000 });
 
 for (const [name, path] of [
   ["inicio", "/"], ["extrato", "/transactions"], ["orcamento", "/budget"], ["metas", "/goals"],
-  ["contas", "/bills"], ["analises", "/analytics"], ["categorias", "/categories"], ["conta", "/account"],
+  ["contas", "/bills"], ["calendario", "/calendar"], ["analises", "/analytics"], ["categorias", "/categories"], ["conta", "/account"],
 ]) {
   await page.goto(`${BASE}${path}`, { waitUntil: "load" });
   await audit(name);
@@ -169,6 +169,8 @@ if (companyHref) {
       await settle();
     }
   }
+  await page.goto(`${BASE}${companyHref}/calendar`, { waitUntil: "load" });
+  await audit("empresa-calendario");
   await page.goto(`${BASE}${companyHref}/withdrawals`, { waitUntil: "load" });
   await audit("retiradas");
   const [newWithdrawal] = await page.$$("xpath/.//button[normalize-space()='Registrar retirada']");

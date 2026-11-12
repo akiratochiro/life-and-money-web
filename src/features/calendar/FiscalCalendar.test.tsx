@@ -66,7 +66,7 @@ describe("calendário fiscal", () => {
     const list = await screen.findByRole("list", { name: "Vencimentos" });
     expect(calendarCalls()).toContainEqual({ from: "2026-11-01", to: "2026-11-30", scope: "ALL" });
     const items = within(list).getAllByRole("link");
-    expect(items[0]).toHaveTextContent(/Contador.*Estúdio Ana · Despesa fixa · Venceu em 10 de nov\. de 2026.*R\$\s500,00.*Atrasado/);
+    expect(items[0]).toHaveTextContent(/Contador.*Venceu em 10 de nov\. de 2026 · Estúdio Ana · Despesa fixa.*R\$\s500,00.*Atrasado/);
     expect(items[0]).toHaveAttribute("href", "/companies/3/expenses");
     expect(items[1]).toHaveTextContent(/Aluguel.*R\$\s1\.500,00.*Pendente/);
     expect(items[1]).toHaveAttribute("href", "/bills");
