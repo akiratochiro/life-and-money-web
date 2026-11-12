@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { usePartners, useRegimes, useUndoRegimeChange } from "./companyApi";
+import { usePartners, useRegimes, useUndoRegimeChange, type CompanyRegime } from "./companyApi";
 import { ArchivedNotice } from "./CompanyLayout";
 import { useCompanyContext } from "./companyContext";
 import { RevenueCard } from "../invoices/RevenueCard";
@@ -10,8 +10,9 @@ import { MonthCards } from "../companyOverview/MonthCards";
 import { UpcomingCard } from "../companyOverview/UpcomingCard";
 import { RegimeChangeSheet } from "./RegimeChangeSheet";
 import { MANUAL_TAXES_NOTICE, hasAutomaticTaxes, regimeLabel } from "./regimeOptions";
-import { regimePeriod } from "./regimePeriod";
+import { regimeMonths, regimePeriod, regimeStatus, type RegimeStatus } from "./regimePeriod";
 import { formatCnpj } from "./cnpj";
+import { Badge, type BadgeTone } from "../../shared/ui/Badge";
 import { Card } from "../../shared/ui/Card";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { formatDate, monthLabel } from "../../shared/lib/dates";
@@ -79,6 +80,8 @@ function RegimeHistory() {
       <h2 className="font-display text-base font-semibold">Enquadramento</h2>
       {regimes.isPending ? (
         <div className="h-16 motion-safe:animate-pulse rounded-2xl bg-sunken" />
+      ) : newestFirst.length > 1 ? (
+        <RegimeTimeline regimes={newestFirst} />
       ) : (
         <ol className="flex flex-col gap-3">
           {newestFirst.map((regime) => (
@@ -145,5 +148,45 @@ function RegimeHistory() {
         <RegimeChangeSheet key={latest.id} companyId={company.id} latest={latest} open onClose={() => setChanging(false)} />
       )}
     </Card>
+  );
+}
+
+const TIMELINE: Record<RegimeStatus, { badge?: { tone: BadgeTone; label: string }; dot: string }> = {
+  CURRENT: { badge: { tone: "income", label: "Atual" }, dot: "border-accent bg-accent" },
+  SCHEDULED: { badge: { tone: "warning", label: "Agendado" }, dot: "border-dashed border-text-muted bg-surface" },
+  PAST: { dot: "border-text-muted bg-surface" },
+};
+
+/**
+ * O histórico de enquadramento como linha do tempo (só quando houve mudança): do mais novo ao mais antigo,
+ * com o atual em destaque, o agendado tracejado e quanto durou cada um dos passados. O status também vem em
+ * texto, nunca só no ponto.
+ */
+function RegimeTimeline({ regimes }: { regimes: CompanyRegime[] }) {
+  return (
+    <ol aria-label="Linha do tempo do enquadramento" className="flex flex-col">
+      {regimes.map((regime, index) => {
+        const status = regimeStatus(regime);
+        const look = TIMELINE[status];
+        const months = status === "PAST" ? regimeMonths(regime) : null;
+        const last = index === regimes.length - 1;
+        return (
+          <li key={regime.id} className="relative flex gap-3 pb-5 last:pb-0">
+            {!last && <span aria-hidden="true" className="absolute left-[7px] top-5 bottom-0 w-0.5 bg-line" />}
+            <span aria-hidden="true" className={`relative mt-1 h-4 w-4 shrink-0 rounded-full border-2 ${look.dot}`} />
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="flex flex-wrap items-center gap-2">
+                <span className={status === "PAST" ? "font-semibold text-text-soft" : "font-semibold"}>{regimeLabel(regime)}</span>
+                {look.badge && <Badge tone={look.badge.tone}>{look.badge.label}</Badge>}
+              </span>
+              <span className="text-sm text-text-muted">
+                {regimePeriod(regime)}
+                {months !== null && ` · ${months} ${months === 1 ? "mês" : "meses"}`}
+              </span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

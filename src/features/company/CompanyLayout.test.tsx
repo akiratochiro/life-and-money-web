@@ -101,11 +101,32 @@ describe("página da empresa", () => {
     expect(screen.getByText("12.ABC.345/01DE-35")).toBeInTheDocument();
     expect(await screen.findByText("Ana Souza (você)")).toBeInTheDocument();
 
-    const history = await screen.findAllByRole("listitem");
-    expect(history.map((item) => item.textContent)).toEqual([
-      "SLU · Simples Nacional · Fator RDesde março de 2025",
-      "MEI · SIMEI · ServiçosDe março de 2024 a fevereiro de 2025",
+    // Com mudança, o histórico vira linha do tempo: o atual em destaque e quanto durou cada um que passou.
+    const timeline = await screen.findByRole("list", { name: "Linha do tempo do enquadramento" });
+    expect(within(timeline).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+      "SLU · Simples Nacional · Fator RAtualDesde março de 2025",
+      "MEI · SIMEI · ServiçosDe março de 2024 a fevereiro de 2025 · 12 meses",
     ]);
+  });
+
+  it("uma mudança agendada aparece no topo da linha do tempo, marcada como agendada", async () => {
+    const scheduled = { ...SIMPLES, id: 3, annexConfig: "ANEXO_III_FIXO", validFrom: "2099-01", validTo: undefined };
+    serve({ regimes: [MEI, { ...SIMPLES, validTo: "2098-12" }, scheduled] });
+    open();
+
+    const timeline = await screen.findByRole("list", { name: "Linha do tempo do enquadramento" });
+    const items = within(timeline).getAllByRole("listitem");
+    expect(items[0]).toHaveTextContent(/Agendado.*A partir de janeiro de 2099 \(agendada\)/);
+    expect(items[1]).toHaveTextContent("Atual");
+    expect(items[2]).not.toHaveTextContent(/Atual|Agendado/);
+  });
+
+  it("com um enquadramento só, não há linha do tempo", async () => {
+    serve({ company: company({ currentRegime: { ...MEI, validTo: undefined } }), regimes: [{ ...MEI, validTo: undefined }] });
+    open();
+
+    expect(await screen.findByText("MEI · SIMEI · Serviços")).toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: "Linha do tempo do enquadramento" })).not.toBeInTheDocument();
   });
 
   it("desfazer a última mudança pede confirmação antes de chamar a API", async () => {
