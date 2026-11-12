@@ -140,6 +140,13 @@ const companyHref = await page.evaluate(() => document.querySelector('a[href^="/
 if (companyHref) {
   await page.goto(`${BASE}${companyHref}`, { waitUntil: "load" });
   await audit("empresa");
+  // O caixa da empresa com o saldo e a reserva abertos: o detalhe tem o link para os vencidos.
+  for (const label of ["Saldo na conta", "Reserva de impostos"]) {
+    const [toggle] = await page.$$(`xpath/.//button[contains(normalize-space(), '${label}')]`);
+    if (toggle) await toggle.tap();
+  }
+  await settle();
+  await audit("empresa-caixa");
   await page.goto(`${BASE}${companyHref}/invoices`, { waitUntil: "load" });
   await audit("notas");
   await page.goto(`${BASE}${companyHref}/expenses`, { waitUntil: "load" });

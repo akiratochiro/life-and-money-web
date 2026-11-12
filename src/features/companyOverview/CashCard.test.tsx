@@ -59,7 +59,7 @@ describe("caixa da empresa", () => {
     expect(within(card).getByText(/^R\$\s8\.328,50$/)).toBeInTheDocument();
     expect(within(card).getByText(/^hoje, 11 de nov\.? de 2026$/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Saldo na conta.*10\.058,50/ })).toHaveAttribute("aria-expanded", "false");
-    expect(screen.getByRole("button", { name: /Reservado para impostos.*1\.730,00/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Reserva de impostos.*1\.730,00/ })).toBeInTheDocument();
     expect(screen.getByText(sentence(/^Das notas de novembro \(R\$\s12\.000,00\), R\$\s1\.080,00 já é do governo \(DAS, 9,0%\)\.$/)))
       .toBeInTheDocument();
     expect(screen.getByText(NOTICE)).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe("caixa da empresa", () => {
     expect(screen.getByText("− Despesas pagas, com impostos").nextSibling).toHaveTextContent(/721,50/);
     expect(screen.getByText("− Retiradas (líquido)").nextSibling).toHaveTextContent(/2\.670,00/);
 
-    await userEvent.click(screen.getByRole("button", { name: /Reservado para impostos/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Reserva de impostos/ }));
     expect(screen.getByText("Do mês corrente (até agora)").nextSibling).toHaveTextContent(/1\.080,00/);
     expect(screen.getByText("A vencer, de meses passados").nextSibling).toHaveTextContent(/330,00/);
     expect(screen.getByRole("link", { name: "Vencidos" })).toHaveAttribute("href", "/companies/7/taxes");

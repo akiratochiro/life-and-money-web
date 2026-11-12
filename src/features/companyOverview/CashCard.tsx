@@ -12,7 +12,7 @@ function Row({ label, value, strong }: { label: ReactNode; value: string; strong
   return (
     <div className={`flex items-baseline justify-between gap-3 ${strong ? "font-semibold" : "text-sm text-text-soft"}`}>
       <dt className="min-w-0">{label}</dt>
-      <dd className="shrink-0 tabular-nums">{value}</dd>
+      <dd className="shrink-0 whitespace-nowrap tabular-nums">{value}</dd>
     </div>
   );
 }
@@ -32,7 +32,7 @@ function Expandable({ label, value, children }: { label: string; value: string; 
           {label}
           <span aria-hidden className={`text-text-muted transition-transform ${open ? "rotate-180" : ""}`}>⌄</span>
         </span>
-        <span className="tabular-nums">{value}</span>
+        <span className="shrink-0 whitespace-nowrap tabular-nums">{value}</span>
       </button>
       {open && <dl className="flex flex-col gap-1 rounded-2xl bg-sunken p-3">{children}</dl>}
     </div>
@@ -105,13 +105,13 @@ export function CashCard({ companyId }: { companyId: number }) {
           <Row label="− Retiradas (líquido)" value={money(balance.withdrawals)} />
           <p className="pt-1 text-xs text-text-muted">Para corrigir o saldo inicial, use Editar no topo da empresa.</p>
         </Expandable>
-        <Expandable label="Reservado para impostos" value={`− ${money(provision.total)}`}>
+        <Expandable label="Reserva de impostos" value={`−\u00a0${money(provision.total)}`}>
           {provision.total === 0 && <p className="text-sm text-text-soft">Nenhum imposto a reservar agora.</p>}
           {provision.currentMonth > 0 && <Row label="Do mês corrente (até agora)" value={money(provision.currentMonth)} />}
           {provision.dueSoon > 0 && <Row label="A vencer, de meses passados" value={money(provision.dueSoon)} />}
           {provision.overdue > 0 && (
             <Row
-              label={<Link to="taxes" className="font-bold text-danger-strong underline">Vencidos</Link>}
+              label={<Link to="taxes" className="inline-flex min-h-11 items-center font-bold text-danger-strong underline">Vencidos</Link>}
               value={money(provision.overdue)}
             />
           )}
