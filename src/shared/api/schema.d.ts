@@ -125,6 +125,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/expected-revenue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** O faturamento esperado do mês que vale hoje; 204 se não houver */
+        get: operations["getExpectedRevenue"];
+        /** Define o faturamento esperado do mês a partir deste mês */
+        put: operations["setExpectedRevenue"];
+        post?: never;
+        /** Encerra o faturamento esperado a partir deste mês */
+        delete: operations["removeExpectedRevenue"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/budgets/{categoryId}": {
         parameters: {
             query?: never;
@@ -1099,6 +1118,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/fator-r": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** O monitor do Fator R: o da próxima competência, com o mês corrente projetado */
+        get: operations["companyFatorR"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/cash": {
         parameters: {
             query?: never;
@@ -1424,6 +1460,21 @@ export interface components {
             recurringExpenseId?: number;
             /** @example 2026-10 */
             occurrenceMonth?: string;
+        };
+        ExpectedRevenueRequest: {
+            amount: number;
+        };
+        ExpectedRevenueResponse: {
+            /** Format: int64 */
+            companyId: number;
+            amount: number;
+            /** @example 2026-11 */
+            validFrom: string;
+            /**
+             * @description O último mês em que valeu; ausente no que vale hoje
+             * @example 2026-12
+             */
+            validTo?: string;
         };
         BudgetRequest: {
             /** @enum {string} */
@@ -2070,6 +2121,8 @@ export interface components {
             bills: components["schemas"]["BillExport"][];
             /** @description Empresas, arquivadas inclusive, com o histórico de enquadramento e os sócios */
             companies: components["schemas"]["CompanyExport"][];
+            /** @description Faturamento esperado das empresas, com o histórico */
+            companyExpectedRevenues: components["schemas"]["ExpectedRevenueResponse"][];
             /** @description Os dados das notas fiscais; os arquivos originais são baixados na tela */
             invoices: components["schemas"]["InvoiceExport"][];
             /** @description Categorias de despesa das empresas, arquivadas inclusive */
@@ -2362,6 +2415,73 @@ export interface components {
             total: number;
             /** Format: int32 */
             count: number;
+        };
+        FatorRMonitorResponse: {
+            /** @description Só no Simples com o Anexo pelo Fator R na próxima competência */
+            applies: boolean;
+            /**
+             * @description A competência cujo Anexo está em jogo: a próxima
+             * @example 2026-12
+             */
+            competence?: string;
+            /**
+             * @description O mês projetado: o corrente
+             * @example 2026-11
+             */
+            projectedMonth?: string;
+            projection?: components["schemas"]["FatorRMonth"];
+            window?: components["schemas"]["FatorRWindow"];
+            /** @description Folha ÷ receita da janela */
+            ratio?: number;
+            /** @description A meta da empresa, nunca abaixo do limite legal */
+            target?: number;
+            /** @description O limite legal, que decide o Anexo */
+            threshold?: number;
+            /** @enum {string} */
+            status?: "OK" | "BELOW_TARGET" | "BELOW_THRESHOLD" | "NO_REVENUE";
+            /** @description Ausente quando está na meta ou sem receita */
+            suggestion?: components["schemas"]["FatorRSuggestion"];
+            /** @description Por que não há número (por exemplo, as regras de 2027) */
+            unavailable?: string;
+            notice: string;
+        };
+        FatorRMonth: {
+            /** @description Notas ativas com competência no mês */
+            invoices: number;
+            /** @description O faturamento esperado que vale no mês, se houver */
+            expectedRevenue?: number;
+            /** @description O maior entre as notas e o faturamento esperado */
+            revenue: number;
+            /** @description Pró-labores do mês: registrados, senão planejados */
+            proLabore: number;
+            /** @description Despesas de folha do mês: pagas e fixas pendentes */
+            otherPayroll: number;
+        };
+        FatorRSuggestion: {
+            /** @description Quanto falta na folha da janela para a meta */
+            missingPayroll: number;
+            /**
+             * Format: int64
+             * @description O sócio "sou eu"
+             */
+            partnerId?: number;
+            currentProLabore: number;
+            suggestedProLabore: number;
+            /** @description O pró-labore do mês já foi registrado: editar a retirada, não o planejado */
+            registered: boolean;
+            /** @description Só abaixo do limite legal: DAS do V − DAS do III − INSS e IRRF a mais */
+            savings?: number;
+            dasAnnexIII?: number;
+            dasAnnexV?: number;
+            extraProLaboreTaxes?: number;
+        };
+        FatorRWindow: {
+            /** @example 2025-12 */
+            from: string;
+            /** @example 2026-11 */
+            to: string;
+            revenue: number;
+            payroll: number;
         };
         ExpenseMonthResponse: {
             /** @example 2026-11 */
@@ -2849,6 +2969,74 @@ export interface operations {
             path: {
                 companyId: number;
                 expenseId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getExpectedRevenue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpectedRevenueResponse"];
+                };
+            };
+        };
+    };
+    setExpectedRevenue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpectedRevenueRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpectedRevenueResponse"];
+                };
+            };
+        };
+    };
+    removeExpectedRevenue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
             };
             cookie?: never;
         };
@@ -4697,6 +4885,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": number[];
+                };
+            };
+        };
+    };
+    companyFatorR: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FatorRMonitorResponse"];
                 };
             };
         };

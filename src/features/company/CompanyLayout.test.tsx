@@ -68,6 +68,7 @@ function serve(data: { company?: unknown; regimes?: unknown[]; companyStatus?: n
     if (path === "/companies/{companyId}/overview") return ok(OVERVIEW);
     if (path === "/companies/{companyId}/upcoming") return ok([]);
     if (path === "/companies/{companyId}/cash") return ok(CASH);
+    if (path === "/companies/{companyId}/fator-r") return ok({ applies: false, notice: "" });
     throw new Error(`GET inesperado: ${path}`);
   });
 }

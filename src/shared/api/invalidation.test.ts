@@ -85,6 +85,10 @@ describe("o que cada mudança recarrega", () => {
     ]);
   });
 
+  it("o faturamento esperado: só as empresas, nunca o Início pessoal", async () => {
+    expect(await staleAfter("expectedRevenue")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
+  });
+
   it("nenhuma mudança das finanças pessoais recarrega as empresas", async () => {
     for (const change of ["transaction", "goal", "category", "budget", "bill", "billPayment"] as const) {
       expect(await staleAfter(change)).not.toContain("companies");

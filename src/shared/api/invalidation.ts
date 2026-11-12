@@ -12,7 +12,8 @@ export type Change =
   | "invoice"
   | "companyExpense"
   | "tax"
-  | "withdrawal";
+  | "withdrawal"
+  | "expectedRevenue";
 
 /**
  * Quais famílias de queries cada mudança deixa desatualizadas. É o contrato que o compilador não
@@ -36,6 +37,8 @@ export type Change =
  * - retirada (pró-labore, distribuição, planejado, lançar): as empresas (muda o DARF e o Fator R) e, desde
  *   a Fase 6, as finanças pessoais: lançar cria uma receita (e talvez a categoria "Pró-labore"), e editar
  *   ou excluir a retirada lançada muda ou apaga essa receita.
+ * - faturamento esperado (Fase 8): só as empresas (o monitor do Fator R). Nunca o Início pessoal: o alerta
+ *   do Fator R mora só na visão da empresa.
  */
 export const AFFECTS: Record<Change, readonly string[]> = {
   transaction: ["transactions", "dashboard", "goals", "bills"],
@@ -49,6 +52,7 @@ export const AFFECTS: Record<Change, readonly string[]> = {
   companyExpense: ["companies", "attachments"],
   tax: ["companies"],
   withdrawal: ["companies", "transactions", "dashboard", "categories"],
+  expectedRevenue: ["companies"],
 };
 
 export function invalidate(queryClient: QueryClient, change: Change): Promise<void> {
