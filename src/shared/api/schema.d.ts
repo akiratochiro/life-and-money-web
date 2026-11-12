@@ -1169,6 +1169,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/accountant-package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** O pacote do mês para o contador (ZIP: notas, comprovantes, CSVs e resumo em PDF) */
+        get: operations["downloadAccountantPackage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cnpj/{cnpj}": {
         parameters: {
             query?: never;
@@ -5141,6 +5158,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CompanyCashResponse"];
+                };
+            };
+        };
+    };
+    downloadAccountantPackage: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": string;
                 };
             };
         };

@@ -13,7 +13,7 @@ import { ApiError } from "../../shared/api/problem";
 /**
  * As abas aparecem quando a fase de cada uma fica pronta (decisão 24): aba que não faz nada é
  * ruído. Com uma aba só, a barra nem aparece. Retiradas vale também para o MEI desde a Fase 6 (a
- * distribuição de lucros). O Calendário (Fase 9) é o calendário fiscal travado na empresa.
+ * distribuição de lucros). O Calendário (Fase 9) é o calendário fiscal travado na empresa, e Contador (Fase 11) gera o pacote do mês.
  */
 const TABS = [
   { to: "", label: "Visão geral" },
@@ -22,6 +22,7 @@ const TABS = [
   { to: "taxes", label: "Impostos" },
   { to: "withdrawals", label: "Retiradas" },
   { to: "calendar", label: "Calendário" },
+  { to: "accountant", label: "Contador" },
 ];
 
 export function CompanyLayout() {

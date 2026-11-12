@@ -16,6 +16,7 @@ import { AnalyticsPage } from "../features/analytics/AnalyticsPage";
 import { AccountPage } from "../features/account/AccountPage";
 import { BillsPage } from "../features/bills/BillsPage";
 import { CalendarPage, CompanyCalendarPage } from "../features/calendar/CalendarPage";
+import { AccountantPage } from "../features/accountant/AccountantPage";
 import { PrivacyPage } from "../features/legal/PrivacyPage";
 import { CompanyLayout } from "../features/company/CompanyLayout";
 import { CompanyOverviewPage } from "../features/company/CompanyOverviewPage";
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
               { path: "taxes", element: <TaxesPage /> },
               { path: "withdrawals", element: <WithdrawalsPage /> },
               { path: "calendar", element: <CompanyCalendarPage /> },
+              { path: "accountant", element: <AccountantPage /> },
             ],
           },
         ],
