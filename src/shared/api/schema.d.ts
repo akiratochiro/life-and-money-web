@@ -1169,6 +1169,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Os vencimentos de contas pessoais, impostos e despesas das empresas no período (até 62 dias) */
+        get: operations["calendar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/calendar/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** O que pede atenção: os atrasados e os próximos 7 dias */
+        get: operations["calendarReminders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/budgets": {
         parameters: {
             query?: never;
@@ -2596,6 +2630,65 @@ export interface components {
              * @enum {string}
              */
             legalNature?: "MEI" | "EI" | "SLU" | "LTDA" | "SOCIEDADE_SIMPLES";
+        };
+        CalendarCompany: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            emoji: string;
+        };
+        CalendarEvent: {
+            /**
+             * @description fonte:chave, estável
+             * @example TAX:12:2026-10
+             */
+            id: string;
+            /** @enum {string} */
+            source: "TAX" | "DECLARATION" | "COMPANY_EXPENSE" | "BILL";
+            /** @enum {string} */
+            scope: "PF" | "PJ";
+            /** @description Ausente no PF */
+            company?: components["schemas"]["CalendarCompany"];
+            title: string;
+            /** @description Competência, "A receber", "Despesa fixa"... */
+            detail?: string;
+            /** Format: date */
+            dueDate: string;
+            /**
+             * Format: date
+             * @description O último dia sem atraso; o OVERDUE sai dele
+             */
+            payableUntil: string;
+            /** @enum {string} */
+            status: "PENDING" | "PAID" | "OVERDUE";
+            /** @enum {string} */
+            direction: "OUT" | "IN";
+            /** @description Ausente quando o app não calcula, ou na declaração */
+            expectedAmount?: number;
+            /** @description Só quando pago */
+            paidAmount?: number;
+            /**
+             * Format: date
+             * @description Só quando pago (ou entregue, na declaração)
+             */
+            paidOn?: string;
+            /** @description DAS de R$ 0,00: aparece apagado e não vira lembrete */
+            nothingToPay: boolean;
+            link: components["schemas"]["CalendarLink"];
+        };
+        CalendarLink: {
+            /** @enum {string} */
+            kind: "COMPANY_TAXES" | "COMPANY_EXPENSES" | "BILLS";
+            /** Format: int64 */
+            companyId?: number;
+            /** @example 2026-11 */
+            month: string;
+        };
+        CalendarReminders: {
+            overdue: components["schemas"]["CalendarEvent"][];
+            nextDays: components["schemas"]["CalendarEvent"][];
+            /** Format: int32 */
+            count: number;
         };
         AttachmentUsage: {
             /** Format: int64 */
@@ -4951,6 +5044,54 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CnpjLookupResponse"];
+                };
+            };
+        };
+    };
+    calendar: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                scope?: "ALL" | "PF" | "PJ";
+                companyId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CalendarEvent"][];
+                };
+            };
+        };
+    };
+    calendarReminders: {
+        parameters: {
+            query?: {
+                scope?: "ALL" | "PF" | "PJ";
+                companyId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CalendarReminders"];
                 };
             };
         };
