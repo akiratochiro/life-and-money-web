@@ -50,6 +50,13 @@ function company(overrides: Record<string, unknown> = {}) {
   };
 }
 
+const CASH = {
+  asOf: "2026-11-12", openingBalance: 1500, openingBalanceDate: "2024-03-10",
+  balance: { total: 1500, revenue: 0, expenses: 0, withdrawals: 0 },
+  provision: { total: 0, currentMonth: 0, dueSoon: 0, overdue: 0, withoutExpected: 0 },
+  available: 1500, notice: "",
+};
+
 function serve(data: { company?: unknown; regimes?: unknown[]; companyStatus?: number } = {}) {
   mocks.GET.mockImplementation((path: string) => {
     if (path === "/companies/{id}") {
@@ -60,6 +67,7 @@ function serve(data: { company?: unknown; regimes?: unknown[]; companyStatus?: n
     if (path === "/companies/{companyId}/revenue") return ok({ granularity: "MONTH", from: "", to: "", total: 0, points: [] });
     if (path === "/companies/{companyId}/overview") return ok(OVERVIEW);
     if (path === "/companies/{companyId}/upcoming") return ok([]);
+    if (path === "/companies/{companyId}/cash") return ok(CASH);
     throw new Error(`GET inesperado: ${path}`);
   });
 }

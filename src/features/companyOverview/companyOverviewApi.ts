@@ -27,3 +27,13 @@ export function useUpcoming(companyId: number) {
     queryFn: () => unwrap(api.GET("/companies/{companyId}/upcoming", { params: { path: { companyId } } })),
   });
 }
+
+export type CompanyCash = components["schemas"]["CompanyCashResponse"];
+
+/** O caixa de hoje (decisão 30): não depende do mês escolhido nos cards, por isso tem chave própria. */
+export function useCompanyCash(companyId: number) {
+  return useQuery({
+    queryKey: ["companies", companyId, "cash"],
+    queryFn: () => unwrap(api.GET("/companies/{companyId}/cash", { params: { path: { companyId } } })),
+  });
+}

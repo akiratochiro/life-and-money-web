@@ -3,6 +3,7 @@ import { usePartners, useRegimes, useUndoRegimeChange } from "./companyApi";
 import { ArchivedNotice } from "./CompanyLayout";
 import { useCompanyContext } from "./companyContext";
 import { RevenueCard } from "../invoices/RevenueCard";
+import { CashCard } from "../companyOverview/CashCard";
 import { MonthCards } from "../companyOverview/MonthCards";
 import { UpcomingCard } from "../companyOverview/UpcomingCard";
 import { RegimeChangeSheet } from "./RegimeChangeSheet";
@@ -15,7 +16,7 @@ import { formatDate, monthLabel } from "../../shared/lib/dates";
 import { formatCents, toCents } from "../../shared/lib/money";
 
 /**
- * A visão geral: os cards do mês e os próximos vencimentos (Fase 5), a receita por competência, os
+ * A visão geral: o caixa de hoje (Fase 7), os cards do mês e os próximos vencimentos (Fase 5), a receita por competência, os
  * dados e o histórico de enquadramento.
  */
 export function CompanyOverviewPage() {
@@ -32,6 +33,7 @@ export function CompanyOverviewPage() {
         </p>
       )}
 
+      <CashCard companyId={company.id} />
       <MonthCards companyId={company.id} />
       <UpcomingCard companyId={company.id} />
       <RevenueCard companyId={company.id} />

@@ -1099,6 +1099,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/cash": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** O caixa de hoje: saldo da conta PJ, provisão de impostos e saldo disponível */
+        get: operations["companyCash"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cnpj/{cnpj}": {
         parameters: {
             query?: never;
@@ -2387,6 +2404,61 @@ export interface components {
             /** @enum {string} */
             status: "PAID" | "PENDING" | "OVERDUE";
             hasReceipt: boolean;
+        };
+        Balance: {
+            total: number;
+            /** @description Líquido das notas ativas emitidas desde o saldo inicial */
+            revenue: number;
+            /** @description Despesas pagas desde o saldo inicial, com os impostos pagos */
+            expenses: number;
+            /** @description Líquido das retiradas pagas desde o saldo inicial */
+            withdrawals: number;
+        };
+        CompanyCashResponse: {
+            /**
+             * Format: date
+             * @description O dia do cálculo: hoje
+             */
+            asOf: string;
+            openingBalance: number;
+            /**
+             * Format: date
+             * @description O saldo inicial vale do começo deste dia
+             */
+            openingBalanceDate: string;
+            balance: components["schemas"]["Balance"];
+            provision: components["schemas"]["Provision"];
+            /** @description Saldo − provisão; pode ser negativo */
+            available: number;
+            /** @description Ausente quando a empresa não tem DAS (Lucro Presumido ou Real) */
+            governmentShare?: components["schemas"]["GovernmentShare"];
+            notice: string;
+        };
+        GovernmentShare: {
+            /** @example 2026-11 */
+            month: string;
+            /** @description Notas ativas com competência no mês */
+            revenue: number;
+            /** @description O DAS dessa receita: pago, ou o previsto */
+            amount: number;
+            /** @description amount ÷ revenue; ausente no MEI (valor fixo) ou sem receita */
+            effectiveRate?: number;
+            /** @enum {string} */
+            kind: "DAS" | "DAS_MEI" | "DARF_PREVIDENCIARIO" | "DEFIS" | "DASN_SIMEI" | "CUSTOM";
+        };
+        Provision: {
+            total: number;
+            /** @description Impostos da competência atual, ainda não pagos */
+            currentMonth: number;
+            /** @description Impostos de competências passadas, ainda no prazo */
+            dueSoon: number;
+            /** @description Impostos vencidos e não pagos (até 3 meses de vencimento) */
+            overdue: number;
+            /**
+             * Format: int32
+             * @description Impostos sem valor previsto, que ficaram fora
+             */
+            withoutExpected: number;
         };
         CnpjLookupResponse: {
             /** @description Falso quando a consulta não respondeu; o cadastro segue à mão */
@@ -4625,6 +4697,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": number[];
+                };
+            };
+        };
+    };
+    companyCash: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyCashResponse"];
                 };
             };
         };
