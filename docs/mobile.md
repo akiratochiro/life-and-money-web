@@ -3,7 +3,7 @@
 ## Auditoria automática (`npm run audit:mobile`)
 
 O Chrome emula um iPhone 13 (390×844, DPR 3, toque, `isMobile`) e, em cada tela (login, Início,
-Extrato, Orçamento, Metas, Contas, Calendário, Análises, Categorias, Minha conta, a folha de cadastro de empresa,
+Extrato, Orçamento, Metas, Contas, Calendário, Análises, Categorias, Minha conta (e a folha de suporte), a folha de cadastro de empresa,
 a página da primeira empresa do usuário (com o caixa da empresa, fechado e com o saldo e a reserva abertos, o monitor do Fator R com o faturamento esperado aberto, os limites de faturamento, os cards do mês e os próximos vencimentos) e as abas de notas, despesas, calendário, contador, impostos (com as folhas de obrigações e da calculadora) e retiradas (com a folha de nova retirada) dela (se ele tiver uma) e Nova transação, além de cadastro e
 privacidade, antes de entrar):
 

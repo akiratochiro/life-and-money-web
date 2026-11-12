@@ -194,6 +194,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/support": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Manda uma mensagem ao suporte; a resposta chega no e-mail da conta */
+        post: operations["contactSupport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/goals": {
         parameters: {
             query?: never;
@@ -1596,6 +1613,11 @@ export interface components {
              * @example 2027-10
              */
             endMonth?: string;
+        };
+        SupportRequest: {
+            /** @description Opcional; sem ele, "Mensagem pelo app" */
+            subject?: string;
+            message: string;
         };
         CreateCompanyRequest: {
             name: string;
@@ -3391,6 +3413,28 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["TransactionResponse"];
                 };
+            };
+        };
+    };
+    contactSupport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupportRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

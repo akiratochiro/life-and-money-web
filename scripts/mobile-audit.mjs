@@ -127,6 +127,17 @@ for (const [name, path] of [
   await audit(name);
 }
 
+// A folha de suporte, no fim de Minha conta.
+await page.goto(`${BASE}/account`, { waitUntil: "load" });
+await settle(1500);
+const [support] = await page.$$("xpath/.//button[normalize-space()='Fale com o suporte']");
+if (support) {
+  await support.tap();
+  await audit("suporte");
+  await page.keyboard.press("Escape");
+  await settle();
+}
+
 // Minha Empresa: o cadastro (folha em Minha conta) e a página da primeira empresa, se houver.
 await page.goto(`${BASE}/account`, { waitUntil: "load" });
 await settle(1500);

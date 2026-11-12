@@ -5,7 +5,7 @@ import { Logo } from "../../shared/brand/Logo";
 const REPOSITORY = "https://github.com/akiratochiro/life-and-money-web";
 
 /** Data da última mudança no texto. Mude junto com o conteúdo. */
-export const PRIVACY_UPDATED_AT = "11 de novembro de 2026";
+export const PRIVACY_UPDATED_AT = "12 de novembro de 2026";
 
 /**
  * O que o app guarda, onde e por quê. Pública (fora do RequireAuth): quem ainda vai criar a conta
@@ -77,7 +77,8 @@ export function PrivacyPage() {
             <li>A API roda no Render, e o banco de dados fica no Neon, ambos nos Estados Unidos.</li>
             <li>
               Os e-mails do app (confirmação do cadastro e redefinição de senha) saem pelo Brevo, que recebe seu nome e seu e-mail
-              para fazer a entrega.
+              para fazer a entrega. Uma mensagem ao suporte (em Minha conta) também sai pelo Brevo, com o seu nome, o seu
+              e-mail e o texto que você escreveu, para a resposta chegar no seu e-mail.
             </li>
             <li>
               Ao criar ou trocar a senha, o app confere se ela já apareceu em vazamentos de dados, no serviço

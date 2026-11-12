@@ -11,6 +11,7 @@ import { Card } from "../../shared/ui/Card";
 import { TextField } from "../../shared/ui/TextField";
 import { PendingLabel } from "../../shared/ui/PendingLabel";
 import { CompanySection } from "../company/CompanySection";
+import { SupportSheet } from "./SupportSheet";
 
 export function AccountPage() {
   const me = useMe();
@@ -72,6 +73,9 @@ export function AccountPage() {
       </Card>
 
       <DeleteAccountSection />
+
+      {/* Discreto de propósito: um link pequeno no fim da tela, para quem procura ajuda (decisão 35). */}
+      <SupportLink email={me.data?.email} />
 
       {/* A licença CC BY 4.0 dessas ilustrações pede o crédito. */}
       <p className="px-1 text-label text-text-muted">
@@ -194,5 +198,20 @@ function DeleteAccountSection() {
         </div>
       </form>
     </Card>
+  );
+}
+
+function SupportLink({ email }: { email?: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <p className="px-1 text-sm text-text-muted">
+        Precisa de ajuda?{" "}
+        <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-11 items-center font-bold text-link underline">
+          Fale com o suporte
+        </button>
+      </p>
+      <SupportSheet email={email} open={open} onClose={() => setOpen(false)} />
+    </>
   );
 }
