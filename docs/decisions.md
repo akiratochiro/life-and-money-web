@@ -769,3 +769,25 @@ custo é uma consulta de lembretes em toda tela, recarregada só quando algo mud
 
 **Consequências.** O dono vê o limite que está chegando e o que acontece se passar, sem ler a lei. O custo é a
 frase morar no servidor: mudar o texto pede um deploy da API.
+
+## 34. Aba Contador: a prévia antes do download, e o download como o da nota
+
+**Contexto.** A Fase 11 entrega o pacote mensal para o contador em ZIP, gerado em streaming pela API (decisão 33
+da API). Falta a tela.
+
+**Decisão.**
+- **Uma aba "Contador"** em cada empresa, depois de Calendário. Ela começa no **mês anterior**, que é o que o
+  contador fecha (ou no mês da abertura, se a empresa abriu agora). Fora do intervalo, o botão trava e a tela diz
+  de quando a quando há pacote.
+- **"O que vai no pacote"** é montado das consultas que já existem: notas do ano filtradas pela competência,
+  despesas do mês (aba Despesas) e retiradas do ano filtradas pelo pagamento. Não há endpoint novo, e a prévia
+  bate com o que a API põe no ZIP.
+- **As despesas pagas sem comprovante aparecem pelo nome**, com o link para a aba Despesas, para anexar antes de
+  mandar ao contador.
+- **O download repete o da nota** (decisão 25): o fetch autenticado com `parseAs: "blob"` e o nome do
+  `Content-Disposition`. Ele não muda nada no servidor, então não invalida nenhuma chave. O botão mostra
+  "Gerando…", e o 429 mostra o tempo de espera com o `useRetryCountdown`.
+- **A Privacidade não muda**: o pacote é gerado na hora, só para quem pede, e nada vai para terceiros.
+
+**Consequências.** O usuário vê o que falta antes de baixar e manda um ZIP completo. O ZIP inteiro passa pela
+memória do navegador como Blob, o que é aceitável para um mês (a cota de anexos é de 50 MB).

@@ -151,6 +151,10 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   `calendar` de cada empresa travada nela. Só mostra e leva à tela de cada coisa (`events.ts`), nunca paga.
   O número de lembretes (`/calendar/reminders`) fica no item do menu e no "Mais". A família `"calendar"`
   entra no `AFFECTS` de toda mudança que mexe em vencimento ou status.
+- **Pacote do contador** (`features/accountant`, decisão 34): aba `accountant` da empresa, começa no mês anterior
+  (nunca antes da abertura); a prévia sai das consultas que já existem (notas do ano, despesas do mês, retiradas),
+  sem endpoint novo. O download é o fetch autenticado com `parseAs: "blob"` e o nome do `Content-Disposition`,
+  como o da nota; não invalida nada. O 429 usa o `useRetryCountdown`.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

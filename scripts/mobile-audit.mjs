@@ -171,6 +171,8 @@ if (companyHref) {
   }
   await page.goto(`${BASE}${companyHref}/calendar`, { waitUntil: "load" });
   await audit("empresa-calendario");
+  await page.goto(`${BASE}${companyHref}/accountant`, { waitUntil: "load" });
+  await audit("empresa-contador");
   await page.goto(`${BASE}${companyHref}/withdrawals`, { waitUntil: "load" });
   await audit("retiradas");
   const [newWithdrawal] = await page.$$("xpath/.//button[normalize-space()='Registrar retirada']");
