@@ -673,3 +673,26 @@ da API. A lista curta não substitui o calendário fiscal da Fase 9.
 
 **Consequências.** Valor e data nunca divergem entre a empresa e o extrato. O custo é um passo a mais
 para corrigir um valor lançado (ir à empresa), que o diálogo explica com o link.
+
+## 30. Caixa da empresa: o disponível em destaque, a conta a um toque
+
+**Contexto.** A Fase 7 mostra quanto dinheiro a empresa tem de verdade: o saldo da conta menos o que já
+é do governo (decisão 29 da API).
+
+**Decisão.**
+- **Um card "Caixa da empresa" no topo da visão geral**, antes dos cards do mês. É o número que se abre o
+  app para ver. Ele é sempre "hoje" e tem chave própria (`["companies", id, "cash"]`): trocar o mês dos
+  cards não mexe nele, e toda mudança da empresa (`"company"` no `AFFECTS`) já o recarrega.
+- **O disponível em destaque**, em vermelho com "Faltam R$ X para cobrir os impostos" quando negativo.
+- **Saldo e reserva abrem com um toque** (`aria-expanded`), mostrando de onde o número vem: saldo inicial,
+  notas pelo líquido, despesas com os impostos pagos e retiradas pelo líquido; reserva do mês corrente, a
+  vencer e vencidos (com link para a aba Impostos), só as linhas com valor. Fechados, o card cabe na
+  primeira dobra do celular.
+- **"Já é do governo"** fica dentro do card: com a alíquota no Simples, "valor fixo" no MEI, "ainda não há
+  notas" sem receita, e some sem DAS. O aviso da data de emissão aparece sempre.
+- **O front não calcula nada**: os números e a alíquota vêm da API, como os impostos (decisão 13).
+- **"Reserva de impostos"**, não "Reservado para impostos": o rótulo longo quebrava e separava o "−" do
+  valor num iPhone de 390 px. Valores do card não quebram linha.
+
+**Consequências.** O usuário vê o disponível sem fazer conta e confere a conta quando duvida. Corrigir o
+saldo inicial continua no Editar da empresa, que o detalhe indica.

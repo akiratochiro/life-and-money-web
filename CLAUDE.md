@@ -137,6 +137,9 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   a transação lançada tem `origin` e abre no extrato com valor e data travados (`TransactionForm` com
   `locked`). Excluir pergunta pela outra ponta; "as duas" é a exclusão da retirada com `deletePersonal`.
   A mudança `withdrawal` recarrega empresas e finanças pessoais.
+- **Caixa da empresa** (`companyOverview/CashCard`, decisão 30): topo da visão geral, sempre "hoje" (chave
+  `["companies", id, "cash"]`, fora do mês dos cards). O front só mostra: saldo, reserva e a frase do
+  governo vêm prontos da API. Saldo e reserva abrem com `aria-expanded`; valores com `whitespace-nowrap`.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 
