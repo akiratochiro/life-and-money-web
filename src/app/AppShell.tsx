@@ -4,6 +4,7 @@ import { AnimatePresence, m } from "motion/react";
 import { pageEnter } from "../shared/ui/motion";
 import {
   BriefcaseIcon,
+  CalendarDaysIcon,
   CalendarIcon,
   ChartIcon,
   GaugeIcon,
@@ -18,6 +19,21 @@ import {
 import { Logo } from "../shared/brand/Logo";
 import { BottomSheet } from "../shared/ui/BottomSheet";
 import { useCompanies, type Company } from "../features/company/companyApi";
+import { useReminders } from "../features/calendar/calendarApi";
+
+/**
+ * O lembrete dentro do app (decisão 32): quantos vencimentos estão atrasados ou vencem nos próximos 7
+ * dias, no item do Calendário e no "Mais". Sem e-mail nem push nesta versão.
+ */
+function ReminderCount({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] font-extrabold text-on-accent">
+      <span aria-hidden="true">{count > 99 ? "99+" : count}</span>
+      <span className="sr-only">, {count} {count === 1 ? "lembrete" : "lembretes"}</span>
+    </span>
+  );
+}
 
 /** Duas de cada lado do "+": com cinco posições iguais, ele fica no centro exato da barra. */
 const primary = [
@@ -33,6 +49,7 @@ const primary = [
 const secondary = [
   { to: "/goals", label: "Metas", icon: TargetIcon },
   { to: "/bills", label: "Contas", icon: CalendarIcon },
+  { to: "/calendar", label: "Calendário", icon: CalendarDaysIcon },
   { to: "/analytics", label: "Análises", icon: ChartIcon },
   { to: "/categories", label: "Categorias", icon: TagIcon },
   { to: "/account", label: "Minha conta", icon: UserIcon },
@@ -58,6 +75,7 @@ export function AppShell() {
   const { pathname } = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
   const companies = useCompanies().data ?? [];
+  const reminders = useReminders().data?.count ?? 0;
   const fullScreen = FULL_SCREEN_ON_MOBILE.includes(pathname);
   const onSecondary = secondary.some((item) => pathname.startsWith(item.to)) || pathname.startsWith("/companies/");
 
@@ -71,6 +89,7 @@ export function AppShell() {
               <NavLink to={to} end={to === "/"} className={sideItemClass}>
                 <Icon />
                 {label}
+                {to === "/calendar" && <ReminderCount count={reminders} />}
               </NavLink>
               {/* Logo abaixo do Início, e só para quem tem empresa ativa. */}
               {to === "/" && <CompanyNav companies={companies} />}
@@ -124,11 +143,19 @@ export function AppShell() {
             onClick={() => setMoreOpen(true)}
             aria-haspopup="dialog"
             aria-expanded={moreOpen}
+            aria-label={reminders > 0 ? `Mais, ${reminders} ${reminders === 1 ? "lembrete" : "lembretes"}` : undefined}
             className={`flex min-h-12 flex-col items-center justify-center gap-0.5 text-[10.5px] font-bold ${
               onSecondary ? "text-accent" : "text-text-muted"
             }`}
           >
-            <MoreIcon />
+            <span className="relative">
+              <MoreIcon />
+              {reminders > 0 && (
+                <span aria-hidden="true" className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-extrabold text-on-accent">
+                  {reminders > 99 ? "99+" : reminders}
+                </span>
+              )}
+            </span>
             Mais
           </button>
         </nav>
@@ -165,6 +192,7 @@ export function AppShell() {
             >
               <Icon />
               {label}
+              {to === "/calendar" && <ReminderCount count={reminders} />}
             </NavLink>
           ))}
         </nav>

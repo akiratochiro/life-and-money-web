@@ -151,7 +151,7 @@ describe("página da empresa", () => {
     open();
     const nav = await screen.findByRole("navigation", { name: "Seções da empresa" });
     expect(within(nav).getAllByRole("link").map((link) => link.textContent)).toEqual([
-      "Visão geral", "Notas fiscais", "Despesas", "Impostos", "Retiradas",
+      "Visão geral", "Notas fiscais", "Despesas", "Impostos", "Retiradas", "Calendário",
     ]);
   });
 

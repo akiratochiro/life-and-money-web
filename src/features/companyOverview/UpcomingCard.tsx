@@ -40,7 +40,7 @@ export function UpcomingCard({ companyId }: { companyId: number }) {
                 </span>
                 <span className="flex flex-col items-end gap-1">
                   <span className="font-semibold tabular-nums">
-                    {item.amount !== undefined ? formatCents(toCents(item.amount)) : "Sem valor"}
+                    {item.amount != null ? formatCents(toCents(item.amount)) : "Sem valor"}
                   </span>
                   <Badge tone={item.status === "OVERDUE" ? "danger" : "warning"}>
                     {item.status === "OVERDUE" ? "Atrasado" : "Pendente"}

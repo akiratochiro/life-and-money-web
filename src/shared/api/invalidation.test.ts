@@ -18,6 +18,8 @@ const QUERIES = {
   companyRegimes: ["companies", 7, "regimes"],
   invoices: ["companies", 7, "invoices", 2026],
   attachmentUsage: ["attachments", "usage"],
+  calendarEvents: ["calendar", "events", "2026-11", "ALL", null],
+  calendarReminders: ["calendar", "reminders", "ALL", null],
   me: ["me"],
 } as const;
 
@@ -35,7 +37,7 @@ async function staleAfter(change: Change): Promise<Query[]> {
 describe("o que cada mudança recarrega", () => {
   it("uma transação: extrato, dashboards, metas e contas", async () => {
     expect(await staleAfter("transaction")).toEqual([
-      "transactions", "expensesByCategory", "monthlyTotals", "budget", "goals", "billOccurrences", "billsUpcoming",
+      "transactions", "expensesByCategory", "monthlyTotals", "budget", "goals", "billOccurrences", "billsUpcoming", "calendarEvents", "calendarReminders",
     ]);
   });
 
@@ -45,7 +47,7 @@ describe("o que cada mudança recarrega", () => {
 
   it("uma categoria: categorias, dashboards e contas", async () => {
     expect(await staleAfter("category")).toEqual([
-      "expensesByCategory", "monthlyTotals", "budget", "categories", "billOccurrences", "billsUpcoming",
+      "expensesByCategory", "monthlyTotals", "budget", "categories", "billOccurrences", "billsUpcoming", "calendarEvents", "calendarReminders",
     ]);
   });
 
@@ -54,35 +56,45 @@ describe("o que cada mudança recarrega", () => {
   });
 
   it("uma conta: só as contas", async () => {
-    expect(await staleAfter("bill")).toEqual(["billOccurrences", "billsUpcoming"]);
+    expect(await staleAfter("bill")).toEqual(["billOccurrences", "billsUpcoming", "calendarEvents", "calendarReminders"]);
   });
 
   it("um pagamento de conta: contas, extrato e dashboards, sem as metas", async () => {
     expect(await staleAfter("billPayment")).toEqual([
-      "transactions", "expensesByCategory", "monthlyTotals", "budget", "billOccurrences", "billsUpcoming",
+      "transactions", "expensesByCategory", "monthlyTotals", "budget", "billOccurrences", "billsUpcoming", "calendarEvents", "calendarReminders",
     ]);
   });
 
   it("uma empresa: só as empresas (a lista do menu, a empresa e o histórico)", async () => {
-    expect(await staleAfter("company")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
+    expect(await staleAfter("company")).toEqual(["companies", "company", "companyRegimes", "invoices", "calendarEvents", "calendarReminders"]);
   });
 
   it("uma despesa da empresa: as empresas (despesas e receita debaixo delas) e o uso da cota", async () => {
-    expect(await staleAfter("companyExpense")).toEqual(["companies", "company", "companyRegimes", "invoices", "attachmentUsage"]);
+    expect(await staleAfter("companyExpense")).toEqual([
+      "companies", "company", "companyRegimes", "invoices", "attachmentUsage", "calendarEvents", "calendarReminders",
+    ]);
   });
 
   it("uma nota: as empresas (notas e data de abertura) e o uso da cota", async () => {
-    expect(await staleAfter("invoice")).toEqual(["companies", "company", "companyRegimes", "invoices", "attachmentUsage"]);
+    expect(await staleAfter("invoice")).toEqual([
+      "companies", "company", "companyRegimes", "invoices", "attachmentUsage", "calendarEvents", "calendarReminders",
+    ]);
   });
 
   it("um imposto: as empresas (impostos e a despesa de Impostos debaixo delas)", async () => {
-    expect(await staleAfter("tax")).toEqual(["companies", "company", "companyRegimes", "invoices"]);
+    expect(await staleAfter("tax")).toEqual(["companies", "company", "companyRegimes", "invoices", "calendarEvents", "calendarReminders"]);
   });
 
   it("uma retirada: as empresas (DARF e Fator R) e as finanças pessoais (o lançamento e a categoria dele)", async () => {
     expect(await staleAfter("withdrawal")).toEqual([
-      "transactions", "expensesByCategory", "monthlyTotals", "budget", "categories", "companies", "company", "companyRegimes", "invoices",
+      "transactions", "expensesByCategory", "monthlyTotals", "budget", "categories", "companies", "company", "companyRegimes", "invoices", "calendarEvents", "calendarReminders",
     ]);
+  });
+
+  it("meta, orçamento e faturamento esperado não mexem em vencimento: o calendário fica", async () => {
+    for (const change of ["goal", "budget", "expectedRevenue"] as const) {
+      expect(await staleAfter(change)).not.toContain("calendarReminders");
+    }
   });
 
   it("o faturamento esperado: só as empresas, nunca o Início pessoal", async () => {

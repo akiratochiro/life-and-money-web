@@ -50,7 +50,7 @@ function sidebar() {
 function bottomNav() {
   return screen
     .getAllByRole("navigation", { name: "Navegação principal" })
-    .find((nav) => within(nav).queryByRole("button", { name: "Mais" }))!;
+    .find((nav) => within(nav).queryByRole("button", { name: /^Mais/ }))!;
 }
 
 describe("AppShell no celular", () => {
@@ -62,6 +62,29 @@ describe("AppShell no celular", () => {
     expect(targets).toEqual(["Início", "Extrato", "Nova transação", "Orçamento", "Mais"]);
   });
 
+  it("o lembrete do calendário: o número no Mais e no item Calendário, só dentro do app", async () => {
+    mocks.GET.mockImplementation((path: string) => Promise.resolve({
+      data: path === "/calendar/reminders" ? { overdue: [], nextDays: [], count: 3 } : [],
+      response: new Response(null, { status: 200 }),
+    }));
+    open("/");
+
+    expect(await within(bottomNav()).findByRole("button", { name: "Mais, 3 lembretes" })).toBeInTheDocument();
+    await userEvent.click(within(bottomNav()).getByRole("button", { name: /Mais/ }));
+    const sheet = screen.getByRole("dialog", { name: "Mais" });
+    expect(within(sheet).getByRole("link", { name: "Calendário, 3 lembretes" })).toHaveAttribute("href", "/calendar");
+  });
+
+  it("sem lembretes, nenhum número", async () => {
+    mocks.GET.mockImplementation((path: string) => Promise.resolve({
+      data: path === "/calendar/reminders" ? { overdue: [], nextDays: [], count: 0 } : [],
+      response: new Response(null, { status: 200 }),
+    }));
+    open("/");
+    await waitFor(() => expect(mocks.GET).toHaveBeenCalledWith("/calendar/reminders", expect.anything()));
+    expect(within(bottomNav()).getByRole("button", { name: "Mais" })).toBeInTheDocument();
+  });
+
   it("o Mais abre uma folha com as outras telas, e escolher uma fecha a folha", async () => {
     open("/");
     await userEvent.click(within(bottomNav()).getByRole("button", { name: "Mais" }));
@@ -69,7 +92,7 @@ describe("AppShell no celular", () => {
     const sheet = screen.getByRole("dialog", { name: "Mais" });
     expect(sheet).toHaveAttribute("open");
     const links = within(sheet).getAllByRole("link").map((link) => link.textContent);
-    expect(links).toEqual(["Metas", "Contas", "Análises", "Categorias", "Minha conta"]);
+    expect(links).toEqual(["Metas", "Contas", "Calendário", "Análises", "Categorias", "Minha conta"]);
 
     await userEvent.click(within(sheet).getByRole("link", { name: "Contas" }));
     expect(sheet).not.toHaveAttribute("open");
@@ -94,7 +117,7 @@ describe("AppShell no celular", () => {
       .find((nav) => !within(nav).queryByRole("button", { name: "Mais" }))!;
 
     const links = within(sidebar).getAllByRole("link").map((link) => link.textContent);
-    expect(links).toEqual(["Início", "Extrato", "Orçamento", "Metas", "Contas", "Análises", "Categorias", "Minha conta"]);
+    expect(links).toEqual(["Início", "Extrato", "Orçamento", "Metas", "Contas", "Calendário", "Análises", "Categorias", "Minha conta"]);
   });
 
   it("a nova transação é tela cheia: sem a barra de baixo", () => {

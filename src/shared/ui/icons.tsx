@@ -83,6 +83,15 @@ export const CalendarIcon = (p: IconProps) => (
     <path d="M15 3v4" />
   </svg>
 );
+/** O calendário fiscal: a folha do mês com os dias marcados, diferente do ícone das Contas. */
+export const CalendarDaysIcon = (p: IconProps) => (
+  <svg {...base} {...p}>
+    <rect x="4" y="5" width="16" height="15" rx="3" />
+    <path d="M9 3v4" />
+    <path d="M15 3v4" />
+    <path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 15h.01M12 15h.01" strokeWidth={2.6} />
+  </svg>
+);
 export const MoreIcon = (p: IconProps) => (
   <svg {...base} {...p}>
     <circle cx="5" cy="12" r="1.6" />

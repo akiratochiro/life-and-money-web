@@ -37,21 +37,25 @@ export type Change =
  * - retirada (pró-labore, distribuição, planejado, lançar): as empresas (muda o DARF e o Fator R) e, desde
  *   a Fase 6, as finanças pessoais: lançar cria uma receita (e talvez a categoria "Pró-labore"), e editar
  *   ou excluir a retirada lançada muda ou apaga essa receita.
+ * - calendário (Fase 9): toda mudança que mexe num vencimento ou no status dele recarrega o calendário e o
+ *   número de lembretes do menu: transação (pode ser o pagamento de uma conta), categoria (arquivar encerra
+ *   contas), conta e pagamento, empresa (arquivar tira os eventos dela), nota (muda o DAS), despesa, imposto
+ *   e retirada (muda o DARF). Meta, orçamento e faturamento esperado não mexem em vencimento.
  * - faturamento esperado (Fase 8): só as empresas (o monitor do Fator R). Nunca o Início pessoal: o alerta
  *   do Fator R mora só na visão da empresa.
  */
 export const AFFECTS: Record<Change, readonly string[]> = {
-  transaction: ["transactions", "dashboard", "goals", "bills"],
+  transaction: ["transactions", "dashboard", "goals", "bills", "calendar"],
   goal: ["goals", "transactions"],
-  category: ["categories", "dashboard", "bills"],
+  category: ["categories", "dashboard", "bills", "calendar"],
   budget: ["dashboard"],
-  bill: ["bills"],
-  billPayment: ["bills", "transactions", "dashboard"],
-  company: ["companies"],
-  invoice: ["companies", "attachments"],
-  companyExpense: ["companies", "attachments"],
-  tax: ["companies"],
-  withdrawal: ["companies", "transactions", "dashboard", "categories"],
+  bill: ["bills", "calendar"],
+  billPayment: ["bills", "transactions", "dashboard", "calendar"],
+  company: ["companies", "calendar"],
+  invoice: ["companies", "attachments", "calendar"],
+  companyExpense: ["companies", "attachments", "calendar"],
+  tax: ["companies", "calendar"],
+  withdrawal: ["companies", "transactions", "dashboard", "categories", "calendar"],
   expectedRevenue: ["companies"],
 };
 

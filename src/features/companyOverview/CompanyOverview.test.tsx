@@ -24,7 +24,7 @@ const NOVEMBER = {
 
 const upcoming = (n: number) => Array.from({ length: n }, (_, i) => ({
   source: i % 2 ? "TAX" : "EXPENSE", name: `Conta ${i + 1}`, dueDate: `2026-11-${String(i + 5).padStart(2, "0")}`,
-  amount: i === 1 ? undefined : 100 + i, status: i === 0 ? "OVERDUE" : "PENDING", month: "2026-11",
+  amount: i === 1 ? null : 100 + i, /* a API manda null no imposto sem valor */ status: i === 0 ? "OVERDUE" : "PENDING", month: "2026-11",
 }));
 
 function serve(overview: unknown, items: unknown[] = []) {
