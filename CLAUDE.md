@@ -140,6 +140,9 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
 - **Caixa da empresa** (`companyOverview/CashCard`, decisão 30): topo da visão geral, sempre "hoje" (chave
   `["companies", id, "cash"]`, fora do mês dos cards). O front só mostra: saldo, reserva e a frase do
   governo vêm prontos da API. Saldo e reserva abrem com `aria-expanded`; valores com `whitespace-nowrap`.
+- **Monitor do Fator R** (`companyOverview/FatorRCard`, decisão 31): depois do caixa, só com `applies`; chave
+  `["companies", id, "fator-r"]`; o faturamento esperado é a mudança `"expectedRevenue"` (só empresas, nunca
+  o Início). A API manda `null` em campo vazio, embora o tipo gerado diga opcional: compare com `!= null`.
 - **Mensagens de erro vêm da API** (RFC 9457): o `detail` já chega em português e é mostrado
   como está; o mapa `errors` marca os campos do formulário.
 

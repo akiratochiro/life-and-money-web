@@ -696,3 +696,26 @@ para corrigir um valor lançado (ir à empresa), que o diálogo explica com o li
 
 **Consequências.** O usuário vê o disponível sem fazer conta e confere a conta quando duvida. Corrigir o
 saldo inicial continua no Editar da empresa, que o detalhe indica.
+
+## 31. Monitor do Fator R: o mês que vem, com a conta à mostra e a verdade sobre a economia
+
+**Contexto.** A Fase 8 avisa quando o Fator R vai ficar abaixo da meta, com o pró-labore que corrige e a
+economia (decisão 30 da API).
+
+**Decisão.**
+- **Um card "Fator R de dezembro"** logo depois do caixa, só quando a API diz `applies` (Simples com Fator R
+  na próxima competência). O título nomeia a competência em jogo, porque o mês corrente decide o Anexo do
+  mês que vem.
+- **O número grande, um selo e uma barra** desenhada em CSS (sem biblioteca), com marca nos 28% e na meta
+  quando ela é maior. O estado aparece em texto e no selo, não só na cor.
+- **O alerta** (vermelho abaixo de 28%, amarelo abaixo só da meta) diz quanto falta de folha, o pró-labore
+  que resolve ("edite" quando já registrado, "aumente o planejado" quando não), e a economia com a conta.
+  Quando a economia é negativa, diz que o Anexo V sai mais barato. O link leva à aba Retiradas.
+- **O faturamento esperado é editado no próprio card**, aberto no lugar como o pró-labore planejado, em vez
+  de uma folha: é um campo só, e o plano das retiradas já usa esse padrão. "Não tenho valor fixo" remove.
+- **A mudança `expectedRevenue` recarrega só as empresas**, com teste: o alerta mora só na visão da empresa.
+- **Campos vazios chegam como `null`** da API, embora o tipo gerado os declare opcionais; os cards comparam
+  com `!= null`, e os testes usam `null` como a API manda.
+
+**Consequências.** O usuário vê com um mês de antecedência que vai para o Anexo V e se corrigir compensa. O
+card some para quem não tem Fator R, sem ocupar espaço.
