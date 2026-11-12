@@ -147,6 +147,13 @@ if (companyHref) {
   }
   await settle();
   await audit("empresa-caixa");
+  // O faturamento esperado aberto no card do Fator R (só no Simples com Fator R).
+  const [expected] = await page.$$("xpath/.//button[contains(@aria-label, 'faturamento esperado')]");
+  if (expected) {
+    await expected.tap();
+    await settle();
+    await audit("empresa-fator-r");
+  }
   await page.goto(`${BASE}${companyHref}/invoices`, { waitUntil: "load" });
   await audit("notas");
   await page.goto(`${BASE}${companyHref}/expenses`, { waitUntil: "load" });

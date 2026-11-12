@@ -100,7 +100,7 @@ describe("caixa da empresa", () => {
   });
 
   it("sem nota no mês, diz que ainda não há notas", async () => {
-    serve({ ...CASH, governmentShare: { month: "2026-11", revenue: 0, amount: 0, kind: "DAS" } });
+    serve({ ...CASH, governmentShare: { month: "2026-11", revenue: 0, amount: 0, effectiveRate: null, kind: "DAS" } });
     open();
     expect(await screen.findByText("Ainda não há notas em novembro.")).toBeInTheDocument();
   });

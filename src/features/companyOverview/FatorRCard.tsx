@@ -67,7 +67,7 @@ function Suggestion({ data }: { data: FatorRMonitor }) {
       : `Um pró-labore de ${money(s.suggestedProLabore)} em ${month} resolve.`;
 
   let outcome: string | null = null;
-  if (danger && s.savings !== undefined) {
+  if (danger && s.savings != null) {
     outcome = s.savings > 0
       ? `Economia estimada em ${monthName(data.competence!)}: ${money(s.savings)} (DAS de ${money(s.dasAnnexV!)} no Anexo V contra ${money(s.dasAnnexIII!)} no III, menos ${money(s.extraProLaboreTaxes!)} de INSS e IRRF a mais).`
       : `Mas isso custaria ${money(-s.savings)} a mais do que economiza (INSS e IRRF de ${money(s.extraProLaboreTaxes!)} contra ${money(s.dasAnnexV! - s.dasAnnexIII!)} de DAS). Neste caso, o Anexo V sai mais barato.`;
@@ -93,7 +93,7 @@ function ExpectedRevenue({ companyId, data }: { companyId: number; data: FatorRM
   const set = useSetExpectedRevenue(companyId);
   const remove = useRemoveExpectedRevenue(companyId);
   const [editing, setEditing] = useState(false);
-  const [cents, setCents] = useState(current !== undefined ? toCents(current) : 0);
+  const [cents, setCents] = useState(current != null ? toCents(current) : 0);
   const error = set.error ?? remove.error;
 
   return (
@@ -101,12 +101,12 @@ function ExpectedRevenue({ companyId, data }: { companyId: number; data: FatorRM
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm">
           <span className="text-text-muted">Faturamento esperado: </span>
-          <span className="font-semibold tabular-nums">{current !== undefined ? `${money(current)}/mês` : "não informado"}</span>
+          <span className="font-semibold tabular-nums">{current != null ? `${money(current)}/mês` : "não informado"}</span>
         </span>
         {!editing && (
           <button type="button" onClick={() => setEditing(true)} className="flex min-h-11 items-center px-2 text-sm font-bold text-link"
-            aria-label={current !== undefined ? "Mudar o faturamento esperado" : "Informar o faturamento esperado"}>
-            {current !== undefined ? "Mudar" : "Informar"}
+            aria-label={current != null ? "Mudar o faturamento esperado" : "Informar o faturamento esperado"}>
+            {current != null ? "Mudar" : "Informar"}
           </button>
         )}
       </div>
@@ -122,7 +122,7 @@ function ExpectedRevenue({ companyId, data }: { companyId: number; data: FatorRM
               <PendingLabel pending={set.isPending} pendingText="Salvando…">Salvar</PendingLabel>
             </button>
             <button type="button" onClick={() => setEditing(false)} className="h-11 rounded-full bg-surface px-5 font-bold">Cancelar</button>
-            {current !== undefined && (
+            {current != null && (
               <button type="button" disabled={remove.isPending}
                 onClick={() => remove.mutate(undefined, { onSuccess: () => { setEditing(false); setCents(0); } })}
                 className="flex min-h-11 items-center px-2 text-sm font-bold text-danger-strong disabled:opacity-60">

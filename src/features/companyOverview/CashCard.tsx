@@ -48,7 +48,7 @@ function governmentSentence(cash: CompanyCash): ReactNode {
   }
   const detail = share.kind === "DAS_MEI"
     ? "DAS-MEI, valor fixo"
-    : share.effectiveRate !== undefined ? `DAS, ${rate.format(share.effectiveRate)}` : "DAS";
+    : share.effectiveRate != null ? `DAS, ${rate.format(share.effectiveRate)}` : "DAS";
   return (
     <>
       Das notas de {month} ({money(share.revenue)}), <strong className="text-text">{money(share.amount)} já é do governo</strong> ({detail}).

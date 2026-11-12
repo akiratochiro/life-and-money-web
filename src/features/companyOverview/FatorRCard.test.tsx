@@ -15,7 +15,8 @@ const NOTICE = "O Fator R é projetado com a receita e a folha previstas do mês
 /** Os números do teste de integração da API: 20%, falta 2.400, economia de 686. */
 const BELOW = {
   applies: true, competence: "2026-12", projectedMonth: "2026-11",
-  projection: { invoices: 10000, revenue: 10000, proLabore: 2000, otherPayroll: 0 },
+  // A API manda null nos campos vazios, não os omite.
+  projection: { invoices: 10000, expectedRevenue: null, revenue: 10000, proLabore: 2000, otherPayroll: 0 },
   window: { from: "2026-09", to: "2026-11", revenue: 30000, payroll: 6000 },
   ratio: 0.2, target: 0.28, threshold: 0.28, status: "BELOW_THRESHOLD",
   suggestion: {
@@ -67,6 +68,7 @@ describe("monitor do Fator R", () => {
     expect(note).toHaveTextContent(/Economia estimada em dezembro: R\$\s686,00/);
     expect(within(note).getByRole("link", { name: "Ajustar o pró-labore" })).toHaveAttribute("href", "/companies/7/withdrawals");
     expect(screen.getByText(NOTICE)).toBeInTheDocument();
+    expect(screen.getByText("não informado")).toBeInTheDocument();
   });
 
   it("com o pró-labore já registrado, manda editar a retirada", async () => {
