@@ -1016,6 +1016,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/companies/{companyId}/revenue-limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Os limites de faturamento do ano: MEI, ME → EPP, sublimite e teto do Simples */
+        get: operations["companyRevenueLimits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/companies/{companyId}/pro-labore-plans": {
         parameters: {
             query?: never;
@@ -2389,6 +2406,84 @@ export interface components {
             /** @description Serviço menos desconto incondicional das notas ativas */
             total: number;
             points: components["schemas"]["Point"][];
+        };
+        LimitView: {
+            /** @enum {string} */
+            kind: "MEI_ANNUAL" | "SIMPLES_EPP" | "SIMPLES_SUBLIMIT" | "SIMPLES_CEILING";
+            label: string;
+            /** @description Já proporcional no ano de abertura */
+            amount: number;
+            /** @description Limite + 20%, onde há tolerância */
+            toleranceAmount?: number;
+            ratio: number;
+            /** @enum {string} */
+            level: "NONE" | "WARNING" | "NEAR" | "EXCEEDED" | "EXCEEDED_TOLERANCE";
+            /**
+             * @description Ausente quando não há o que avisar
+             * @enum {string}
+             */
+            severity?: "INFO" | "WARNING" | "DANGER";
+            /**
+             * @description O mês em que passou
+             * @example 2026-07
+             */
+            exceededIn?: string;
+            /**
+             * @description Desde quando a consequência vale
+             * @example 2027-01
+             */
+            effectiveFrom?: string;
+            /**
+             * @description O mês em que a projeção passa, se ainda não passou
+             * @example 2026-12
+             */
+            projectedIn?: string;
+            /** @description O aviso em linguagem simples, a partir de 70% */
+            message?: string;
+            /** @description "No ritmo atual, ..." */
+            projectionMessage?: string;
+            source: string;
+        };
+        Projection: {
+            /** @description A receita do ano no ritmo atual */
+            total: number;
+            /**
+             * @description Os meses que faltam pelo faturamento esperado, ou pela média
+             * @enum {string}
+             */
+            basis: "EXPECTED_REVENUE" | "AVERAGE";
+        };
+        RevenueLimitsResponse: {
+            /** @description Só no MEI e no Simples */
+            applies: boolean;
+            /** Format: int32 */
+            year: number;
+            /** @description Os anos que dá para ver, do mais recente ao mais antigo */
+            years: number[];
+            /**
+             * @description O enquadramento usado: o vigente hoje, ou o de dezembro num ano passado
+             * @enum {string}
+             */
+            regime?: "SIMEI" | "SIMPLES_NACIONAL" | "LUCRO_PRESUMIDO" | "LUCRO_REAL";
+            openingYear: boolean;
+            /**
+             * Format: int32
+             * @description Meses de atividade no ano (12 fora do ano de abertura)
+             */
+            activityMonths: number;
+            /** @description Notas ativas com competência no ano */
+            revenue: number;
+            /** @description Ausente num ano fechado */
+            projection?: components["schemas"]["Projection"];
+            limits: components["schemas"]["LimitView"][];
+            /**
+             * @description O limite mais alto que pede atenção; ausente se nenhum
+             * @enum {string}
+             */
+            alert?: "MEI_ANNUAL" | "SIMPLES_EPP" | "SIMPLES_SUBLIMIT" | "SIMPLES_CEILING";
+            /** @description A ressalva da LC 238/2026 nos limites do MEI de 2027 em diante */
+            conditional?: string;
+            notice: string;
         };
         ProLaboreCalculatorResponse: {
             monthlyRevenue: number;
@@ -4818,6 +4913,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RevenueResponse"];
+                };
+            };
+        };
+    };
+    companyRevenueLimits: {
+        parameters: {
+            query?: {
+                year?: number;
+            };
+            header?: never;
+            path: {
+                companyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RevenueLimitsResponse"];
                 };
             };
         };

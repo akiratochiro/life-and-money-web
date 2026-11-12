@@ -65,3 +65,15 @@ export function useRemoveExpectedRevenue(companyId: number) {
     onSuccess: () => invalidate("expectedRevenue"),
   });
 }
+
+export type RevenueLimits = components["schemas"]["RevenueLimitsResponse"];
+export type RevenueLimit = components["schemas"]["LimitView"];
+
+/** Os limites de faturamento do ano (decisão 33); sem ano, o corrente. */
+export function useRevenueLimits(companyId: number, year?: number) {
+  return useQuery({
+    queryKey: ["companies", companyId, "revenue-limits", year ?? "current"],
+    queryFn: () =>
+      unwrap(api.GET("/companies/{companyId}/revenue-limits", { params: { path: { companyId }, query: year ? { year } : {} } })),
+  });
+}
