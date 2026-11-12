@@ -719,3 +719,30 @@ economia (decisão 30 da API).
 
 **Consequências.** O usuário vê com um mês de antecedência que vai para o Anexo V e se corrigir compensa. O
 card some para quem não tem Fator R, sem ocupar espaço.
+
+## 32. Calendário fiscal: um componente, o filtro na URL e o lembrete no menu
+
+**Contexto.** A Fase 9 pede um único calendário com filtro PF/PJ (e por empresa), os vencimentos com status
+e valor, e lembretes só dentro do app (decisão 31 da API).
+
+**Decisão.**
+- **Um componente só.** O calendário em grade das Contas (decisão 11) virou `shared/ui/MonthCalendar`, que
+  recebe itens com dia e status e as palavras do status ("paga" nas contas, "pago" no fiscal). As Contas
+  usam o mesmo, sem mudança visível. A grade e os rótulos foram para `shared/lib/monthCalendar.ts`.
+- **A tela `/calendar`** fica no menu, junto de Contas, com o filtro Tudo/Pessoal/Empresas (segmentado em
+  argila neutra) e o seletor de empresa quando há mais de uma. O filtro mora na URL, para o voltar e os
+  links funcionarem. Cada empresa ganha a aba "Calendário", a mesma tela travada nela.
+- **"Pede atenção"** fica no topo, com os atrasados e os próximos 7 dias, e a data vem primeiro na linha:
+  cortada no celular, é ela que não pode sumir.
+- **O calendário só mostra e leva** (`events.ts`: `linkOf`, `statusOf`, `amountOf`): impostos para a aba
+  Impostos, despesas para Despesas, contas para Contas. O status aparece em texto e selo, além do marcador
+  com forma própria. O DAS zero aparece apagado, como "Nada a pagar".
+- **O lembrete dentro do app é um número** no item "Calendário" (sidebar e "Mais") e no botão "Mais" do
+  celular, com nome acessível ("Mais, 4 lembretes"). O Início não muda: o que é da empresa fica na empresa.
+- **A família `"calendar"`** entra no `AFFECTS` de transação, categoria, conta, pagamento, empresa, nota,
+  despesa, imposto e retirada, com teste. Meta, orçamento e faturamento esperado não mexem em vencimento.
+- **Corrigido:** o "Próximos vencimentos" mostrava "R$ 0,00" num imposto sem valor, porque a API manda
+  `null`; agora mostra "Sem valor", e os testes usam `null` como a API.
+
+**Consequências.** Contas e impostos se veem no mesmo mês, e o número no menu avisa sem e-mail nem push. O
+custo é uma consulta de lembretes em toda tela, recarregada só quando algo muda um vencimento.

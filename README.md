@@ -68,6 +68,7 @@ receive, and you start with a default set of categories. It is a portfolio proje
 | Withdrawals | The planned pró-labore of each partner, paid pró-labore (INSS, IRRF and net calculated; payslip values before 2026) and profit distribution with its warnings; one tap launches the net of your own withdrawal into your personal finances, where its amount and date stay locked |
 | Company expenses | The month's one-off and recurring expenses with paid and pending totals, paying a recurring month with the real amount and date, receipts, and per-company categories (with the ones that count as payroll for the Fator R) |
 | My company | The company's cash today (what is really available after the taxes already owed, with the account balance and the tax reserve opening into their parts, and how much of this month's invoices already belongs to the government), the Fator R monitor (next month's Fator R against the 28% and the company's target, with the pró-labore that fixes it and whether it pays, and the expected monthly revenue), the month at a glance (revenue, expenses, taxes by competence, result with its sign, withdrawals) and what is overdue or due in the next 30 days; revenue by day, week or month on the overview, company data, partner and the tax-regime history (MEI, Simples Nacional, Lucro Presumido or Real), with changes dated in the past or scheduled for the future and an undo for the latest one; a CNPJ lookup pre-fills the registration |
+| Calendar | Personal bills, company taxes and declarations and company fixed expenses in one month calendar, filtered by everything, personal, companies or one company (also a tab in each company); "Needs attention" with what is overdue or due in the next 7 days, and the count on the menu item. In-app only: no email or push yet |
 
 ## Visual identity
 
@@ -210,4 +211,5 @@ The full step by step, including the API and the database, is in the
 
 - Installable as a PWA, with a home-screen shortcut
 - Withdrawals from savings goals (depends on the API)
-- Keyboard arrow navigation in the bills calendar
+- Keyboard arrow navigation in the month calendar (bills and fiscal calendar)
+- Email reminders for the calendar (depends on the API; see its roadmap)
