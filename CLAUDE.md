@@ -143,6 +143,9 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
 - **Monitor do Fator R** (`companyOverview/FatorRCard`, decisão 31): depois do caixa, só com `applies`; chave
   `["companies", id, "fator-r"]`; o faturamento esperado é a mudança `"expectedRevenue"` (só empresas, nunca
   o Início). A API manda `null` em campo vazio, embora o tipo gerado diga opcional: compare com `!= null`.
+- **Limites de faturamento** (`companyOverview/RevenueLimitsCard`, decisão 33): depois do Fator R, só no MEI e no
+  Simples (`applies`); a barra é do `mainLimit` (no Simples, o próximo não passado), as frases e o alerta vêm da
+  API, e o percentual usa `percent` (sem arredondar para cima, como as frases). Virar EPP é aviso, não vermelho.
 - **Calendário fiscal** (`features/calendar`, decisão 32): um único `shared/ui/MonthCalendar` (as Contas
   usam o mesmo, pelo `BillCalendar`); `/calendar` com o filtro na URL (`?scope=PF|PJ&company=`) e a aba
   `calendar` de cada empresa travada nela. Só mostra e leva à tela de cada coisa (`events.ts`), nunca paga.

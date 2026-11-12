@@ -746,3 +746,26 @@ e valor, e lembretes só dentro do app (decisão 31 da API).
 
 **Consequências.** Contas e impostos se veem no mesmo mês, e o número no menu avisa sem e-mail nem push. O
 custo é uma consulta de lembretes em toda tela, recarregada só quando algo muda um vencimento.
+
+## 33. Limites de faturamento: uma barra, o alerta mais urgente e a frase do servidor
+
+**Contexto.** A Fase 10 mostra o progresso do ano até os limites do MEI e do Simples, com alertas em 70%, 90% e
+100% que explicam a consequência (decisão 32 da API).
+
+**Decisão.**
+- **Um card "Limites de faturamento"** depois do Fator R, só quando a API diz `applies` (MEI e Simples). Num ano
+  passado de Lucro Presumido, o card fica e diz que não há limites; no ano corrente, ele some.
+- **Uma barra só, a do limite que importa agora** (`mainLimit`): no MEI, o limite (com a faixa de tolerância de
+  20% desenhada depois dos 100%); no Simples, o próximo limite ainda não passado. Os outros ficam em linha,
+  com o percentual ou "passou em abril de 2026". Três barras para uma empresa pequena seriam ruído.
+- **O alerta é o do limite mais urgente** (`alert` da API), com a frase pronta e a cor da gravidade: amarelo
+  na atenção e no perto, vermelho quando passou, e neutro quando a empresa vira EPP, porque no Simples isso
+  não muda imposto. O nível também aparece em selo.
+- **"No ritmo atual"** aparece em texto, só quando a projeção passa de um limite.
+- **O percentual não arredonda para cima** (`percent`): 79,4% é "79%", como nas frases do servidor, para o número
+  da barra e o do alerta nunca discordarem.
+- **Um seletor de ano** para ver como os anos passados fecharam, sem projeção.
+- **Nada no Início nem no número do calendário**: o alerta é da empresa.
+
+**Consequências.** O dono vê o limite que está chegando e o que acontece se passar, sem ler a lei. O custo é a
+frase morar no servidor: mudar o texto pede um deploy da API.
