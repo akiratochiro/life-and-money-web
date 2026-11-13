@@ -123,6 +123,31 @@ describe("worker", () => {
     expect(await response.json()).toMatchObject({ status: 502 });
   });
 
+  it("troca o desafio anti-bot da Cloudflare do Render por um 503 que o front sabe repetir", async () => {
+    captureUpstream(
+      new Response("<!DOCTYPE html><title>Just a moment...</title>", {
+        status: 429,
+        headers: { "cf-mitigated": "challenge", "Content-Type": "text/html; charset=UTF-8" },
+      }),
+    );
+
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env());
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get("Content-Type")).toBe("application/problem+json");
+    expect(response.headers.get("Retry-After")).toBe("5");
+    expect(await response.json()).toMatchObject({ status: 503 });
+  });
+
+  it("repassa como veio um 429 da própria API, que não é desafio", async () => {
+    captureUpstream(new Response('{"status":429}', { status: 429, headers: { "Retry-After": "30" } }));
+
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/auth/login", { method: "POST" }), env());
+
+    expect(response.status).toBe(429);
+    expect(response.headers.get("Retry-After")).toBe("30");
+  });
+
   it("não manda para a API o que não é /api, nem um caminho que só começa parecido", async () => {
     const upstream = captureUpstream();
     const bindings = env();

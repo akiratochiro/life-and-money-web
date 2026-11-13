@@ -52,9 +52,11 @@ export default {
     // do usuário. Um redirecionamento da API volta para o navegador em vez de ser seguido aqui.
     try {
       const upstream = new Request(upstreamUrl(request.url, env.API_ORIGIN), request);
-      return await fetch(new Request(upstream, { headers: upstreamHeaders(request, env.PROXY_SHARED_SECRET) }), {
-        redirect: "manual",
-      });
+      const response = await fetch(
+        new Request(upstream, { headers: upstreamHeaders(request, env.PROXY_SHARED_SECRET) }),
+        { redirect: "manual" },
+      );
+      return isEdgeChallenge(response) ? challengeUnavailable() : response;
     } catch {
       // Sem conexão com a API (o Render subindo, por exemplo). Um 502 diz ao front que o pedido
       // não chegou lá, e que pode tentar de novo sem risco.
@@ -65,3 +67,37 @@ export default {
     }
   },
 };
+
+/**
+ * A Cloudflare que fica na frente do Render às vezes responde com um desafio anti-bot (um 429 ou 403
+ * em HTML, com `cf-mitigated: challenge`) em vez de repassar o pedido — visto enquanto a API do plano
+ * gratuito acorda. Ninguém aqui resolve esse desafio: nem este Worker nem o fetch do app.
+ */
+export function isEdgeChallenge(response: Response): boolean {
+  return response.headers.get("cf-mitigated") === "challenge";
+}
+
+/** Tempo sugerido ao front antes da próxima tentativa depois de um desafio. */
+export const CHALLENGE_RETRY_AFTER_SECONDS = 5;
+
+/**
+ * O desafio vira um 503: o pedido não chegou à API, então é seguro repetir, e o front já trata 503
+ * como "servidor ainda não está de pé". Repassado como 429, ele pareceria o limite de tentativas da
+ * própria API, e o HTML do desafio não é um ProblemDetail.
+ */
+function challengeUnavailable(): Response {
+  return Response.json(
+    {
+      title: "Service Unavailable",
+      status: 503,
+      detail: "O servidor ainda está acordando. Tente de novo em instantes.",
+    },
+    {
+      status: 503,
+      headers: {
+        "Content-Type": "application/problem+json",
+        "Retry-After": String(CHALLENGE_RETRY_AFTER_SECONDS),
+      },
+    },
+  );
+}
