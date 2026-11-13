@@ -814,3 +814,28 @@ quando a empresa muda de regime, e os usuários precisam de um contato de suport
 
 **Consequências.** O contato existe sem expor o endereço. O custo é não haver canal para quem não tem conta, o
 que foi aceito.
+
+## 36. O aviso de servidor acordando não desiste, e o desafio da Cloudflare vira 503
+
+**Contexto.** Depois de o site ir ao ar, o app às vezes ficava preso no aviso: depois de 90 s aparecia "O
+servidor não respondeu", o botão "Tentar de novo" voltava para "Acordando o servidor…" e nada acontecia; só um
+F5 resolvia, e nem sempre. Duas causas:
+- enquanto a API do Render acorda, a Cloudflare que fica na frente do Render às vezes responde com um desafio
+  anti-bot (429 em HTML, cabeçalho `cf-mitigated: challenge`) em vez de repassar o pedido. Nem o Worker nem o
+  fetch do app resolvem desafio, e o 429 parecia o limite de tentativas da própria API;
+- o `serverWake` tentava a cada 2 s, sem backoff, e depois de 90 s parava de vez. Uma rajada de pedidos é
+  justamente o que mantém o desafio ligado, e depois da desistência o app só voltava com ação do usuário.
+
+**Decisão.**
+- **O Worker troca o desafio por um 503** (`application/problem+json`, `Retry-After: 5`). O pedido não chegou à
+  API, então é seguro repetir, e o front já trata 503 como "ainda não está de pé" (queries, renovação da sessão
+  e o `/health`). Um 429 da própria API, sem `cf-mitigated`, segue como veio.
+- **Backoff no `/health`:** 2, 4, 8 e depois 15 s entre as tentativas, para não martelar a Cloudflare.
+- **Nunca desistir:** depois de 90 s o aviso muda e mostra o botão, mas as tentativas continuam no mesmo ritmo
+  de 15 s; quando o servidor responde, o aviso some sozinho. O botão zera o backoff e tenta na hora (se uma
+  tentativa já estiver em andamento, é ela que vale, para não somar pedidos).
+
+**Consequências.** O app se recupera sem F5. Uma aba aberta com o servidor fora do ar faz um pedido a cada 15 s,
+o que é pouco para o Worker (limite gratuito de 100 mil pedidos por dia). O desafio da Cloudflare do Render não
+é controlado por nós: se ele ficar ligado por muito tempo, o app espera em vez de quebrar, mas não tem como
+pulá-lo.

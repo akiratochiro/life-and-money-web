@@ -34,7 +34,8 @@ export function ServerWakeOverlay({ status, onRetry }: Props) {
               O servidor não respondeu
             </p>
             <p className="mt-3 text-sm leading-relaxed text-text-soft">
-              Ele não acordou depois de um minuto e meio. Confira sua conexão e tente de novo.
+              Ele não acordou depois de um minuto e meio. Seguimos tentando sozinhos e o app abre assim que
+              ele responder; confira também sua conexão.
             </p>
             <Button type="button" onClick={onRetry} className="mt-8 w-full">
               Tentar de novo
