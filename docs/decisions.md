@@ -829,7 +829,9 @@ F5 resolvia, e nem sempre. Duas causas:
 **Decisão.**
 - **O Worker troca o desafio por um 503** (`application/problem+json`, `Retry-After: 5`). O pedido não chegou à
   API, então é seguro repetir, e o front já trata 503 como "ainda não está de pé" (queries, renovação da sessão
-  e o `/health`). Um 429 da própria API, sem `cf-mitigated`, segue como veio.
+  e o `/health`). O mesmo vale para o 429 em texto puro ("Too Many Requests") que a borda do Render também
+  devolve: o 429 da API é sempre JSON
+  (um ProblemDetail), e só ele segue como veio.
 - **Backoff no `/health`:** 2, 4, 8 e depois 15 s entre as tentativas, para não martelar a Cloudflare.
 - **Nunca desistir:** depois de 90 s o aviso muda e mostra o botão, mas as tentativas continuam no mesmo ritmo
   de 15 s; quando o servidor responde, o aviso some sozinho. O botão zera o backoff e tenta na hora (se uma

@@ -139,8 +139,22 @@ describe("worker", () => {
     expect(await response.json()).toMatchObject({ status: 503 });
   });
 
+  it("troca também o 429 em texto puro da borda do Render, que não é da API", async () => {
+    captureUpstream(new Response("Too Many Requests", { status: 429, headers: { "Content-Type": "text/plain; charset=utf-8" } }));
+
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env());
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get("Retry-After")).toBe("5");
+  });
+
   it("repassa como veio um 429 da própria API, que não é desafio", async () => {
-    captureUpstream(new Response('{"status":429}', { status: 429, headers: { "Retry-After": "30" } }));
+    captureUpstream(
+      new Response('{"status":429}', {
+        status: 429,
+        headers: { "Retry-After": "30", "Content-Type": "application/problem+json" },
+      }),
+    );
 
     const response = await worker.fetch(new Request("https://front.workers.dev/api/auth/login", { method: "POST" }), env());
 

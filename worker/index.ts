@@ -74,7 +74,12 @@ export default {
  * gratuito acorda. Ninguém aqui resolve esse desafio: nem este Worker nem o fetch do app.
  */
 export function isEdgeChallenge(response: Response): boolean {
-  return response.headers.get("cf-mitigated") === "challenge";
+  if (response.headers.get("cf-mitigated") === "challenge") return true;
+  // A borda do Render também devolve um 429 em texto puro ("Too Many Requests"). O 429 da API é
+  // sempre um ProblemDetail em JSON (problem+json ou json, conforme o Accept), então um 429 que não
+  // é JSON não veio dela.
+  const contentType = response.headers.get("Content-Type") ?? "";
+  return response.status === 429 && !/^application\/(problem\+)?json/.test(contentType);
 }
 
 /** Tempo sugerido ao front antes da próxima tentativa depois de um desafio. */
