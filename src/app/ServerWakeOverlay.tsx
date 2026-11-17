@@ -25,7 +25,7 @@ export function ServerWakeOverlay({ status, onRetry }: Props) {
             <p className="mt-3 font-display text-2xl font-semibold leading-tight">Acordando o servidor…</p>
             <p className="mt-3 text-sm leading-relaxed text-text-soft">
               O servidor gratuito dorme quando ninguém usa o app. A primeira visita depois disso
-              leva até um minuto.
+              pode levar alguns minutos.
             </p>
           </>
         ) : (
@@ -34,7 +34,7 @@ export function ServerWakeOverlay({ status, onRetry }: Props) {
               O servidor não respondeu
             </p>
             <p className="mt-3 text-sm leading-relaxed text-text-soft">
-              Ele não acordou depois de um minuto e meio. Seguimos tentando sozinhos e o app abre assim que
+              Ele não acordou depois de cinco minutos. Seguimos tentando sozinhos e o app abre assim que
               ele responder; confira também sua conexão.
             </p>
             <Button type="button" onClick={onRetry} className="mt-8 w-full">

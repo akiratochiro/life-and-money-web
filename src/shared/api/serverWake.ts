@@ -21,7 +21,7 @@ type Options = {
   check: () => Promise<boolean>;
   /** Quanto tempo sem resposta até mostrar o aviso. */
   slowAfterMs: number;
-  /** Quanto tempo de tentativas até trocar o aviso. Um despertar do Render leva até um minuto. */
+  /** Quanto tempo de tentativas até trocar o aviso. Um despertar do Render leva de 2 a 4 minutos. */
   giveUpAfterMs: number;
   /** Intervalo depois da primeira falha; dobra a cada falha seguinte, até `maxRetryDelayMs`. */
   retryDelayMs: number;
@@ -129,8 +129,14 @@ export function createServerWake({ check, slowAfterMs, giveUpAfterMs, retryDelay
   };
 }
 
-/** Uma tentativa sem resposta em 15 s é abandonada e refeita, em vez de ficar pendurada. */
-const HEALTH_TIMEOUT_MS = 15_000;
+/**
+ * Uma tentativa fica aberta até o servidor acordar, em vez de ser abandonada e refeita. O Render
+ * segura o pedido enquanto a instância sobe, o que leva de 2 a 4 minutos (medido em 16/11/2026).
+ * Abandonar a cada poucos segundos virava uma rajada de conexões canceladas, e é a rajada que liga
+ * o desafio anti-bot da Cloudflare do Render (decisão 37). O limite só existe para uma conexão que
+ * morreu sem avisar não prender o laço para sempre.
+ */
+const HEALTH_TIMEOUT_MS = 240_000;
 
 async function checkHealth(): Promise<boolean> {
   try {
@@ -148,7 +154,7 @@ async function checkHealth(): Promise<boolean> {
 export const serverWake = createServerWake({
   check: checkHealth,
   slowAfterMs: 2_000,
-  giveUpAfterMs: 90_000,
+  giveUpAfterMs: 300_000,
   retryDelayMs: 2_000,
   maxRetryDelayMs: 15_000,
 });

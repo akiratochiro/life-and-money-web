@@ -842,3 +842,28 @@ acima disso responde com o erro 1027 (documentação de limites do Workers, conf
 pedidos de `/api/*` contam, porque os estáticos não executam o script. O desafio da Cloudflare do Render não
 é controlado por nós: se ele ficar ligado por muito tempo, o app espera em vez de quebrar, mas não tem como
 pulá-lo.
+
+## 37. O /health espera o servidor acordar em vez de desistir a cada 15 s
+
+**Contexto.** Mesmo com a decisão 36, o app voltava a ficar preso no aviso, e só um deploy manual no Render
+destravava. Em 16/11/2026 a API foi medida de perto:
+- a instância hiberna depois de uns 15 minutos sem uso, e o despertar leva **de 2 a 4 minutos**, não o minuto que
+  a decisão 36 supunha. Enquanto ela sobe, o Render segura o pedido aberto, sem responder;
+- oito rodadas de teste, cada uma com um único pedido mantido aberto depois de 20 minutos de ociosidade:
+  nenhuma recebeu o desafio anti-bot da Cloudflare do Render. Todos os despertares passaram;
+- o front abandonava cada tentativa do `/health` depois de 15 s e mandava outra (2, 4, 8 e depois 15 s). Num
+  despertar de 3 minutos, isso é mais de uma dezena de conexões canceladas por aba, todas saindo de IPs da
+  Cloudflare (o Worker). Essa rajada é a explicação provável para o desafio: o despertar sozinho não o
+  dispara, e uma vez ligado ele barra o próprio pedido que acordaria a instância.
+
+**Decisão.**
+- **Cada tentativa do `/health` fica aberta até 4 minutos** (`HEALTH_TIMEOUT_MS`). O limite só existe para uma
+  conexão morta não prender o laço; na prática, a resposta chega quando a API termina de subir. O backoff e o
+  "nunca desistir" da decisão 36 continuam valendo entre tentativas que falham de fato (502, 503).
+- **O aviso troca para "não respondeu" depois de 5 minutos**, e não mais de 90 s: antes disso, a demora é o
+  despertar normal. O texto do aviso passa a dizer "alguns minutos".
+
+**Consequências.** Um despertar custa um pedido por aba, e não uma rajada. O botão "Tentar de novo" quase nunca
+dispara um pedido novo, porque a tentativa em andamento é a que vale. A causa foi deduzida, não reproduzida: se o
+desafio voltar mesmo assim, os próximos passos são reduzir o tempo de subida da API (AppCDS) e um Cron Trigger no
+Worker que reinicia o serviço pela API do Render.
