@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from "vitest";
-import worker, { upstreamUrl } from "./index";
+import worker, { REDEPLOY_COOLDOWN_MS, redeployOnChallenge, upstreamUrl } from "./index";
 
 const API_ORIGIN = "https://life-and-money-api.onrender.com";
 
@@ -9,6 +9,23 @@ function env() {
     API_ORIGIN,
     PROXY_SHARED_SECRET: "segredo",
     ASSETS: { fetch: vi.fn(async () => new Response("<!doctype html>")) },
+  };
+}
+
+/** Um contexto do Workers que guarda o que o Worker deixou para depois de responder. */
+function ctx() {
+  return { waitUntil: vi.fn<(promise: Promise<unknown>) => void>() };
+}
+
+/** Um KV em memória, do tamanho do que o Worker usa. */
+function memoryStore(initial: Record<string, string> = {}) {
+  const data = new Map(Object.entries(initial));
+  return {
+    data,
+    get: vi.fn(async (key: string) => data.get(key) ?? null),
+    put: vi.fn(async (key: string, value: string) => {
+      data.set(key, value);
+    }),
   };
 }
 
@@ -21,6 +38,7 @@ function captureUpstream(response = new Response("{}", { status: 200 })) {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("upstreamUrl", () => {
@@ -42,6 +60,7 @@ describe("worker", () => {
         body: '{"x":1}',
       }),
       env(),
+      ctx(),
     );
 
     const [sent, init] = upstream.mock.calls[0];
@@ -62,6 +81,7 @@ describe("worker", () => {
         headers: { "CF-Connecting-IP": "198.51.100.7" },
       }),
       env(),
+      ctx(),
     );
 
     const [sent] = upstream.mock.calls[0];
@@ -78,6 +98,7 @@ describe("worker", () => {
         headers: { "CF-Connecting-IP": "198.51.100.7", "X-Client-IP": "10.9.9.9", "X-Proxy-Auth": "chute" },
       }),
       env(),
+      ctx(),
     );
 
     const [sent] = upstream.mock.calls[0];
@@ -94,6 +115,7 @@ describe("worker", () => {
         headers: { "CF-Connecting-IP": "198.51.100.7", "X-Proxy-Auth": "chute" },
       }),
       { ...env(), PROXY_SHARED_SECRET: undefined },
+      ctx(),
     );
 
     const [sent] = upstream.mock.calls[0];
@@ -106,7 +128,7 @@ describe("worker", () => {
       new Response("{}", { status: 200, headers: { "Set-Cookie": "refreshToken=novo; Path=/api/auth; HttpOnly" } }),
     );
 
-    const response = await worker.fetch(new Request("https://front.workers.dev/api/auth/login", { method: "POST" }), env());
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/auth/login", { method: "POST" }), env(), ctx());
 
     expect(response.headers.get("Set-Cookie")).toBe("refreshToken=novo; Path=/api/auth; HttpOnly");
   });
@@ -116,7 +138,7 @@ describe("worker", () => {
       throw new TypeError("connection refused");
     }));
 
-    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env());
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env(), ctx());
 
     expect(response.status).toBe(502);
     expect(response.headers.get("Content-Type")).toBe("application/problem+json");
@@ -131,7 +153,7 @@ describe("worker", () => {
       }),
     );
 
-    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env());
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env(), ctx());
 
     expect(response.status).toBe(503);
     expect(response.headers.get("Content-Type")).toBe("application/problem+json");
@@ -142,7 +164,7 @@ describe("worker", () => {
   it("troca também o 429 em texto puro da borda do Render, que não é da API", async () => {
     captureUpstream(new Response("Too Many Requests", { status: 429, headers: { "Content-Type": "text/plain; charset=utf-8" } }));
 
-    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env());
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/health"), env(), ctx());
 
     expect(response.status).toBe(503);
     expect(response.headers.get("Retry-After")).toBe("5");
@@ -156,7 +178,7 @@ describe("worker", () => {
       }),
     );
 
-    const response = await worker.fetch(new Request("https://front.workers.dev/api/auth/login", { method: "POST" }), env());
+    const response = await worker.fetch(new Request("https://front.workers.dev/api/auth/login", { method: "POST" }), env(), ctx());
 
     expect(response.status).toBe(429);
     expect(response.headers.get("Retry-After")).toBe("30");
@@ -166,10 +188,76 @@ describe("worker", () => {
     const upstream = captureUpstream();
     const bindings = env();
 
-    await worker.fetch(new Request("https://front.workers.dev/goals"), bindings);
-    await worker.fetch(new Request("https://front.workers.dev/apivo"), bindings);
+    await worker.fetch(new Request("https://front.workers.dev/goals"), bindings, ctx());
+    await worker.fetch(new Request("https://front.workers.dev/apivo"), bindings, ctx());
 
     expect(upstream).not.toHaveBeenCalled();
     expect(bindings.ASSETS.fetch).toHaveBeenCalledTimes(2);
+  });
+});
+
+type FetchMock = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+
+describe("redeployOnChallenge", () => {
+  const HOOK = "https://api.render.com/deploy/srv-x?key=y";
+  const NOW = 1_800_000_000_000;
+
+  function hookFetch() {
+    const hook = vi.fn<FetchMock>(async () => new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", hook);
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    return hook;
+  }
+
+  it("dispara o Deploy Hook e marca a hora no KV", async () => {
+    const hook = hookFetch();
+    const store = memoryStore();
+
+    expect(await redeployOnChallenge({ ...env(), RENDER_DEPLOY_HOOK_URL: HOOK, WAKE_STATE: store }, NOW)).toBe("redeployed");
+
+    const [url, init] = hook.mock.calls[0];
+    expect(String(url)).toBe(HOOK);
+    expect(init?.method).toBe("POST");
+    expect(store.data.get("lastRedeployAt")).toBe(String(NOW));
+  });
+
+  it("não empilha deploys dentro do intervalo", async () => {
+    const hook = hookFetch();
+    const store = memoryStore({ lastRedeployAt: String(NOW - REDEPLOY_COOLDOWN_MS + 1) });
+
+    expect(await redeployOnChallenge({ ...env(), RENDER_DEPLOY_HOOK_URL: HOOK, WAKE_STATE: store }, NOW)).toBe("cooling-down");
+    expect(hook).not.toHaveBeenCalled();
+  });
+
+  it("dispara de novo passado o intervalo, se o desafio continuar", async () => {
+    const hook = hookFetch();
+    const store = memoryStore({ lastRedeployAt: String(NOW - REDEPLOY_COOLDOWN_MS) });
+
+    expect(await redeployOnChallenge({ ...env(), RENDER_DEPLOY_HOOK_URL: HOOK, WAKE_STATE: store }, NOW)).toBe("redeployed");
+    expect(hook).toHaveBeenCalledOnce();
+  });
+
+  it("sem o hook ou o KV configurados, não faz nada", async () => {
+    const hook = hookFetch();
+
+    expect(await redeployOnChallenge({ ...env(), WAKE_STATE: memoryStore() }, NOW)).toBe("unconfigured");
+    expect(await redeployOnChallenge({ ...env(), RENDER_DEPLOY_HOOK_URL: HOOK }, NOW)).toBe("unconfigured");
+    expect(hook).not.toHaveBeenCalled();
+  });
+
+  it("o proxy deixa o deploy para depois de responder, e só para o desafio anti-bot", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const bindings = { ...env(), RENDER_DEPLOY_HOOK_URL: HOOK, WAKE_STATE: memoryStore() };
+
+    captureUpstream(new Response("<!DOCTYPE html>", { status: 429, headers: { "cf-mitigated": "challenge" } }));
+    const onChallenge = ctx();
+    expect((await worker.fetch(new Request("https://front.workers.dev/api/health"), bindings, onChallenge)).status).toBe(503);
+    expect(onChallenge.waitUntil).toHaveBeenCalledOnce();
+
+    // O 429 em texto puro da borda é limite de taxa, não o bloqueio: um deploy não muda nada.
+    captureUpstream(new Response("Too Many Requests", { status: 429, headers: { "Content-Type": "text/plain" } }));
+    const onRateLimit = ctx();
+    expect((await worker.fetch(new Request("https://front.workers.dev/api/health"), bindings, onRateLimit)).status).toBe(503);
+    expect(onRateLimit.waitUntil).not.toHaveBeenCalled();
   });
 });

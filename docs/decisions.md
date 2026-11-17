@@ -867,3 +867,25 @@ destravava. Em 16/11/2026 a API foi medida de perto:
 dispara um pedido novo, porque a tentativa em andamento é a que vale. A causa foi deduzida, não reproduzida: se o
 desafio voltar mesmo assim, os próximos passos são reduzir o tempo de subida da API (AppCDS) e um Cron Trigger no
 Worker que reinicia o serviço pela API do Render.
+
+## 38. O Worker destrava a API com um deploy quando encontra o desafio
+
+**Contexto.** A decisão 37 não bastou: horas depois de ela ir ao ar, a Cloudflare do Render voltou a responder
+com o desafio anti-bot, até para um curl direto no `onrender.com`, e só um deploy manual destravou. Outros
+projetos no plano gratuito do Render relatam o mesmo padrão em novembro de 2026: depois que o serviço hiberna,
+pedidos automáticos passam a receber o desafio. Manter a API acordada com um cron resolveria (nas 2 horas de
+ping de 16/11/2026 o desafio não apareceu), mas a conta do Render tem outros serviços gratuitos, e uma instância
+ligada o mês inteiro gasta 720 a 744 das 750 horas que eles dividem. Esse cron chegou a ir ao ar e foi desfeito.
+
+**Decisão.** Quando um pedido em `/api/*` recebe o desafio (`cf-mitigated: challenge`), o Worker responde o 503
+de sempre e, depois de responder (`ctx.waitUntil`), faz um `POST` no Deploy Hook do Render (secret
+`RENDER_DEPLOY_HOOK_URL`). O hook fica em `api.render.com`, fora do bloqueio, e um deploy sobe uma instância nova:
+é o que destravava à mão. Para não empilhar deploys, a hora do último fica no KV `WAKE_STATE`, e outro só sai
+15 minutos depois (`REDEPLOY_COOLDOWN_MS`), tempo de um build e de a instância subir. O 429 em texto puro da borda
+do Render não dispara deploy: é limite de taxa, e um deploy não muda nada nele.
+
+**Consequências.** Com ninguém usando o app, a API dorme e não gasta horas. Quem abrir o app com o bloqueio
+ligado espera de 5 a 8 minutos no aviso de servidor acordando (build mais subida), e o app abre sozinho no fim;
+a decisão 37 garante que esse tempo todo custe um pedido por vez. Cada destravamento gasta uns 4 minutos de
+build do plano gratuito. O KV não é atômico: duas abas no mesmo segundo podem disparar dois deploys, o que só
+reinicia o build. O `wrangler.jsonc` mantém `"crons": []` para o deploy apagar o cron que esteve no ar.

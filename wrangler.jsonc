@@ -16,6 +16,14 @@
   "triggers": {
     "crons": []
   },
+  // Guarda quando o Worker disparou o último deploy de destravamento, para não empilhar deploys
+  // (decisão 38). Criado com `npx wrangler kv namespace create WAKE_STATE`.
+  "kv_namespaces": [
+    {
+      "binding": "WAKE_STATE",
+      "id": "f62d5eea4f844ff594256722a0bb8459"
+    }
+  ],
   "vars": {
     // URL da API no Render, sem barra no final. Para o wrangler dev, sobrescreva no .dev.vars.
     "API_ORIGIN": "https://life-and-money-api.onrender.com"
