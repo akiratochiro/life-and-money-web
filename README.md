@@ -199,6 +199,11 @@ There is no build variable. The API address is `vars.API_ORIGIN` in [`wrangler.j
 without a trailing slash, and it is read at runtime: pointing the front at another API only needs
 a new `wrangler deploy`, not a new build.
 
+A Cron Trigger runs every 10 minutes (`triggers.crons` in [`wrangler.jsonc`](wrangler.jsonc)): it pings
+`/api/health` on Render so the free instance never hibernates, and if Render's Cloudflare answers with its
+anti-bot challenge, it triggers a redeploy through the Render Deploy Hook. Set the hook as a secret:
+`npx wrangler secret put RENDER_DEPLOY_HOOK_URL`.
+
 To try the Worker locally against the local API, create a `.dev.vars` file (ignored by git) with
 `API_ORIGIN=http://localhost:8081` and run `npm run build && npx wrangler dev`.
 

@@ -867,3 +867,27 @@ destravava. Em 16/11/2026 a API foi medida de perto:
 dispara um pedido novo, porque a tentativa em andamento é a que vale. A causa foi deduzida, não reproduzida: se o
 desafio voltar mesmo assim, os próximos passos são reduzir o tempo de subida da API (AppCDS) e um Cron Trigger no
 Worker que reinicia o serviço pela API do Render.
+
+## 38. Um cron no Worker mantém a API acordada e a destrava com um deploy
+
+**Contexto.** A decisão 37 não bastou: horas depois de ela ir ao ar, a Cloudflare do Render voltou a responder
+com o desafio anti-bot, até para um curl direto no `onrender.com`, e só um deploy manual destravou. Outros
+projetos no plano gratuito do Render relatam o mesmo padrão em novembro de 2026: depois que o serviço hiberna,
+pedidos automáticos passam a receber o desafio. A rajada de pedidos do front não era, então, a causa (ou não a
+única). Nas 2 horas em que a API ficou acordada por um ping a cada 5 minutos (16/11/2026), o desafio não
+apareceu nenhuma vez.
+
+**Decisão.** Um Cron Trigger no Worker (`triggers.crons` no `wrangler.jsonc`, a cada 10 minutos) chama
+`keepApiAwake`:
+- **ping** em `/api/health` direto no Render, com até 4 minutos de espera. A instância nunca chega aos 15 minutos
+  de ociosidade que a fazem hibernar. O `/health` não toca no banco, então o compute do Neon não é gasto;
+- **se a resposta for o desafio**, um `POST` no Deploy Hook do Render (secret `RENDER_DEPLOY_HOOK_URL`). O hook
+  fica em `api.render.com`, fora do bloqueio, e um deploy sobe uma instância nova: é o que destravava à mão;
+- **sem resposta nenhuma** (timeout ou rede), nada é disparado: pode ser um despertar em andamento, e o próximo
+  cron tenta de novo.
+
+**Consequências.** Isso inverte a escolha do `deploy.md` da API ("avisar em vez de pingar"): a instância passa a
+ficar ligada o mês inteiro, 720 h em novembro e 744 h num mês de 31 dias, dentro das 750 h gratuitas desde que
+este seja o único serviço gratuito da conta. Cada destravamento custa um build (uns 4 minutos dos minutos de
+build gratuitos). Sem o secret, o cron só mantém a API acordada e registra o desafio no log do Worker. O aviso
+de servidor acordando continua, para o caso de o Render reiniciar a instância por conta própria.

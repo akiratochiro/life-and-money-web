@@ -11,6 +11,11 @@
     // não conta no limite de requisições do plano gratuito.
     "run_worker_first": ["/api/*"]
   },
+  // Mantém a API do Render acordada e a destrava se a Cloudflare dela ligar o desafio anti-bot
+  // (keepApiAwake em worker/index.ts, decisão 38). Cron Triggers são gratuitos.
+  "triggers": {
+    "crons": ["*/10 * * * *"]
+  },
   "vars": {
     // URL da API no Render, sem barra no final. Para o wrangler dev, sobrescreva no .dev.vars.
     "API_ORIGIN": "https://life-and-money-api.onrender.com"
