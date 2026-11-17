@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from "vitest";
-import worker, { keepApiAwake, upstreamUrl } from "./index";
+import worker, { upstreamUrl } from "./index";
 
 const API_ORIGIN = "https://life-and-money-api.onrender.com";
 
@@ -21,7 +21,6 @@ function captureUpstream(response = new Response("{}", { status: 200 })) {
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  vi.restoreAllMocks();
 });
 
 describe("upstreamUrl", () => {
@@ -172,68 +171,5 @@ describe("worker", () => {
 
     expect(upstream).not.toHaveBeenCalled();
     expect(bindings.ASSETS.fetch).toHaveBeenCalledTimes(2);
-  });
-});
-
-type FetchMock = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
-
-describe("keepApiAwake", () => {
-  const HOOK = "https://api.render.com/deploy/srv-x?key=y";
-  const challenge = () =>
-    new Response("<!DOCTYPE html><title>Just a moment...</title>", {
-      status: 429,
-      headers: { "cf-mitigated": "challenge", "Content-Type": "text/html; charset=UTF-8" },
-    });
-
-  it("bate no /health direto no Render e não mexe em nada quando a API responde", async () => {
-    const upstream = vi.fn<FetchMock>(async () => new Response('{"status":"UP"}'));
-    vi.stubGlobal("fetch", upstream);
-
-    expect(await keepApiAwake({ ...env(), RENDER_DEPLOY_HOOK_URL: HOOK })).toBe("awake");
-    expect(upstream).toHaveBeenCalledOnce();
-    expect(String(upstream.mock.calls[0][0])).toBe("https://life-and-money-api.onrender.com/api/health");
-  });
-
-  it("dispara o deploy quando encontra o desafio da Cloudflare do Render", async () => {
-    const upstream = vi.fn<FetchMock>(async (input) =>
-      String(input) === HOOK ? new Response("{}", { status: 200 }) : challenge(),
-    );
-    vi.stubGlobal("fetch", upstream);
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    expect(await keepApiAwake({ ...env(), RENDER_DEPLOY_HOOK_URL: HOOK })).toBe("redeployed");
-    const [hookUrl, init] = upstream.mock.calls[1];
-    expect(String(hookUrl)).toBe(HOOK);
-    expect(init?.method).toBe("POST");
-  });
-
-  it("sem o Deploy Hook configurado, só registra o desafio", async () => {
-    const upstream = vi.fn(async () => challenge());
-    vi.stubGlobal("fetch", upstream);
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    expect(await keepApiAwake(env())).toBe("challenged");
-    expect(upstream).toHaveBeenCalledOnce();
-  });
-
-  it("não dispara deploy quando a API só não respondeu: pode ser um despertar em andamento", async () => {
-    const upstream = vi.fn(async () => {
-      throw new DOMException("timeout", "TimeoutError");
-    });
-    vi.stubGlobal("fetch", upstream);
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    expect(await keepApiAwake({ ...env(), RENDER_DEPLOY_HOOK_URL: HOOK })).toBe("unreachable");
-    expect(upstream).toHaveBeenCalledOnce();
-  });
-
-  it("o cron segura o evento até o ping terminar", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => new Response('{"status":"UP"}')));
-    const waitUntil = vi.fn();
-
-    worker.scheduled({}, env(), { waitUntil });
-
-    expect(waitUntil).toHaveBeenCalledOnce();
-    await expect(waitUntil.mock.calls[0][0]).resolves.toBe("awake");
   });
 });

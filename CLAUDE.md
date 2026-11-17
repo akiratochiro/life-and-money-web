@@ -89,8 +89,7 @@ npm run audit:mobile  # iPhone emulado: alvos, fontes, overflow e gestos (docs/m
   servidor. Cada tentativa do `/health` fica aberta até 4 min, sem ser abandonada, porque o despertar
   leva de 2 a 4 min e uma rajada de pedidos cancelados liga o desafio anti-bot (decisão 37). Entre
   falhas há backoff (2 → 15 s) e ele **nunca desiste**: o botão só antecipa a tentativa (decisão 36). O Worker troca o desafio anti-bot da Cloudflare do Render (`cf-mitigated: challenge`)
-  por um 503 com `Retry-After`. Um **Cron Trigger** do Worker (a cada 10 min, `keepApiAwake`) mantém a API
-  acordada e, se encontrar o desafio, dispara um deploy pelo secret `RENDER_DEPLOY_HOOK_URL` (decisão 38). As regras de rede ficam em `shared/api/retryPolicy.ts`: queries repetem só erros
+  por um 503 com `Retry-After`. As regras de rede ficam em `shared/api/retryPolicy.ts`: queries repetem só erros
   transitórios (rede, timeout, 502/503/504) e leituras (GET) têm timeout de 20 s. **Escrita nunca
   ganha timeout nem retry** (duplicaria lançamentos), e o refresh só repete 502/503, porque
   reenviar um token já rotacionado revoga todas as sessões do usuário.

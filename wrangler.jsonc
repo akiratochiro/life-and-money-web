@@ -11,10 +11,10 @@
     // não conta no limite de requisições do plano gratuito.
     "run_worker_first": ["/api/*"]
   },
-  // Mantém a API do Render acordada e a destrava se a Cloudflare dela ligar o desafio anti-bot
-  // (keepApiAwake em worker/index.ts, decisão 38). Cron Triggers são gratuitos.
+  // Sem Cron Triggers. A lista vazia é explícita para o deploy remover o cron que já esteve aqui
+  // (decisão 38, desfeita): sem a chave, o wrangler deixaria o agendamento antigo como estava.
   "triggers": {
-    "crons": ["*/10 * * * *"]
+    "crons": []
   },
   "vars": {
     // URL da API no Render, sem barra no final. Para o wrangler dev, sobrescreva no .dev.vars.
